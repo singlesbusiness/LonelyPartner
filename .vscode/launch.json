@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run via dotnet (uses launchSettings.json)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/LonelyPartner/bin/Debug/net9.0/LonelyPartner.dll",
+      "args": [
+        "run",
+        "--launch-profile",
+        "http"  // 👈 replace this with the name of the profile in launchSettings.json
+      ],
+      "cwd": "${workspaceFolder}/LonelyPartner",
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+            "action": "openExternally",
+             //"url": "http://localhost:5001",
+             "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+             "browser": "brave",
+             //"browser": "custom",
+             //"browserLaunchLocation": "Brave Browser"
+         }
+    }
+  ]
+}

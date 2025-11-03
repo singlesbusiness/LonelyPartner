@@ -1,0 +1,27 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/LonelyPartner/LonelyPartner.csproj"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+	{
+      "label": "Add Migration",
+      "type": "shell",
+      "command": "dotnet ef migrations add NewMigration",
+      "problemMatcher": []
+    },
+    {
+      "label": "Update Database",
+      "type": "shell",
+      "command": "dotnet ef database update",
+      "problemMatcher": []
+    }
+  ]
+}

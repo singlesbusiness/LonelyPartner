@@ -1,0 +1,352 @@
+﻿
+@model LonelyPartner.Models.UserEntity
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>LonelyPartner - Video Chat</title>
+    <link rel="stylesheet" href="~/css/videochat.css" />
+
+    <!-- MediaPipe for Face masks
+    <script src="https://cdn.jsdelivr.net/npm/@@mediapipe/face_mesh/face_mesh.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@@mediapipe/camera_utils/camera_utils.js"></script>
+    -->
+</head>
+<body>
+    <div class="center"> <h3>LonelyPartner</h3> </div>
+    
+    <!-- Hamburger Icon -->
+    <div class="menu-toggle" id="menuToggle">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- logout user and give alert if user login into second browser-->
+    @if (Context.Request.Query["expired"] == "true")
+{
+    <div class="alert1 alert-warning1">
+        You’ve been signed out because your account was used in another browser.
+    </div>
+} 
+    <!-- Slide-Down Menu -->
+    <div class="overlay-menu" id="overlayMenu">
+        <div class="overlay-content">
+            <button id="closeMenu" class="close-btn-menu">&times;</button>
+
+
+            <button id="loginInMenu" class="menu-btn login-btn">Login</button>
+
+            <nav>
+                <a href="/">🏠 Home</a>
+                <a href="/Info/FAQ">❓FAQ</a>
+                <a href="/Info/Terms">📜 Terms</a>
+                <a href="/Info/Privacy">🔒 Privacy</a>
+                <a href="/Info/ContactUs">✉️ Contact Us</a>
+            </nav>
+        </div>
+    </div>
+
+    <!--   Main container    -->
+    <div class="container">
+        <div class="left-panel" id="leftPanel">
+            <div id="remoteVideoBlock" class="video-block">
+                <div class="label">LoneyPartner</div>
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="placeholder" id="remotePlaceholder">
+                    <div class="avatar">👤</div>
+                    <h3>Partner</h3>
+                    @*<p class="sub">Searching..</p>*@
+                </div>
+                <!-- CAMERA & MIC CONTROLS -->
+                <div class="video-controls" id="remoteControls">
+                    <button id="remoteToggleMic" disabled class="circle-btn gray" title="Remote Mic">🎙️</button>
+                </div>
+               
+            </div>
+
+            <div class="vertical-divider" id="verticalDivider"></div>
+
+            <div id="localVideoBlock" class="video-block small">
+                <div class="label">You</div>
+                <video id="localVideo" autoplay muted playsinline></video>
+                <div class="placeholder" id="localPlaceholder">
+                    <div class="avatar">🎥</div>
+                    <h3>You</h3>
+                    <p class="sub">Camera is Off</p>
+                </div>
+                <!-- CAMERA & MIC CONTROLS -->
+                <div class="video-controls" id="localControls">
+                    <button id="toggleCamera" class="circle-btn" title="Toggle Camera">📷</button>
+                    <button id="toggleMic" class="circle-btn" title="Toggle Mic">🎙️</button>
+                </div>       
+                
+            </div>
+        
+        </div>
+
+        <div class="splitter" id="splitter"></div>
+
+        <div class="right-panel" id="rightPanel">
+            <div class="controls">
+                <button id="startBtn" class="btn green">📞 Start</button>
+                <button id="stopBtn" class="btn red">⛔ Stop</button>
+                <button id="nextBtn" class="btn blue" style="display:none;">⏭ Next</button>
+                 
+                <button id="girlsBtn" class="btn pink">💖 Girls only</button>
+                <button id="upgradeBtn" class="btn red">Upgrade</button>
+
+                <select id="myGenderSelect" class="select-box">
+                    <option value="">I Am</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="couple">Couple</option>
+                </select>
+
+                <select id="genderSelect" class="select-box">
+                    <option value="All">Looking For</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="couple">Couple</option>
+                </select>
+
+                <select id="continentSelect" class="select-box">
+                    <option value="All">All Cotinents</option>
+                    <option value="Africa">Africa</option>
+                    <option value="Asia">Asia</option>
+                    <option value="Europe">Europe</option>
+                    <option value="North America">North America</option>
+                    <option value="South America">South America</option>
+                    <option value="Australia">Australia</option>
+                </select>
+
+                @*For Admin User*@
+                <button id="adminBtn" class="btn red" style="display:none;">Admin</button>
+                
+
+                @*For Authenticated user*@    
+                @if(User.Identity?.IsAuthenticated ?? false) 
+                  {  
+                    <button id="profileBtn" class="btn dark">👤 Profile</button>
+                    <button id="logoutBtn" class="btn gray">Logout</button>
+                }
+                else
+                {
+                    <button id="loginBtn" class="btn blue">Login</button>
+                }
+                
+                   
+                    
+                     
+                               
+            </div>
+
+            <div class="chat-section">
+                @*location*@
+                <div id="partnerInfo" class="text-center text-gray-400 text-sm mb-2"></div>
+
+                <div class="messages" id="messages">
+                    <div class="message system">Welcome to the video chat!</div>
+                </div>
+                
+                <div class="chat-input">
+                    <button id="emojiBtn">😊</button>
+                    <input id="chatText" placeholder="Type your message..." />
+                    <button id="sendChat">📨 Send</button>
+                </div>
+                <div id="emojiPicker" class="emoji-picker" style="display:none;">
+                    😀 😁 😂 🤣 😍 😘 😎 😢 😡 😱 🙏 💖 💋 🥰 😜 😇 🤗
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+   
+    <!-- 🔞 Age Verification Modal -->
+    <div id="ageModal" class="modal">
+        <div class="modal-content">
+            <h2>🔞 Age Verification</h2>
+            <p>
+                You are entering an <strong>ADULT video chat</strong> environment.
+                You are <strong> responsible</strong> for your choices or any
+                interactions that occur here.
+                Please confirm that you are <strong>18 years or older</strong>.
+            </p>
+            <div class="modal-actions">
+                <button id="ageConfirmYes" class="btn green">Yes, I am 18+</button>
+                <button id="ageConfirmNo" class="btn red">No, Exit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔹 Google Login Modal   was here -->
+
+    <!-- 🔹 Google Login Modal -->
+   
+    <div id="loginModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Login to Continue</h2>
+            <p>Please sign in with your Google account.</p>
+            <button id="googleLoginBtn" class="google-btn">
+                <img src="~/images/google-sign.svg" alt="Google" />
+                Continue with Google
+            </button>
+            <button id="closeModal" class="close-btn1">Close</button>
+        </div>
+    </div>
+    
+   
+
+
+    <!--   Profile Modal -->
+    <div id="profileModal" class="profile-modal" style="display:none;">
+        <div>
+            <h2 class="profile-title">Profile</h2>
+            <div>
+                <table id="profileTable" class="profile-details">
+                    <tbody>
+                        <tr>
+                            <td><strong>Name:</strong></td>
+                            <td id="profName"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email:</strong></td>
+                            <td id="profEmail"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>ProductName:</strong></td>
+                            <td id="profProductName"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Start Date:</strong></td>
+                            <td id="profStart"></td>
+                        </tr>
+                        <tr>
+                            <td><strong>End Date:</strong></td>
+                            <td id="profEnd"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+             <hr class="profile-divider" />
+            @*verifyPaymentSection*@
+            <h3 class="profile-subtitle">Payment Verification</h3>
+
+                <div class="verify-section">
+                    <input type="text" id="txSignatureInput" placeholder="Enter Solana Tx Signature" class="verify-input" />
+                    <button id="verifyPaymentBtn" class="verify-btn">Verify Payment</button>
+                </div>
+
+                <div id="verifyStatusMsg" class="verify-status"></div>
+
+                <p class="verify-tip">💡 If you made the payment from another device (e.g., scanned QR with your mobile),
+        please paste your <span class="highlight">SolScan Transaction Signature</span> above to verify your payment.
+                </p>
+
+            <button id="closeProfileModal" class="close-btn-profile">Close</button>
+        </div>
+    </div>
+    
+
+    
+    <!-- 💳 Upgrade / Purchase Modal -->
+    <div id="upgradeModal" class="upgrademodal" style="display:none;">
+        <div class="modal-content large">
+            <h2>Upgrade Your Experience 💎</h2>
+            <p>Select a plan to unlock premium features</p>
+            <div id="plansContainer" class="plans-carousel">
+                <!-- Plans will be loaded dynamically here -->
+                <div class="loading">Loading plans...</div>
+            </div>
+
+            <button id="closeUpgradeModal" class="close-btn1">Close</button>
+        </div>
+    </div>
+
+    <!--  💳    Payment Modal  -->
+    @*
+        <div class="modal fade" id="solModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center p-4">
+                <h5>Confirm Payment</h5>
+                <p>Please pay <span id="solAmount"></span> using Phantom Wallet.</p>
+                <button id="confirmPay" class="btn btn-primary mt-3">Pay Now</button>
+            </div>
+        </div>
+    </div> 
+    *@
+
+    <div id="solModal" class="sol-modal" style="display:none;">
+        <div class="sol-modal-inner">
+            <button id="solModalClose" class="close-x">✕</button>
+            <div class="sol-amount-box">
+                <div><strong>Payment</strong></div>
+                <div class="sol-amount"><span id="solAmountDisplay"></span> SOL</div>
+                <div class="sol-usd" id="solUsdHint"></div>
+            </div>            
+            <div class="send-to">Send to: <code id="receiveAddress" class="receive-address"></code></div>            
+            <div class="memo">Memo: <code id="orderMemo"></code></div>
+            <button id="phantomPayBtn" class="pay-btn">                
+                <span>Pay <span id="payAmt"></span>SOL</span>
+            </button>
+            <div id="solStatus" class="sol-status"></div>
+            <canvas id="solQrCanvas"></canvas>
+            <div class="sol-footer">
+            Secure payment powered by <span class="solona-test">Solana blockchain</span></div>
+        </div>
+    </div>
+
+
+  
+    @*=====================Scripts=========================*@
+      
+    <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+    
+    @*give access to js if user is loggedin*@
+    <script>
+        window.appUser = {
+            isAuthenticated: @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower()),
+            email: '@(User.Identity?.Name ?? "")' ,
+            hasPlan: @( (Model.ProductId > 0  && Model.EndDate > DateTime.UtcNow).ToString().ToLower()) ,
+            productId: @(Model.ProductId) ?? 0,
+           // productName: 'Model.ProductName',
+            endDate: "@( Model?.EndDate.ToString("o") ?? "" )"
+            
+        };
+
+        console.log("🔹 window.appUser initialized:");
+        console.table(window.appUser);
+
+        // Check if Razor values came through
+        if (!window.appUser.isAuthenticated || window.appUser.isAuthenticated === "false") {
+            console.warn("⚠️ User not authenticated according to Razor context.");
+        } else {
+            console.log("✅ User is authenticated according to Razor context.");
+        }
+    </script>
+
+    <script src="https://unpkg.com/@@solana/web3.js@1.65.1/lib/index.iife.min.js"></script>
+    <!-- qrcode (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="~/js/videochat.js"></script>
+    <script src="~/js/accessButtons.js"></script>
+    <script src="~/js/menu.js"></script>
+    <script src="~/js/upgradeButton.js"></script>
+    
+    <script src="~/js/adminUser.js"></script>
+    <script src ="~/js/verifyPayment.js"></script>
+    <script src="~/js/profile.js"></script>
+    @* 
+        <script src="~/js/maskCarousel.js"></script>
+    *@
+    
+    
+    
+</body>
+</html>

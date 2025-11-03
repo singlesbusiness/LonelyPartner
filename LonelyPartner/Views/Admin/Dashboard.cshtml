@@ -1,0 +1,65 @@
+﻿@model List<LonelyPartner.Models.UserEntity>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var searchEmail = Context.Request?.Query["searchEmail"].ToString() ?? "";
+}
+
+
+
+<div class="admin-container">
+    <h2 class="admin-title">👩‍💼 Admin Dashboard</h2>
+
+    <div class="summary-bar">
+        <span><b>Total Users:</b> @ViewBag.TotalUsers</span>
+        <span><b>ActivePlan Users:</b> @ViewBag.ActivePlans</span>
+        <span><b>Total SOl:</b> @ViewBag.TotalSol</span>
+        <span><b>Total AmountUSD:</b> @ViewBag.AmountUSD</span>
+    </div>
+
+    <form method="get" asp-action="Dashboard" class="search-form mt-3 mb-3">
+        <input type="text" name="searchEmail" placeholder="🔍 Search by email" value="@searchEmail" />
+        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+    </form>
+
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Id</th>
+                <th>Email</th>
+                <th>Name</th>                
+                <th>Product Name</th>
+                <th>Product Id</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Order Id</th>
+                <th>Transaction Id</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <form asp-action="Edit" method="post">
+                    <td>@u.Id <input type="hidden" name="Id" value="@u.Id" /></td>
+                    <td><input name="CustomerEmail" value="@u.CustomerEmail" class="form-control form-control-sm" /></td>
+                    <td><input name="CustomerName" value="@u.CustomerName" class="form-control form-control-sm" /></td>                    
+                    <td><input name="ProductName" value="@u.ProductName" class="form-control form-control-sm" /></td>
+                    <td><input name="ProductId" value="@u.ProductId" class="form-control form-control-sm" /></td>
+                    <td><input name="StartDate" value="@u.StartDate.ToString("u")" class="form-control form-control-sm" /></td>
+                    <td><input name="EndDate" value="@u.EndDate.ToString("u")" class="form-control form-control-sm" /></td>
+                    <td><input name="OrderId" value="@u.OrderId" class="form-control form-control-sm" /></td>
+                    <td><input name="TransactionId" value="@u.TransactionId" class="form-control form-control-sm" /></td>
+                   <td><button type="submit" class="btn btn-success btn-sm">💾 Save</button></td>
+                    </form>
+                   
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+
+                
+
+       

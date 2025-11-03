@@ -1,0 +1,185 @@
+﻿@{
+    var title = ViewData["Title"] ?? "LonelyPartner";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title - LonelyPartner</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        /* HEADER */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #150726;
+            color: #fff;
+            height: 60px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            font-family: "Poppins", sans-serif;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* MENU BUTTON RIGHT */
+        .menu-btn {
+            position: absolute;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 26px;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+            .menu-btn:hover {
+                transform: scale(1.1);
+            }
+
+        /* MENU OVERLAY */
+        #sideMenu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            transition: height 0.3s ease;
+            z-index: 9999;
+        }
+
+            #sideMenu.open {
+                height: 100%;
+            }
+
+        .menu-content {
+            background: white;
+            width: 100%;
+            padding: 25px;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.4s ease forwards;
+        }
+
+        @@keyframes slideDown {
+            from
+
+        {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        }
+
+        .menu-content a {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            text-decoration: none;
+            margin: 12px 0;
+            transition: color 0.2s;
+        }
+
+            .menu-content a:hover {
+                color: #007bff;
+            }
+
+        main {
+            padding-top: 70px;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 10px 0;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-title">LonelyPartner</div>
+        <button class="menu-btn" id="menuToggleBtn">&#9776;</button>
+    </header>
+
+    <!-- SLIDE-DOWN MENU -->
+    <div id="sideMenu">
+        <div class="menu-content">
+            <a href="/">🏠 Home</a>
+            <a href="/FAQ">❓ FAQ</a>
+            <a href="/Terms">📜 Terms</a>
+            <a href="/Privacy">🔒 Privacy</a>
+            <a href="/ContactUs">✉️ Contact Us</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main role="main" class="container-fluid">
+        @RenderBody()
+    </main>
+
+    <footer class="text-center text-muted">
+        &copy; @DateTime.Now.Year - LonelyPartner
+    </footer>
+    <script src="https://unpkg.com/@@solana/web3.js@1.65.1/lib/index.iife.min.js"></script>
+    <!-- qrcode (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @RenderSection("Scripts", required: false)
+
+    <script>
+        const menu = document.getElementById("sideMenu");
+        const menuBtn = document.getElementById("menuToggleBtn");
+
+        let isOpen = false;
+
+        menuBtn.addEventListener("click", () => {
+            isOpen = !isOpen;
+            if (isOpen) {
+                menu.classList.add("open");
+                menuBtn.innerHTML = "&times;"; // change icon to "X"
+            } else {
+                menu.classList.remove("open");
+                menuBtn.innerHTML = "&#9776;"; // change back to ☰
+            }
+        });
+
+        // Close menu when clicking outside content
+        menu.addEventListener("click", e => {
+            if (e.target === menu) {
+                menu.classList.remove("open");
+                menuBtn.innerHTML = "&#9776;";
+                isOpen = false;
+            }
+        });
+    </script>
+</body>
+</html>
