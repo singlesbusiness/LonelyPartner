@@ -49,7 +49,8 @@ namespace LonelyPartner.Hubs
         // 🔹 Start Searching
         // ======================================
         public async Task StartSearching(string gender, string continent)
-        {
+        {   
+            
             //get location
             var httpContext = Context.GetHttpContext();
             var ip = httpContext?.Connection?.RemoteIpAddress?.ToString();
@@ -65,6 +66,13 @@ namespace LonelyPartner.Hubs
             var (country, city) = await GetLocationFromIp(ip);
             //Console.WriteLine($"🌍 {Context.ConnectionId} from=> {city}, {country}");
 
+            //get admin user, and set Unknown
+            var currentUser = await GetCurrentUserAsync();
+            if (currentUser != null && currentUser.Role == "Admin")
+                {
+                    country = "Unknown";
+                    city = "Unknown";
+                }
 
             //set default value or user selected values
             gender = string.IsNullOrWhiteSpace(gender) ? "All" : gender;
@@ -79,10 +87,10 @@ namespace LonelyPartner.Hubs
             // If already waiting, remove old entry
             //WaitingUsers.TryRemove(Context.ConnectionId, out _);
 
-            // Try find partner
+            // Try find partner for paid users
             var matchId = FindCompatiblePartner(Context.ConnectionId, gender, continent);
 
-            //fallback ( ignore continent)
+            //fallback ( ignore continent and gender) for non paid and non activeplan user
             if (matchId == null && continent != "All")
             {
                 matchId = FindCompatiblePartner(Context.ConnectionId, gender, "All");
@@ -116,7 +124,7 @@ namespace LonelyPartner.Hubs
 
                     //Tell the partner: you wait for the offer
                     //await Clients.Client(matchId).SendAsync("Matched", Context.ConnectionId, "Callee");
-                    await Clients.Client(matchId).SendAsync("Matched", Context.ConnectionId, "Callee", Context.ConnectionId, country, city);
+                    await Clients.Client(matchId).SendAsync("Matched", Context.ConnectionId, "Callee", country, city);
                     
                     // ✅ NEW: Register active pair
                     ActivePairs[Context.ConnectionId] = matchId;

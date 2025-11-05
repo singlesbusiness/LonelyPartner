@@ -139,24 +139,28 @@
                     <button id="loginBtn" class="btn blue">Login</button>
                 }
                 
-                   
-                    
-                     
-                               
             </div>
-
+            
             <div class="chat-section">
+                
+                <!-- 🔹 Status Message -->
+                    <div id="statusText"
+                        class="alert alert-info text-center mb-3"
+                        style="font-weight:Thin;">Welcome! Click Start to find lonley partner....
+                    </div>
+
                 @*location*@
                 <div id="partnerInfo" class="text-center text-gray-400 text-sm mb-2"></div>
-
+                
+                
                 <div class="messages" id="messages">
-                    <div class="message system">Welcome to the video chat!</div>
-                </div>
+                    <!--<div class="message system"></div> -->
+                </div>   
                 
                 <div class="chat-input">
                     <button id="emojiBtn">😊</button>
                     <input id="chatText" placeholder="Type your message..." />
-                    <button id="sendChat">📨 Send</button>
+                    <button id="sendChat" class="btn blue">📨 Send</button>
                 </div>
                 <div id="emojiPicker" class="emoji-picker" style="display:none;">
                     😀 😁 😂 🤣 😍 😘 😎 😢 😡 😱 🙏 💖 💋 🥰 😜 😇 🤗

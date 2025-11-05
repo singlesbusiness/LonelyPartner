@@ -24,13 +24,12 @@
 
     let genderSelect, continentSelect;
 
-    let chatInput, sendChatBtn, messagesDiv, emojiBtn, emojiPicker;
+    let chatInput, sendChatBtn, messagesDiv, statusText, infoDiv, emojiBtn, emojiPicker;
 
     let leftPanel, verticalDivider, localBlock, remoteBlock, splitter, rightPanel;
 
- 
+    let isMatched = false; // global flag to prevent re-search overwrite
 
- 
 
     const loginBtn = document.getElementById('loginBtn');
 
@@ -182,7 +181,11 @@
 
     }
 
- 
+    //clear chat messages
+    function clearChatMessages() {
+            //const chatArea = document.getElementById("chatMessages");
+            if (messagesDiv) messagesDiv.innerHTML = "";
+    }
 
     // append message
 
@@ -379,38 +382,54 @@ function stopRemoteVideo() {
 }
 
 // 🔹 Stop local chat input and hide typing area
-function stopChat() {
-    const chatInput = document.getElementById("chatInput");
-    const sendBtn = document.getElementById("sendButton");
+function stopTextChat() {
+    
+    //if (chatInput) chatInput.disabled = true;
+    //if (sendChatBtn) sendBtn.disabled = true;
 
-    if (chatInput) chatInput.disabled = true;
-    if (sendBtn) sendBtn.disabled = true;
+    //setStatus("Chat ended.");
+    console.log("💬 Chat disabled.");
+}
 
-    const status = document.getElementById("chatStatus");
-    if (status) status.textContent = "Chat ended.";
-    console.log("💬 Chat stopped.");
+// 🔹 Enable local chat input 
+function starttextChat() {
+    
+    //if (chatInput) chatInput.enabled = true;
+    //if (sendChatBtn) sendBtn.enabled = true;
+
+    //setStatus("Chat ended.");
+    console.log("💬 Chat enabled.");
 }
 
 // 🔹 Restore waiting UI state
 function showWaitingState() {
-    const status = document.getElementById("statusText");
-    if (status) status.textContent = "⏳ Waiting for a new partner...";
-
-    const localVideo = document.getElementById("localVideo");
-    const remoteVideo = document.getElementById("remoteVideo");
-    //if (remoteVideo) remoteVideo.style.opacity = 0.3; // fade remote preview
-
+    
+    setStatus("⏳ Waiting for a new partner...", "info");
+    
     console.log("⌛ Showing waiting state.");
 }
 
 // 🔹 Optional: show a subtle 'You left the chat' message
 function showStoppedMessage() {
-    const status = document.getElementById("statusText");
-    if (status) status.textContent = "✅ You left the chat.";
+    setStatus("✅ You left the chat.", "info");
     console.log("🛑 User stopped chat manually.");
 }
 
+// For status message
 
+function setStatus(message, type = "info") {
+    
+    if (!statusText) return;
+    
+    statusText.className = `alert alert-${type} text-center mb-3`;
+    statusText.textContent = message;
+    statusText.style.display = "block";
+}
+
+function clearStatus() {
+    const el = document.getElementById("statusText");
+    if (el) el.style.display = "none";
+}
  
 
     // --- PeerConnection lifecycle ---
@@ -652,7 +671,16 @@ function showStoppedMessage() {
     // teardown current call
 
     function endCallLocal() {
+        
+        //clear chat
+        if (infoDiv) {
+            infoDiv.textContent = "";
+            infoDiv.style.display = "none";
+            }
 
+        //clear text chat messages
+        clearChatMessages();
+            //close connection
         if (pc) try {
 
             pc.close();
@@ -764,23 +792,37 @@ function showStoppedMessage() {
 
  
 
-        connection.on("WaitingForPartner", () => log("Server: waiting for partner..."));
+        connection.on("WaitingForPartner", () => {
+            console.log("Server: waiting for partner...")
+            });
 
-        connection.on("Waiting", () => log("Server: waiting for partner..."));
 
+        //connection.on("Waiting", () => log("Server: waiting for partner..."));
+        connection.on("Waiting", () => {
+                if (isMatched) return; // 🚫 Don’t show searching if already matched
+                setStatus("🔎 Searching for a partner...", "info");
+            });
  
 
         // Matched payload may be object with .partner / .Partner and isInitiator / IsInitiator
 
         connection.on("Matched", async (payload, role, partnerCountry, partnerCity) => {
-
-            log("Matched with partner:",  partnerCity, partnerCountry);
-
- 
+            // ✅ mark matched state so “Searching...” won't override later
+            isMatched = true;
+            setStatus("🎉 Partner found!", "success");
+            // show partner’s location
+            //const infoDiv = document.getElementById("partnerInfo");
+            infoDiv.style.display = "inline-block";
+            if (infoDiv) {
+                    infoDiv.textContent = `🌍 ${partnerCity}, ${partnerCountry}`;
+                }
+            
+            
+            console.log("Matched with partner:",  partnerCity, partnerCountry);
 
             try {
 
-                log("Matched payload:", payload);
+                console.log("Matched payload:", payload);
 
                 isCaller = role === "Caller";
 
@@ -790,7 +832,7 @@ function showStoppedMessage() {
 
                 if (!partner) {
 
-                    warn("Matched received but partner id missing:", payload);
+                    console.warn("Matched received but partner id missing:", payload);
 
                     return;
 
@@ -800,22 +842,11 @@ function showStoppedMessage() {
 
                 isInitiator = !!initiator;
 
-                log("Matched -> partner:", currentPartnerId, "initiator:", isInitiator);
+                console.log("Matched -> partner:", currentPartnerId, "initiator:", isInitiator);
 
  
-
-                // show partner’s location
-
-                const infoDiv = document.getElementById("partnerInfo");
-
-                if (infoDiv) {
-
-                    infoDiv.textContent = `🌍 ${partnerCity}, ${partnerCountry}`;
-
-                }
-
- 
-
+                // Start WebRTC flow
+                
                 if (isInitiator || isCaller ) {
 
                     await createOfferFlow(currentPartnerId);
@@ -824,13 +855,13 @@ function showStoppedMessage() {
 
                     // wait for offer; nothing to do here explicitly
 
-                    log("Awaiting offer from partner");
+                    console.log("Awaiting offer from partner");
 
                 }
 
             } catch (e) {
 
-                error("Matched handler error:", e);
+                console.error("Matched handler error:", e);
 
             }
 
@@ -866,45 +897,61 @@ function showStoppedMessage() {
 
         //Partnerlwft
         connection.on("PartnerLeft", async () => {
-    log("⚠️ Partner left the chat.");
+            /*
+            // Prevent false PartnerLeft during match setup
+            if (isMatched === true && currentPartnerId) {
+                console.log("⚠️ Ignoring PartnerLeft — currently matched in progress");
+                return;
+            } */
+            console.log("⚠️ Partner left the chat.");
 
-    // 1️⃣ Stop local media and peer connection
-    endCallLocal(); // your existing function for ending WebRTC call
+            //Reset partner status
+            isMatched = false;
+            //currentPartnerId = null;
 
-    // 2️⃣ Stop remote video cleanly (if stream still visible)
-    stopRemoteVideo();
+            //location reset
+            //if (infoDiv) infoDiv.textContent = "";
+            // 5️Show waiting UI while finding next match
+            setStatus("Partner left. Searching for next partner...", "info");
+            
+            
 
-    // 3️⃣ Stop chat / disable typing
-    stopChat();
+            // 1️⃣ Stop local media and peer connection
+            endCallLocal(); // your existing function for ending WebRTC call
 
-    // 4️⃣ Remove partner info (country/city)
-    const infoDiv = document.getElementById("partnerInfo");
-    if (infoDiv) infoDiv.textContent = "";
+            
+            // 2️⃣ Stop remote video cleanly (if stream still visible)
+            stopRemoteVideo();
 
-    // 5️⃣ Show waiting UI while finding next match
-    showWaitingState();
+            // 3️⃣ Stop chat / disable typing
+            //stopTextChat();
 
-    // 6️⃣ Give WebRTC time to fully close before restarting
-    await new Promise(res => setTimeout(res, 500));
+            
+            // 6️⃣ Give WebRTC time to fully close before restarting
+            await new Promise(res => setTimeout(res, 500));
 
-    // 7️⃣ Try to start searching for the next partner
-    try {
-        await start(); // your existing start() reconnects to hub for next partner
-    } catch (e) {
-        err("Next partner search failed:", e);
-    }
+            // 7️⃣ Try to start searching for the next partner
+            try {
+                await start(); // your existing start() reconnects to hub for next partner
+            } catch (e) {
+                err("Next partner search failed:", e);
+            }
 });
 
 
         
     
  
-
+    //called from hub from Next and stop
         connection.on("ChatStopped", () => {
-
+            //for statusText
+            isMatched = false;
             endCallLocal();
-            resetUI("You left the chat. Click Start to join again.");
+            setStatus("You left the chat. Click Start again...", "info");
+            //resetUI("You left the chat. Click Start to join again.");
             //appendMessage("System", "Chat stopped.");
+            
+           
 
         });
 
@@ -912,6 +959,7 @@ function showStoppedMessage() {
 
         connection.on("Error", (message) => {
 
+            setStatus("Error...", "warning");
             console.error("Hub Error:", message);
 
             //End the call safely
@@ -919,7 +967,6 @@ function showStoppedMessage() {
             if (typeof endCallLocal === "function") {
 
                 endCallLocal();
-
             }
 
         });
@@ -930,19 +977,35 @@ function showStoppedMessage() {
 
         connection.on("ReceiveChatMessage", (senderId, message) => {
 
-            log("ReceiveChatMessage from", senderId, message);
+            console.log("ReceiveChatMessage from", senderId, message);
 
             appendMessage("Partner", message);
 
         });
 
  
+        //when server connection is lost or server is down
+        connection.onclose(async () => {
+                console.warn("⚠️ Connection to server lost.");
 
-        connection.onclose((err) => {
+                setStatus("⚠️ Disconnected from server. Please refresh the page.", "danger");
 
-            warn("SignalR connection closed", err);
+                // Stop local camera and mic
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                    localStream = null;
+                }
 
-        });
+                // Clean up peer connection
+                if (peerConnection) {
+                    peerConnection.close();
+                    peerConnection = null;
+                }
+
+                // Optionally disable UI buttons
+                document.getElementById("startBtn").disabled = true;
+                document.getElementById("stopBtn").disabled = true;
+            });
 
  
 
@@ -1066,7 +1129,7 @@ function showStoppedMessage() {
 
         if (!verified) return;
 
-        //select my gender
+        //select mygenderSelect
 
         if (!validateMyGender()) return;
 
@@ -1087,23 +1150,19 @@ function showStoppedMessage() {
         }
 
         // ✅ Connect to hub now, if not already connected
-    try {
-        if (!connection) await initSignalR(); // build connection if missing
-        if (connection.state !== signalR.HubConnectionState.Connected) {
-            await connection.start();
-            log("✅ SignalR connection started on Start click");
-        } else {
-            log("SignalR already connected, skipping start()");
-        }
+            try {
+                if (!connection) await initSignalR(); // build connection if missing
+                if (connection.state !== signalR.HubConnectionState.Connected) {
+                    await connection.start();
+                    log("✅ SignalR connection started on Start click");
+                } else {
+                    log("SignalR already connected, skipping start()");
+                }
 
-        //call hub
-
-       
-
-            await start();
+                //call hub very important
+                await start();
 
             //enable Next button       
-
             nextBtn.style.display = "inline-block";
 
     }
@@ -1191,12 +1250,14 @@ function showStoppedMessage() {
  
 
             await connection.invoke("StartSearching", gender, continent);
+            
+            console.log("StartSearching invoked");
 
-            log("StartSearching invoked");
+            myGenderSelect.style.display = "none";  // hide gender select while chatting
 
         } catch (e) {
 
-            error("StartSearching invoke failed:", e);
+            console.error("StartSearching invoke failed:", e);
 
         }
 
@@ -1210,10 +1271,11 @@ function showStoppedMessage() {
 
     async function onNextClicked() {
 
+        isMatched = false;
         // close local call and request next
 
         endCallLocal();
-
+        
         //PartnerLeft();
 
         try {
@@ -1329,20 +1391,26 @@ function showStoppedMessage() {
  
     //Stop button click event
     async function onStopClicked() {
-    // stop camera and local call
-    stopCamera();
-    endCallLocal();
-    nextBtn.style.display = "none";
 
-    try {
-        if (connection && connection.state === signalR.HubConnectionState.Connected) {
-            await connection.invoke("Stop");
-        } else {
-            console.warn("SignalR not connected when Stop clicked");
+        //reset statusText
+        isMatched = false;
+        setStatus("You left the chat.", "info");
+        // stop camera and local call
+        stopCamera();
+        endCallLocal();
+        //Next button hide
+        nextBtn.style.display = "none";
+        //myGenderSelect dispaly
+        myGenderSelect.style.display = "inline-block"; 
+        try {
+            if (connection && connection.state === signalR.HubConnectionState.Connected) {
+                await connection.invoke("Stop");
+            } else {
+                console.warn("SignalR not connected when Stop clicked");
+            }
+        } catch (e) {
+            console.error("Stop failed:", e);
         }
-    } catch (e) {
-        console.error("Stop failed:", e);
-    }
 }
 
 
@@ -1493,7 +1561,11 @@ function showStoppedMessage() {
 
             if (!msg) return;
 
-            if (!currentPartnerId) { alert("You are not connected to a partner."); return; }
+            if (!currentPartnerId) { 
+                //alert("You are not connected to a partner."); 
+                setStatus("Click Start, connect to a partner.", "info");
+                return; 
+            }
 
             appendMessage("You", msg);
 
@@ -1632,6 +1704,7 @@ function showStoppedMessage() {
  
 
        
+        infoDiv = document.getElementById("partnerInfo");
 
         chatInput = document.getElementById("chatText");
 
@@ -1639,7 +1712,7 @@ function showStoppedMessage() {
 
         messagesDiv = document.getElementById("messages");
 
- 
+        statusText = document.getElementById("statusText");
 
         emojiBtn = document.getElementById("emojiBtn");
 
