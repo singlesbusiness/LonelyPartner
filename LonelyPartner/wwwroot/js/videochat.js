@@ -30,6 +30,7 @@
 
     let isMatched = false; // global flag to prevent re-search overwrite
 
+    let fallbackTimer = null; //for fallback match,set to 5sec in on.waiting
 
     const loginBtn = document.getElementById('loginBtn');
 
@@ -401,13 +402,7 @@ function starttextChat() {
     console.log("💬 Chat enabled.");
 }
 
-// 🔹 Restore waiting UI state
-function showWaitingState() {
-    
-    setStatus("⏳ Waiting for a new partner...", "info");
-    
-    console.log("⌛ Showing waiting state.");
-}
+
 
 // 🔹 Optional: show a subtle 'You left the chat' message
 function showStoppedMessage() {
@@ -791,16 +786,102 @@ function clearStatus() {
             .build();
 
  
+        //connection.on("Error", (message) => { from = start stop next
+        connection.on("Waiting", (from) => {
+                console.log("⏳ No match found. Waiting...");
 
-        connection.on("WaitingForPartner", () => {
-            console.log("Server: waiting for partner...")
-            });
+                mygenderSelectEl = document.getElementById("myGenderSelect");
 
+                genderSelectEl = document.getElementById("genderSelect");
 
-        //connection.on("Waiting", () => log("Server: waiting for partner..."));
-        connection.on("Waiting", () => {
+                continentSelectEl = document.getElementById("continentSelect");
+
+                let myGender = mygenderSelectEl?.value || "All";
+
+                let desiredGender = genderSelectEl?.value || "All";
+
+                let desiredContinent = continentSelectEl?.value || "All";
+
+                //Read User Info
+
+                const appUser = window.appUser || {};
+
+                const isLoggedIn = appUser.isAuthenticated === true;
+
+                const productId = parseInt(window.appUser?.productId || 0);
+
+                const endDate = appUser.endDate ? new Date(appUser.endDate) : null;
+
+                const hasActivePlan = (isLoggedIn && productId > 0 && endDate > new Date());
+
+                console.log(" Waiting js=>hasActivePlan" , hasActivePlan);
+
+            if(!isMatched) 
+                {
+                    console.log("⏳ No match found, going for Waiting...");
+                        // Only trigger fallback for paid/admin users
+                if (hasActivePlan) 
+                {
+                    
+                    //if waiting comes from hub-start we should do RelaxedSearch
+                    if(from == "start")
+                        {   
+                            console.log("⏳ No Strict match found. going for relaxed search...");
+                            // After 10 seconds, call relaxed version
+                            fallbackTimer = setTimeout(async () => {
+                            try {
+                                setStatus(`Expanding search for ${desiredGender} in all continents...`, "info");
+                                await connection.invoke("StartSearchingRelaxed", myGender, desiredGender);
+                                } catch (err) {
+                                    console.error("Relaxed search failed:", err);
+                                    setStatus("Relaxed search failed. Please try again.", "error");
+                                    myGenderSelect.style.display = "inline-block";  // dont hide mygender
+                                }
+                             }, 10000);
+                        }
+                        //if waiting comes from hub-Next, meaning next button click, should start from 
+                        //StrictSearch, then relaxedsearch
+                        if(from == "next")
+                        {   
+                            console.log("⏳ Next button match with Strict search...");
+                            //just to make await work adding dealy of 3millisecs
+                            fallbackTimer = setTimeout(async () => {
+                            try {
+                                setStatus(`Searching for ${desiredGender} in ${desiredContinent}...`, "info");
+                                await connection.invoke("StartSearchingStrict", myGender, desiredGender, desiredContinent);
+                        
+                                
+                            } catch (err) {
+                                console.error("RSearch failed:", err);
+                                setStatus("Search failed. Please try again.", "error");
+                                myGenderSelect.style.display = "inline-block";  // dont hide mygender
+                            }
+                        }, 300);  
+                      }
+              }
+              //non paid user clicks next button=from js->nexthub->here
+              if (from == "next" && !hasActivePlan)
+                {   
+                    //just to make await work adding dealy of 3millisecs
+                    fallbackTimer = setTimeout(async () => {
+                    // Free or anonymous user/non paid user, comes from=next
+                    try
+                    {
+                        setStatus("Searching for a partner...", "info");
+                        await connection.invoke("StartSearchingFree", myGender, desiredContinent);
+                    }
+                    catch (err) {
+                                console.error("Search failed:", err);
+                                setStatus("Search failed. Please try again.", "error");
+                                myGenderSelect.style.display = "inline-block";  // dont hide mygender
+                            }
+                        }, 300);
+                }
+                }
+                
+            
                 if (isMatched) return; // 🚫 Don’t show searching if already matched
-                setStatus("🔎 Searching for a partner...", "info");
+                //setStatus("🔎 Searching for a partner...", "info");
             });
  
 
@@ -950,20 +1031,16 @@ function clearStatus() {
             setStatus("You left the chat. Click Start again...", "info");
             //resetUI("You left the chat. Click Start to join again.");
             //appendMessage("System", "Chat stopped.");
-            
-           
-
         });
 
  
 
         connection.on("Error", (message) => {
 
-            setStatus("Error...", "warning");
+            setStatus("Error...", "info");
             console.error("Hub Error:", message);
 
             //End the call safely
-
             if (typeof endCallLocal === "function") {
 
                 endCallLocal();
@@ -1007,7 +1084,12 @@ function clearStatus() {
                 document.getElementById("stopBtn").disabled = true;
             });
 
- 
+        // ===============================
+        // setStatus message coming from hub
+        // ===============================
+        connection.on("StatusUpdate", (message, type) => {
+        setStatus(message, type);
+        });
 
         //these are important lines, commented so pageon load hub is not connected
         /*
@@ -1038,8 +1120,6 @@ function clearStatus() {
             const statusEl = document.getElementById("solStatus");
 
             if (statusEl) statusEl.innerText = `Plan activated: ${payload.productName} until ${new Date(payload.endDate).toLocaleString()}`;
-
- 
 
             // hide upgrade buttons and enable filters
 
@@ -1101,7 +1181,7 @@ function clearStatus() {
 
         const val = myGenderSelect.value.trim();
 
-        if (!val) {
+        if (!val || val == "All") {
 
             myGenderSelect.classList.add("shake", "error-border");
 
@@ -1165,15 +1245,15 @@ function clearStatus() {
             //enable Next button       
             nextBtn.style.display = "inline-block";
 
-    }
+            }
 
-        catch (e) {
-            console.error("Start error:", e);
-            alert("Server Error. please wait");
+             catch (e) {
+                    console.error("Start error:", e);
+                    alert("Server Error. please wait");
 
-            //return;
+                    //return;
 
-        }
+                }
 
     }
 
@@ -1183,21 +1263,25 @@ function clearStatus() {
 
     async function start() {
 
-       
+       try {
+            clearTimeout(fallbackTimer);
 
-        try {
+            mygenderSelectEl = document.getElementById("myGenderSelect");
 
             genderSelectEl = document.getElementById("genderSelect");
 
             continentSelectEl = document.getElementById("continentSelect");
 
- 
+            let myGender = mygenderSelectEl?.value || "Male";
 
-            let gender = genderSelectEl?.value || "All";
+            let desiredGender = genderSelectEl?.value || "All";
 
-            let continent = continentSelectEl?.value || "All";
+            let desiredContinent = continentSelectEl?.value || "All";
 
- 
+            mygenderSelectEl.addEventListener("change", (e) => {
+                myGender = e.target.value;
+                console.log("Updated gender:", myGender);
+            });
 
             //Read User Info
 
@@ -1211,9 +1295,7 @@ function clearStatus() {
 
             const hasActivePlan = (isLoggedIn && productId > 0 && endDate > new Date());
 
-            //const hasActivePlan = window.appUser?.hasPlan;
-
- 
+            
 
             console.log("isLoggedIn=>", isLoggedIn);
 
@@ -1227,43 +1309,41 @@ function clearStatus() {
 
             if (!hasActivePlan) {
 
-                gender = "All";
+                desiredGender = "All";
 
-                continent = "All";
+                //desiredContinent is set to deafult based on ip in accessbutton.js
+                //desiredContinent = continentSelectEl?.value || "All";
 
-                console.log("genderSelect in activeplan fun=>", gender)
-
- 
-
-                //optional
+                //optional setting value for UI
 
                 if (genderSelectEl) genderSelectEl.value = "All";
 
-                if (continentSelectEl) continentSelectEl.value = "All";
+                //if (continentSelectEl) continentSelectEl.value = "All";
 
             }
 
- 
-
-            console.log(" Sending to Hib search request with gender and continent as = ", { gender, continent });
-
- 
-
-            await connection.invoke("StartSearching", gender, continent);
+          
+            if (hasActivePlan) {
+                // Paid or admin user - start strict search
+                setStatus(`Searching for ${desiredGender} in ${desiredContinent}...`, "info");
+                console.log("StartSearchingStrict my gender=>",myGender, "-",  desiredGender , "-", desiredContinent);
+                await connection.invoke("StartSearchingStrict", myGender, desiredGender, desiredContinent);
+                myGenderSelect.style.display = "none";  // hide gender select while chatting
+                } else {
+                // Free or anonymous user
+                setStatus("Searching for a partner...", "info");
+                console.log("StartSearchingFree my gender=>",myGender, "-", desiredGender , "-", desiredContinent);
+                await connection.invoke("StartSearchingFree", myGender, desiredContinent);
+                myGenderSelect.style.display = "none";  // hide gender select while chatting
+                }
+            } catch (e) {
+                console.error("Start search failed:", e);
+                setStatus("Search failed. Please retry.", "error");
+                myGenderSelect.style.display = "inline-block";  // hide gender select while chatting
+            }
             
-            console.log("StartSearching invoked");
 
-            myGenderSelect.style.display = "none";  // hide gender select while chatting
-
-        } catch (e) {
-
-            console.error("StartSearching invoke failed:", e);
-
-        }
-
-    }
-
- 
+     }
 
  
 
@@ -1272,126 +1352,41 @@ function clearStatus() {
     async function onNextClicked() {
 
         isMatched = false;
-        // close local call and request next
-
-        endCallLocal();
         
+        // 1️⃣ Clear any running fallback timer (strict→relaxed)
+        clearTimeout(fallbackTimer);
+        // 2️⃣ End local media cleanly
+        endCallLocal();
         //PartnerLeft();
 
         try {
 
-            // try named method variants
+                if (connection) {
 
-            if (connection) {
+                    if (connection.invoke.length) {
 
-                if (connection.invoke.length) {
-
-                    // try NextPartner first (latest hub)
-
-                    /*
-
-                    try {
-
-                        //await connection.invoke("Next",  gender, continent));
-
-                        await start();
-
-                    } catch (e) {
-
-                        error("start invoke in hub failed:", e);
-
-                        return;
-
+                    //// Notify hub that this user is leaving the current match
+                        try {
+                            await connection.invoke("Next");
+                            setStatus("Searching for the next partner...", "info");
+                        } catch (err) {
+                            console.error("Next() failed:", err);
+                            setStatus("Next failed. Please retry...", "info");
+                        }
                     }
-
-                    */
-
-                    try {
-
- 
-
-                    genderSelectEl = document.getElementById("genderSelect");
-
-                            continentSelectEl = document.getElementById("continentSelect");
-
- 
-
-                            let gender = genderSelectEl?.value || "All";
-
-                            let continent = continentSelectEl?.value || "All";
-
- 
-
-                            //Read User Info
-
-                            const appUser = window.appUser || {};
-
-                            const isLoggedIn = appUser.isAuthenticated === true;
-
-                            const productId = parseInt(window.appUser?.productId || 0);
-
-                            const endDate = appUser.endDate ? new Date(appUser.endDate) : null;
-
-                            const hasActivePlan = (isLoggedIn && productId > 0 && endDate > new Date());
-
-                            //const hasActivePlan = window.appUser?.hasPlan;
-
- 
-
-                            console.log("isLoggedIn=>", isLoggedIn);
-
-                            console.log("hasActivePlan=>", hasActivePlan);
-
-                            console.log("productId=>", productId);
-
- 
-
-                            //Only send custom filters if User has Active Plan
-
-                            if (!hasActivePlan) {
-
-                                gender = "All";
-
-                                continent = "All";
-
-                                console.log("genderSelect in activeplan fun=>", gender)
-
- 
-
-                                //optional
-
-                                if (genderSelectEl) genderSelectEl.value = "All";
-
-                                if (continentSelectEl) continentSelectEl.value = "All";
-
-                            }
-
-                                        await connection.invoke("Next", gender , continent);
-
-                                        return;
-
-                                    } catch (e) {
-
-                                        error("Next invoke variants failed:", e);
-
-                                    }                   
-
                 }
-
             }
-
-        } catch (e) {
-
-            error("Next error:", e);
-
-        }
-
-    }
+            catch (err) {
+                           console.error("Next() failed:", err);
+                            setStatus("Next failed. Please retry...", "info");
+                        }
+    }    
 
  
     //Stop button click event
     async function onStopClicked() {
 
+        clearTimeout(fallbackTimer);
         //reset statusText
         isMatched = false;
         setStatus("You left the chat.", "info");
@@ -1698,12 +1693,6 @@ function clearStatus() {
         remotePlaceholder = document.getElementById("remotePlaceholder");
 
  
-
-       
-
- 
-
-       
         infoDiv = document.getElementById("partnerInfo");
 
         chatInput = document.getElementById("chatText");
@@ -1768,23 +1757,7 @@ function clearStatus() {
 
         stopBtn.addEventListener("click", onStopClicked);
         
- 
-
-        // optional girls only quick filter (sets genderSelect)
-
-        /*
-
-        if ( genderSelect) {
-
-            genderSelect.value = "female";           
-
-        }
-
-        */
-
-      
-
- 
+        
 
         // init chat, emoji, resizers, signalr
 
@@ -1826,8 +1799,6 @@ function clearStatus() {
 
     //let localStream;
 
-   
-
     let videoTrackEnabled = true;
 
     let audioTrackEnabled = true;
@@ -1835,7 +1806,7 @@ function clearStatus() {
  
 
     // === CAMERA / MIC TOGGLE ===
-
+    //local camera
     document.getElementById("toggleCamera").addEventListener("click", () => {
 
         const btn = document.getElementById("toggleCamera");
@@ -1854,7 +1825,7 @@ function clearStatus() {
 
     });
 
- 
+    //local mic
 
     document.getElementById("toggleMic").addEventListener("click", () => {
 

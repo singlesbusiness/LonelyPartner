@@ -12,17 +12,15 @@ namespace LonelyPartner.Hubs
     {
         private readonly UserDBContext _db;
 
-        // Store waiting users: ConnectionId → user details
-        //private static readonly ConcurrentDictionary<string, (string Gender, string Continent)> WaitingUsers = new();
         
         // 🔹 Users waiting for a partner
-        private static readonly ConcurrentDictionary<string, (string Gender, string Continent, string Country, string City)> WaitingUsers = new();
+        private static readonly ConcurrentDictionary<string, (string Gender, string DesiredGender, string Continent, string Country, string City, bool IsPaidUser, bool IsAdmin)> WaitingUsers = new();
 
         // 🔹 Active chat pairs (connectionId -> partnerConnectionId)
         public static ConcurrentDictionary<string, string> ActivePairs = new();
         
         //user preference
-        public static ConcurrentDictionary<string, (string Gender, string Continent, string Country, string City)> UserPreferences = new();
+        public static ConcurrentDictionary<string, (string Gender, string DesiredGender, string Continent, string Country, string City, bool IsPaidUser, bool IsAdmin)> UserPreferences = new();
         public ChatHub(UserDBContext db)
         {
             _db = db;
@@ -33,158 +31,185 @@ namespace LonelyPartner.Hubs
         {
             var email = Context.User?.FindFirst(ClaimTypes.Email)?.Value;
             if (string.IsNullOrEmpty(email))
+            {
                 return null;
-
-            return await _db.UserEntity.FirstOrDefaultAsync(u => u.CustomerEmail == email);
+            }
+                return await _db.UserEntity.FirstOrDefaultAsync(u => u.CustomerEmail == email);
         }
 
         // 🔹 Check for active plan
         private static bool HasActivePlan(UserEntity? user)
         {
-            return user != null && user.ProductId > 0 && user.EndDate > DateTime.UtcNow;
+            return user != null && ( user.ProductId > 0 ||  user.Role == "Admin" )&& user.EndDate > DateTime.UtcNow;
         }
 
-        // 🔹 Start searching for a random match
-        // ======================================
-        // 🔹 Start Searching
-        // ======================================
-        public async Task StartSearching(string gender, string continent)
-        {   
-            
-            //get location
-            var httpContext = Context.GetHttpContext();
-            var ip = httpContext?.Connection?.RemoteIpAddress?.ToString();
-            //var ip = "77.175.186.52";
-            //Console.WriteLine($"ip-1===> {ip}");
-            //Handle reverse proxy /IPv6 / localhost cases
-            if (string.IsNullOrEmpty(ip) || ip == "::1" || ip == "127.0.0.1")
-            {
-                //Console.WriteLine($"ip-2===> {ip}");
-                ip = httpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-                //Console.WriteLine($"ip-3===> {ip}");
-            }
-            var (country, city) = await GetLocationFromIp(ip);
-            //Console.WriteLine($"🌍 {Context.ConnectionId} from=> {city}, {country}");
-
-            //get admin user, and set Unknown
-            var currentUser = await GetCurrentUserAsync();
-            if (currentUser != null && currentUser.Role == "Admin")
-                {
-                    country = "Unknown";
-                    city = "Unknown";
-                }
-
-            //set default value or user selected values
-            gender = string.IsNullOrWhiteSpace(gender) ? "All" : gender;
-            continent = string.IsNullOrWhiteSpace(continent) ? "All" : continent;
-
-            Console.WriteLine($"🔍 {Context.ConnectionId} searching → Gender:{gender}, Continent:{continent}");
-
-            //store user preference
-            UserPreferences[Context.ConnectionId] = (gender, continent, country, city);
-            WaitingUsers[Context.ConnectionId] = (gender, continent, country, city);
-
-            // If already waiting, remove old entry
-            //WaitingUsers.TryRemove(Context.ConnectionId, out _);
-
-            // Try find partner for paid users
-            var matchId = FindCompatiblePartner(Context.ConnectionId, gender, continent);
-
-            //fallback ( ignore continent and gender) for non paid and non activeplan user
-            if (matchId == null && continent != "All")
-            {
-                matchId = FindCompatiblePartner(Context.ConnectionId, gender, "All");
-                if(matchId != null)
-                {
-                    Console.WriteLine($"🕒 Fallback Match: {Context.ConnectionId}");
-                }
-                
-                //return;
-            }
-
-            // no Partner -> wait
-            if (matchId == null)
-            {
-                WaitingUsers[Context.ConnectionId] = (gender, continent, country, city);
-                await Clients.Caller.SendAsync("Waiting");
-                Console.WriteLine($"🕒 Waiting: {Context.ConnectionId}");
-            }
-
-            // ✅ Match found, remove both from waiting list
-            if (matchId != null)
-            {
-                if (WaitingUsers.TryRemove(matchId, out var partnerInfo))
-                {
-                    //Remove Self if present
-                    WaitingUsers.TryRemove(Context.ConnectionId, out _);
-
-                    // Tell the current user: you initiate the offer
-                    // await Clients.Client(Context.ConnectionId).SendAsync("Matched", matchId, "Caller");
-                    await Clients.Client(Context.ConnectionId).SendAsync("Matched", matchId, "Caller", partnerInfo.Country, partnerInfo.City);
-
-                    //Tell the partner: you wait for the offer
-                    //await Clients.Client(matchId).SendAsync("Matched", Context.ConnectionId, "Callee");
-                    await Clients.Client(matchId).SendAsync("Matched", Context.ConnectionId, "Callee", country, city);
-                    
-                    // ✅ NEW: Register active pair
-                    ActivePairs[Context.ConnectionId] = matchId;
-                    ActivePairs[matchId] = Context.ConnectionId;
-                        
-                    Console.WriteLine($"💞 MATCHED: {Context.ConnectionId}(Caller) ↔ {matchId}(Callee)");
-
-                }
-            }
-        }
-
-        // ======================================
-        // 🔹 Improved Matching Logic (Mutual Check)
-        // ======================================
-        private string? FindCompatiblePartner(string currentId, string desiredGender, string desiredContinent)
+        // ===============================
+        // 🔹 Shared Match Helper
+        // ===============================
+        private string? FindCompatiblePartner(
+            string currentId,
+            string desiredGender,
+            string desiredContinent,
+            bool strict)
         {
-            foreach (var kvp in WaitingUsers)
-            {
+            if (!UserPreferences.TryGetValue(currentId, out var currentUser))
+                return null;
 
-                string candidateId = kvp.Key;
+            var selfGender = currentUser.Gender;
+            var selfContinent = currentUser.Continent;
+
+            foreach (var kvp in WaitingUsers)
+            {   
+                
+                var candidateId = kvp.Key;
                 if (candidateId == currentId) continue;
 
-                var candidate = kvp.Value;
-                /*
-                Console.WriteLine($"candidate====> {candidate}");
-                Console.WriteLine($"candidate.Gender====> {candidate.Gender}");
-                Console.WriteLine($"candidate.Continent====>{candidate.Continent}");
-                Console.WriteLine($"desiredGender.Gender====>{desiredGender}");
-                Console.WriteLine($"desiredContinent.Continent====>{ desiredContinent}");
-                */
-                bool genderMatch =
-                    desiredGender == "All" || candidate.Gender == "All" || candidate.Gender == desiredGender;
+                if (!UserPreferences.TryGetValue(candidateId, out var candidate))
+                    continue;
 
-                bool continentMatch =
-                    desiredContinent == "All" || candidate.Continent == "All" || candidate.Continent == desiredContinent;
+                    // Get candidate details
+                    string candidateGender = candidate.Gender;        // candidate’s self gender
+                    string candidateContinent = candidate.Continent;  // candidate’s continent
+                    bool candidateIsPaid = candidate.IsPaidUser;          // assuming stored in prefs
+                    bool candidateIsAdmin = candidate.IsAdmin;        // same
+                    // strict = true meaning paid candidate
+                //var candidate = kvp.Value;
 
-                //Console.WriteLine($"genderMatch====>{genderMatch}");
-                //Console.WriteLine($"continentMatch====>{continentMatch}");
-                /*
-                // mutual compatibility — both ways
-                bool mutualGenderOK =
-                    genderOK ||
-                    (candidate.Gender == "All" && desiredGender != "All") ||
-                    (desiredGender == "All" && candidate.Gender != "All");
+                
 
-                bool mutualContinentOK =
-                    continentOK ||
-                    (candidate.Continent == "All" && desiredContinent != "All") ||
-                    (desiredContinent == "All" && candidate.Continent != "All");
-                */
-                if (genderMatch && continentMatch)
+
+
+                // =============== PAID USER MATCHING strict=true====================
+                if (strict)
                 {
-                    Console.WriteLine($"✅ Compatible: {currentId} ↔ {candidateId}  " +
-                                      $"({desiredGender}/{desiredContinent} ↔ {candidate.Gender}/{candidate.Continent})");
-                    return candidateId;
+                    // 1️⃣ STRICT: Match desired gender + desired continent
+                    bool genderMatch = candidateGender.Equals(desiredGender, StringComparison.OrdinalIgnoreCase);
+                    bool continentMatch = candidateContinent.Equals(desiredContinent, StringComparison.OrdinalIgnoreCase);
+
+                    if (genderMatch && continentMatch)
+                    {
+                        Console.WriteLine($"✅ Strict match: {currentId} ↔ {candidateId} ({desiredGender}/{desiredContinent})");
+                        return candidateId;
+                    }
+
+                    // 2️⃣ RELAXED: Match desired gender (any continent)
+                    if (genderMatch)
+                    {
+                        Console.WriteLine($"🌍 Relaxed match: {currentId} ↔ {candidateId} ({desiredGender}/All continents)");
+                        return candidateId;
+                    }
+
+                    // 3️⃣ Otherwise skip — paid users won’t match non-desired gender
+                    continue;
+                }
+                // =============== FREE USER MATCHING ====================
+                else
+                {
+                    // ========== FREE USER LOGIC ==========
+                    // Free users can match *any* gender / continent.
+                    // But they *cannot* override a paid user's preferences.
+                    // So we only allow match if the other person’s desiredGender is "All" OR includes the free user's gender.
+
+                    bool candidateWantsAll = candidate.DesiredGender.Equals("All", StringComparison.OrdinalIgnoreCase);
+                    bool candidateWantsThisGender = candidate.DesiredGender.Equals(selfGender, StringComparison.OrdinalIgnoreCase);
+
+                    bool matchAllowed =
+                        candidateWantsAll ||
+                        candidateWantsThisGender ||
+                        (candidateIsPaid && desiredGender.Equals(candidate.DesiredGender, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchAllowed)
+                    {
+                        Console.WriteLine($"🎲 Free/random match: {currentId} ↔ {candidateId}");
+                        return candidateId;
+                    }
                 }
             }
-
+            // 4️⃣ No compatible partner found
             return null;
         }
+
+        // ===============================
+        // 🔹 Core: Start Searching Shared
+        // ===============================
+        private async Task StartSearchInternal(
+            string gender,
+            string desiredGender,
+            string continent,
+            bool strict)
+        {
+            var connectionId = Context.ConnectionId;
+            var currentUser = await GetCurrentUserAsync();
+            bool isPaidUser = HasActivePlan(currentUser);
+            bool isAdmin = currentUser?.Role == "Admin";
+
+            // Location detection
+            string country = "Unknown", city = "Unknown";
+            if (!isAdmin)
+            {
+                var httpContext = Context.GetHttpContext();
+                var ip = httpContext?.Connection?.RemoteIpAddress?.ToString();
+                if (string.IsNullOrEmpty(ip) || ip == "::1" || ip == "127.0.0.1")
+                    ip = httpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+
+                (country, city) = await GetLocationFromIp(ip);
+            }
+
+            // Store preferences
+            UserPreferences[connectionId] = (gender, desiredGender, continent, country, city, isPaidUser, isAdmin);
+            WaitingUsers[connectionId] = (gender, desiredGender, continent, country, city, isPaidUser, isAdmin);
+
+            //await Clients.Caller.SendAsync("StatusUpdate", $"Searching for {desiredGender} in {continent}...", "info");
+
+            // Try to find partner
+            var matchId = FindCompatiblePartner(connectionId, desiredGender, continent, strict);
+
+            if (matchId != null && WaitingUsers.TryRemove(matchId, out var partnerInfo))
+            {
+                // Remove self too
+                WaitingUsers.TryRemove(connectionId, out _);
+
+                ActivePairs[connectionId] = matchId;
+                ActivePairs[matchId] = connectionId;
+
+                // Notify both users
+                await Clients.Client(connectionId).SendAsync("Matched", matchId, "Caller", partnerInfo.Country, partnerInfo.City);
+                await Clients.Client(matchId).SendAsync("Matched", connectionId, "Callee", country, city);
+
+                await Clients.Client(connectionId).SendAsync("StatusUpdate", "🎉 Partner found!", "success");
+                await Clients.Client(matchId).SendAsync("StatusUpdate", "🎉 Partner found!", "success");
+            }
+            else
+            {
+                await Clients.Caller.SendAsync("Waiting","start");
+                //await Clients.Caller.SendAsync("StatusUpdate", "Waiting for a partner...", "warning");
+            }
+        }
+
+        // ===============================
+        // 🔹 StartSearching for Paid Users (Strict)
+        // ===============================
+        public async Task StartSearchingStrict(string gender, string desiredGender, string continent)
+        {
+            await StartSearchInternal(gender, desiredGender, continent, strict: true);
+        }
+
+        // ===============================
+        // 🔹 StartSearching for Paid Users (Relaxed)
+        // ===============================
+        public async Task StartSearchingRelaxed(string gender, string desiredGender)
+        {
+            await StartSearchInternal(gender, desiredGender, "All", strict: true);
+        }
+
+        // ===============================
+        // 🔹 StartSearching for Free Users
+        // ===============================
+        public async Task StartSearchingFree(string gender, string continent)
+        {
+            await StartSearchInternal(gender, "All", continent, strict: false);
+        }
+
 
 
         // 🔹 Stop searching / disconnect current match
@@ -213,7 +238,7 @@ namespace LonelyPartner.Hubs
                     if (UserPreferences.TryGetValue(partnerId, out var prefs))
                     {
                         WaitingUsers[partnerId] = prefs;
-                        await Clients.Client(partnerId).SendAsync("Waiting");
+                        await Clients.Client(partnerId).SendAsync("Waiting", "stop");
                         Console.WriteLine($"🔄 Requeued partner {partnerId}");
                     }
                 }
@@ -236,29 +261,46 @@ namespace LonelyPartner.Hubs
          
 
         // 🔹 Next partner
-        public async Task Next(string gender, string continent)
+        public async Task Next()
         {
             var connectionId = Context.ConnectionId;
-
-            if (!WaitingUsers.TryRemove(connectionId, out _))
-                Console.WriteLine($"Next(): {connectionId} not found in waiting list.");
-            //notify current partner, if any
-            await Clients.Others.SendAsync("PartnerLeft", connectionId);
-
-            await Clients.Caller.SendAsync("ChatStopped");
-
-            Console.WriteLine($"{connectionId} clicked Next-notify partner.");
+            
             try
-            {
-                //await Stop();
-                await Task.Delay(300); //short pause to allow cleanup
-                await StartSearching(gender, continent);
-            }
-            catch (Exception ex)
-            {   
-                Console.WriteLine($"Next() Error=> {ex.Message}");
-                await Clients.Caller.SendAsync("Error", "Failed to find next partner, please try again.");
-            }
+                {
+                    Console.WriteLine($"➡️ Next() called by {connectionId}");
+
+                    // 1️⃣ Remove from waiting list
+                    WaitingUsers.TryRemove(connectionId, out _);
+
+                    // 2️⃣ If this user was matched with someone, end that pairing
+                    if (ActivePairs.TryRemove(connectionId, out var partnerId))
+                    {
+                        ActivePairs.TryRemove(partnerId, out _);
+
+                        Console.WriteLine($"🔄 {connectionId} clicked Next — ending pair with {partnerId}");
+
+                        // Notify partner
+                        await Clients.Client(partnerId).SendAsync("PartnerLeft");
+                        
+
+                        // Requeue partner if they are still online and valid
+                        if (UserPreferences.TryGetValue(partnerId, out var prefs))
+                        {
+                            WaitingUsers[partnerId] = prefs;
+                            await Clients.Client(partnerId).SendAsync("Waiting","next");
+                            Console.WriteLine($"🔁 Partner {partnerId} requeued.");
+                        }
+                    }
+
+                    // 3️⃣ Notify caller that chat ended
+                    await Clients.Caller.SendAsync("ChatStopped");
+                    Console.WriteLine($"✅ {connectionId} ended chat, ready to start searching again.");
+                }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Next() Error=> {ex.Message}");
+                        await Clients.Caller.SendAsync("Error", "Failed to find next partner, please try again.");
+                    }
                         
         }
 
@@ -300,13 +342,7 @@ namespace LonelyPartner.Hubs
         //Get user location
         private async Task<(string Country, string City)> GetLocationFromIp(string ip)
         {
-            //Console.WriteLine($"ip location=>{ip}");
-           /*
-            if (string.IsNullOrEmpty(ip))
-            {
-                return ("Unknown", "Unknown");
-            }
-           */
+            
             try
             {
                 using var http = new HttpClient();

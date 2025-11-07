@@ -26,13 +26,15 @@
         <span></span>
     </div>
 
-    <!-- logout user and give alert if user login into second browser-->
-    @if (Context.Request.Query["expired"] == "true")
-{
-    <div class="alert1 alert-warning1">
-        You’ve been signed out because your account was used in another browser.
-    </div>
-} 
+    <!-- logout user and give alert if user login into second browser  -->
+        @if (Context.Request.Query["expired"] == "true")
+    {  <!-- 
+        <div class="alert1 alert-warning1">
+            You’ve been signed out because your account was used in another browser.
+        </div>
+        -->
+    } 
+    
     <!-- Slide-Down Menu -->
     <div class="overlay-menu" id="overlayMenu">
         <div class="overlay-content">
@@ -101,7 +103,7 @@
                 <button id="upgradeBtn" class="btn red">Upgrade</button>
 
                 <select id="myGenderSelect" class="select-box">
-                    <option value="">I Am</option>
+                    <option value="All">I Am</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="couple">Couple</option>
@@ -116,12 +118,13 @@
 
                 <select id="continentSelect" class="select-box">
                     <option value="All">All Cotinents</option>
-                    <option value="Africa">Africa</option>
-                    <option value="Asia">Asia</option>
-                    <option value="Europe">Europe</option>
-                    <option value="North America">North America</option>
-                    <option value="South America">South America</option>
-                    <option value="Australia">Australia</option>
+                    <option value="AF">Africa</option>
+                    <option value="AS">Asia</option>
+                    <option value="EU">Europe</option>
+                    <option value="NA">North America</option>
+                    <option value="SA">South America</option>
+                    <option value="OC">Australia</option>
+                    <option value="AN">Antarctica</option>
                 </select>
 
                 @*For Admin User*@

@@ -25,8 +25,27 @@ function initAccessControl() {
     const upgradeModal = document.getElementById("upgradeModal");
 
  
-
-   
+    // ===============================
+    // 🌍 Auto-detect continent (non-paid users)
+    // ===============================
+            let userContinent = "All";
+            window.addEventListener("load", async () => {
+            try {
+                const res = await fetch("https://ipapi.co/json/");
+                const data = await res.json();
+                userContinent = data.continent_code || "All";
+                console.log("🌍 User continent:", userContinent);
+                if (continentSelect) 
+                    {
+                        continentSelect.value = userContinent;
+                    }
+                } catch (e) {
+                console.warn("🌍 Failed to get continent:", e);
+                continentSelect.value = "All";
+                }
+            });
+            
+            
 
     function isActivePlan() {
 
@@ -106,13 +125,7 @@ function initAccessControl() {
 
         }
 
-        if (continentSelect) {
-
-            continentSelect.value = "All";
-
-            continentSelect.disabled = true;
-
-        }
+        
 
     }
 
