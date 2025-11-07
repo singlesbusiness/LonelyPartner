@@ -85,7 +85,21 @@ public class SolanaPaymentsController : ControllerBase
         _db.OrderEntity.Add(order);
         await _db.SaveChangesAsync();
 
-        var receiveAddress = _cfg["Solana:ReceiveAddress"];
+        
+        // ✅ Fetch Solana public key dynamically from DB, takes 1st record
+        var wallet = await _db.WalletEntity
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.KeyName == "SolanaPublicKey"); 
+
+                if (wallet == null || string.IsNullOrWhiteSpace(wallet.ValueText))
+                {
+                    _logger.LogError("No Solana wallet key found in database.");
+                    return BadRequest(new { error = "❌ No Solana wallet key found. Please contact support ." });
+                }
+
+        var receiveAddress = wallet.ValueText.Trim();
+                //get address from appsetting
+                //var receiveAddress = _cfg["Solana:ReceiveAddress"];
 
         //var inrAmount = (selectPlan.Price * 87 );
         //INR value to i USD

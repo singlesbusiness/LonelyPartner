@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LonelyPartner")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bc1954f609cc44bf6250e1a1f7ce3b54db6d168f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4c106194a105ca8f3d7656217b4f63c48afe4297")]
 [assembly: System.Reflection.AssemblyProductAttribute("LonelyPartner")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LonelyPartner")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

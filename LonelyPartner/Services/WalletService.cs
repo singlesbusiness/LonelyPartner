@@ -16,7 +16,8 @@ namespace LonelyPartner.Services
 
         /// <summary>Get current Solana public key.</summary>
         public async Task<string> GetSolanaPublicKeyAsync()
-        {
+        {   
+            // takes 1st record
             var setting = await _context.WalletEntity
                 .AsNoTracking()
                 .FirstOrDefaultAsync(s => s.KeyName == "SolanaPublicKey");
