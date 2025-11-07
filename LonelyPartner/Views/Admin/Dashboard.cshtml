@@ -4,7 +4,17 @@
     var searchEmail = Context.Request?.Query["searchEmail"].ToString() ?? "";
 }
 
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>LonelyPartner - Admin Portal</title>
+    <link rel="stylesheet" href="~/css/admin.css" />
 
+
+</head>
+<body>
 
 <div class="admin-container">
     <h2 class="admin-title">👩‍💼 Admin Dashboard</h2>
@@ -15,6 +25,17 @@
         <span><b>Total SOl:</b> @ViewBag.TotalSol</span>
         <span><b>Total AmountUSD:</b> @ViewBag.AmountUSD</span>
     </div>
+
+    <!--Solana Wallet -->
+    <div class="card p-3 mt-3 text-center" style="max-width:600px; margin:auto;">
+            <h5 class="mb-3">Solana Wallet Settings</h5>
+            <p><b>Current Public Key:</b> <span id="solKey" class="text-primary"></span></p>
+            <div class="d-flex justify-content-center gap-2">
+                <button id="refreshKey" type="button" class="btn btn-outline-info btn-sm px-3">🔄 Refresh</button>
+                <button id="changeKey" type="button" class="btn btn-outline-warning btn-sm px-3">✏️ Change</button>
+            </div>
+    </div>
+
 
     <form method="get" asp-action="Dashboard" class="search-form mt-3 mb-3">
         <input type="text" name="searchEmail" placeholder="🔍 Search by email" value="@searchEmail" />
@@ -59,7 +80,25 @@
 </div>
 
 
+<script>
+        window.appUser = {
+            isAuthenticated: @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower()),
+            };
 
-                
+        console.log("🔹 window.appUser initialized:");
+        console.table(window.appUser);
+
+        // Check if Razor values came through
+        if (!window.appUser.isAuthenticated || window.appUser.isAuthenticated === "false") {
+            console.warn("⚠️ User not authenticated according to Razor context.");
+        } else {
+            console.log("✅ User is authenticated according to Razor context.");
+        }
+    </script>
+<!-- Place JS at bottom of page -->
+<script src="~/js/adminuser.js"></script>
+
+</body>
+</html>               
 
        

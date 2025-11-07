@@ -565,7 +565,7 @@ function clearStatus() {
 
     async function handleOffer(fromId, offerStr) {
 
-        log("handleOffer from", fromId);
+        console.log("handleOffer from", fromId);
 
         const offer = safeParse(offerStr);
 
@@ -597,7 +597,7 @@ function clearStatus() {
 
         await sendSignal(fromId, "answer", JSON.stringify(answer));
 
-        log("Answer created & sent to", fromId);
+        console.log("Answer created & sent to", fromId);
 
     }
 
@@ -607,7 +607,7 @@ function clearStatus() {
 
     async function handleAnswer(answerStr) {
 
-        log("handleAnswer");
+        console.log("handleAnswer");
 
         if (!pc) { warn("No pc when answer arrived"); return; }
 
@@ -617,11 +617,11 @@ function clearStatus() {
 
             await pc.setRemoteDescription(new RTCSessionDescription(answer));
 
-            log("Remote description set (answer)");
+            console.log("Remote description set (answer)");
 
         } catch (e) {
 
-            error("setRemoteDescription(answer) failed:", e);
+            console.error("setRemoteDescription(answer) failed:", e);
 
         }
 
@@ -639,7 +639,7 @@ function clearStatus() {
 
         if (!pc) {
 
-            log("pc not ready, queue candidate for", fromId);
+            console.log("pc not ready, queue candidate for", fromId);
 
             ensurePendingArray(fromId).push(cand);
 
@@ -651,11 +651,11 @@ function clearStatus() {
 
             await pc.addIceCandidate(new RTCIceCandidate(cand));
 
-            log("Added ICE candidate");
+            console.log("Added ICE candidate");
 
         } catch (e) {
 
-            error("addIceCandidate failed:", e);
+            console.error("addIceCandidate failed:", e);
 
         }
 
@@ -787,7 +787,7 @@ function clearStatus() {
 
  
         //connection.on("Error", (message) => { from = start stop next
-        connection.on("Waiting", (from) => {
+        connection.on("Waiting", async (from) => {
                 console.log("⏳ No match found. Waiting...");
 
                 mygenderSelectEl = document.getElementById("myGenderSelect");
@@ -815,6 +815,8 @@ function clearStatus() {
                 const hasActivePlan = (isLoggedIn && productId > 0 && endDate > new Date());
 
                 console.log(" Waiting js=>hasActivePlan" , hasActivePlan);
+                // 6️⃣ Give WebRTC time to fully close before restarting
+                await new Promise(r => setTimeout(r, 1000)); // waits 1 second
 
             if(!isMatched) 
                 {
@@ -823,15 +825,18 @@ function clearStatus() {
                 if (hasActivePlan) 
                 {
                     
-                    //if waiting comes from hub-start we should do RelaxedSearch
-                    if(from == "start")
+                      //if waiting comes from hub-start we should do RelaxedSearch
+                     if(from == "start")
                         {   
                             console.log("⏳ No Strict match found. going for relaxed search...");
                             // After 10 seconds, call relaxed version
                             fallbackTimer = setTimeout(async () => {
-                            try {
-                                setStatus(`Expanding search for ${desiredGender} in all continents...`, "info");
-                                await connection.invoke("StartSearchingRelaxed", myGender, desiredGender);
+                            try {   
+                                    //if is for, in case match happens in the delay period, then dont call relaxed search.
+                                    if(!isMatched) {
+                                    setStatus(`Expanding search for ${desiredGender} in all continents...`, "info");
+                                    await connection.invoke("StartSearchingRelaxed", myGender, desiredGender);
+                                        }
                                 } catch (err) {
                                     console.error("Relaxed search failed:", err);
                                     setStatus("Relaxed search failed. Please try again.", "error");
@@ -841,7 +846,7 @@ function clearStatus() {
                         }
                         //if waiting comes from hub-Next, meaning next button click, should start from 
                         //StrictSearch, then relaxedsearch
-                        if(from == "next")
+                     if(from == "next")
                         {   
                             console.log("⏳ Next button match with Strict search...");
                             //just to make await work adding dealy of 3millisecs
@@ -858,25 +863,25 @@ function clearStatus() {
                             }
                         }, 300);  
                       }
-              }
-              //non paid user clicks next button=from js->nexthub->here
-              if (from == "next" && !hasActivePlan)
-                {   
-                    //just to make await work adding dealy of 3millisecs
-                    fallbackTimer = setTimeout(async () => {
-                    // Free or anonymous user/non paid user, comes from=next
-                    try
-                    {
-                        setStatus("Searching for a partner...", "info");
-                        await connection.invoke("StartSearchingFree", myGender, desiredContinent);
                     }
-                    catch (err) {
-                                console.error("Search failed:", err);
-                                setStatus("Search failed. Please try again.", "error");
-                                myGenderSelect.style.display = "inline-block";  // dont hide mygender
+                    //non paid user clicks next button=from js->nexthub->here
+                    if (from == "next" && !hasActivePlan)
+                        {   
+                            //just to make await work adding dealy of 1sec
+                            fallbackTimer = setTimeout(async () => {
+                            // Free or anonymous user/non paid user, comes from=next
+                            try
+                            {
+                                setStatus("Searching for a partner...", "info");
+                                await connection.invoke("StartSearchingFree", myGender, desiredContinent);
                             }
-                        }, 300);
-                }
+                            catch (err) {
+                                        console.error("Search failed:", err);
+                                        setStatus("Search failed. Please try again.", "error");
+                                        myGenderSelect.style.display = "inline-block";  // dont hide mygender
+                                    }
+                                }, 1000);
+                        }
                 }
                 
             
@@ -892,7 +897,6 @@ function clearStatus() {
             isMatched = true;
             setStatus("🎉 Partner found!", "success");
             // show partner’s location
-            //const infoDiv = document.getElementById("partnerInfo");
             infoDiv.style.display = "inline-block";
             if (infoDiv) {
                     infoDiv.textContent = `🌍 ${partnerCity}, ${partnerCountry}`;
@@ -952,27 +956,40 @@ function clearStatus() {
 
         // ReceiveSignal(senderId, type, data)
 
-        connection.on("ReceiveSignal", async (fromId, type, data) => {
+        connection.on("ReceiveSignal", async (senderId, type, data) => {
 
-            log("ReceiveSignal:", fromId, type);
-
-            if (type === "offer") {
-
-                await handleOffer(fromId, data);
-
-            } else if (type === "answer") {
-
-                await handleAnswer(data);
-
-            } else if (type === "candidate") {
-
-                await handleCandidate(fromId, data);
-
-            } else {
-
-                warn("Unknown signal type:", type);
-
+            // ✅ Safety check: only accept signals from current partner
+            if (!currentPartnerId) {
+                console.warn("⚠️ Ignored signal (no active partner):", senderId, type);
+                return;
             }
+
+            if (senderId !== currentPartnerId) {
+                console.warn("🚫 Ignored signal from non-partner:", senderId, "Expected:", currentPartnerId);
+                return;
+            }
+
+            // ✅ Proceed only if signal comes from current partner
+            console.log("📡 ReceiveSignal:", senderId, type);
+
+            try {
+                    switch (type) {
+                        case "offer":
+                            await handleOffer(senderId, data);
+                            break;
+                        case "answer":
+                            await handleAnswer(data);
+                            break;
+                        case "candidate":
+                            await handleCandidate(senderId, data);
+                            break;
+                        default:
+                            warn("Unknown signal type:", type);
+                            break;
+                    }
+                } catch (err) {
+                    console.error("❌ Error handling signal:", type, err);
+                }
 
         });
 
@@ -1369,6 +1386,7 @@ function clearStatus() {
                         try {
                             await connection.invoke("Next");
                             setStatus("Searching for the next partner...", "info");
+                            console.info("Next() hub is called");
                         } catch (err) {
                             console.error("Next() failed:", err);
                             setStatus("Next failed. Please retry...", "info");

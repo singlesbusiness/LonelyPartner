@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace YourAppNamespace.Services
+namespace LonelyPartner.Services
 {
     public interface IINRExchangeRateService
     {

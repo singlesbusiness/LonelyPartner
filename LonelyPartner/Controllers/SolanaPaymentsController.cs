@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using YourAppNamespace.Services;
+using LonelyPartner.Services;
 
 [ApiController]
 [Route("api/[controller]")]

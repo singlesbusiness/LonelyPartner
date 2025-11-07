@@ -107,6 +107,23 @@ namespace LonelyPartner.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "WalletEntity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    KeyName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    ValueText = table.Column<string>(type: "longtext", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WalletEntity", x => x.Id);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -278,6 +295,9 @@ namespace LonelyPartner.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserEntity");
+
+            migrationBuilder.DropTable(
+                name: "WalletEntity");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

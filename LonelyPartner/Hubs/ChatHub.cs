@@ -267,34 +267,35 @@ namespace LonelyPartner.Hubs
             
             try
                 {
-                    Console.WriteLine($"➡️ Next() called by {connectionId}");
+                    Console.WriteLine($"➡️ myself Next() called by {connectionId}");
 
                     // 1️⃣ Remove from waiting list
                     WaitingUsers.TryRemove(connectionId, out _);
 
-                    // 2️⃣ If this user was matched with someone, end that pairing
-                    if (ActivePairs.TryRemove(connectionId, out var partnerId))
-                    {
-                        ActivePairs.TryRemove(partnerId, out _);
+                // 2️⃣ If this user was matched with someone, end that pairing
+                if (ActivePairs.TryRemove(connectionId, out var partnerId))
+                {
+                    ActivePairs.TryRemove(partnerId, out _);
 
-                        Console.WriteLine($"🔄 {connectionId} clicked Next — ending pair with {partnerId}");
+                    Console.WriteLine($"🔄 myself {connectionId} clicked Next — ending pair with {partnerId}");
 
-                        // Notify partner
-                        await Clients.Client(partnerId).SendAsync("PartnerLeft");
-                        
-
-                        // Requeue partner if they are still online and valid
-                        if (UserPreferences.TryGetValue(partnerId, out var prefs))
-                        {
-                            WaitingUsers[partnerId] = prefs;
-                            await Clients.Client(partnerId).SendAsync("Waiting","next");
-                            Console.WriteLine($"🔁 Partner {partnerId} requeued.");
-                        }
-                    }
-
-                    // 3️⃣ Notify caller that chat ended
+                    // Notify partner so partner will start search again from js/partnerleft
+                    await Clients.Client(partnerId).SendAsync("PartnerLeft");
+                }
+                        // 3️⃣ Notify caller that chat ended
                     await Clients.Caller.SendAsync("ChatStopped");
-                    Console.WriteLine($"✅ {connectionId} ended chat, ready to start searching again.");
+                    Console.WriteLine($"✅ myself {connectionId} ended chat, ready to start searching again.");
+
+                        // Requeue myself if they are still online and valid
+                        if (UserPreferences.TryGetValue(connectionId, out var prefs))
+                        {
+                            WaitingUsers[connectionId] = prefs;
+                            await Clients.Client(connectionId).SendAsync("Waiting","next");
+                            Console.WriteLine($"🔁 myself {connectionId} re-queued.");
+                        }
+                    
+
+                    
                 }
                     catch (Exception ex)
                     {
@@ -316,7 +317,15 @@ namespace LonelyPartner.Hubs
         // 🔹 WebRTC signaling relay
         public async Task SendSignal(string targetId, string type, object data)
         {
-            await Clients.Client(targetId).SendAsync("ReceiveSignal", Context.ConnectionId, type, data);
+            var senderId = Context.ConnectionId;
+            
+            // ✅ Check if sender and target are in the same active pair
+                if (!ActivePairs.TryGetValue(senderId, out var partnerId) || partnerId != targetId)
+                {
+                    Console.WriteLine($"🚫 Invalid signal: {senderId} attempted to send to {targetId}, not a valid pair.");
+                    return;
+                }
+            await Clients.Client(targetId).SendAsync("ReceiveSignal", senderId, type, data);
         }
 
         // 🔹 Handle disconnect

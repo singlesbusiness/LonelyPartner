@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MySqlX.XDevAPI;
-using YourAppNamespace.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,30 +36,10 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 
-// Authentication: Cookie + Google (external)
-/*
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-})
-    .AddCookie()
-    .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
-    {
-        options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
-        options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
-        // Optionally request additional scopes:
-        options.Scope.Add("profile");
-        options.Scope.Add("email");
-    });
-*/
+// Wallet Service
+builder.Services.AddScoped<WalletService>();
 
 
-/*
-//ProductPlansPrices
-builder.Services.Configure<ProductPlansPrices>(
-    builder.Configuration.GetSection("ProductPlansPrices"));
-*/
 
 //✅  MySQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnectionString");
@@ -114,7 +93,7 @@ builder.Services.AddScoped<LonelyPartner.Services.SolanaRpcService>();
 builder.Services.AddHttpClient<CryptoPriceService>();
 
 //INR exchange
-builder.Services.AddHttpClient<IINRExchangeRateService, INRExchangeRateService>();
+builder.Services.AddHttpClient<INRExchangeRateService, INRExchangeRateService>();
 
 //Cleanup Orderentity
 builder.Services.AddHostedService<OrderCleanupService>();

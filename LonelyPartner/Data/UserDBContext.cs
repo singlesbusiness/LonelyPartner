@@ -1,7 +1,6 @@
 ﻿using LonelyPartner.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using LonelyPartner.Models;
 
 namespace LonelyPartner.Data
 {
@@ -14,6 +13,8 @@ namespace LonelyPartner.Data
         public DbSet<UserEntity> UserEntity { get; set; }
 
         public DbSet<OrderEntity> OrderEntity { get; set; }
+
+        public DbSet<WalletEntity> WalletEntity { get; set; }
 
          // optional
         protected override void OnModelCreating(ModelBuilder builder)

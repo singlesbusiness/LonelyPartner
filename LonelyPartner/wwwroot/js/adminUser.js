@@ -4,88 +4,123 @@
 
 // ===============================
 
- 
+//=======Wallet details==================
+                async function updateSolKey(newKey) {
+                    console.log("update address");
+                    try{
+                            if (!confirm("⚠️ Changing the Solana address will redirect all new payments. Proceed?"))
+                                return;
 
- 
+                            const res = await fetch("/api/wallet/solkey/update", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ newKey })
+                            });
 
+                            const data = await res.json();
+                            alert(data.message || "✅ Solana key updated.");
+                            await loadSolKey(); // refresh displayed key
+                     } catch (err) {
+                        console.error("❌ updateSolKey() failed:", err);
+                        alert("Error updating Solana key. Check console.");
+                        }
+                    }
+                    
+                    
+                    async function loadSolKey() {
+                        
+                            console.log("get address");
+                            try {
+                                const res = await fetch("/api/wallet/solkey");
+                                if (!res.ok) {
+                                    console.error("Failed to load SolKey:", res.status);
+                                    return;
+                                }
+                                const text = await res.text();
+                                if (!text) {
+                                    console.warn("Empty response");
+                                    return;
+                                }
+                                const data = JSON.parse(text);
+                                console.log("get address==", data);
+                                document.getElementById("solKey").textContent = data.solanaPublicKey || "(none)";
+                            } catch (err) {
+                                console.error("Error fetching SolKey:", err);
+                            }
+                        }
+    //======================================
+
+    
+ 
 document.addEventListener("DOMContentLoaded", async () => {
+    console.log("Admin dashboard script loaded ✅");
 
- 
+    // Wait until DOM has the wallet buttons
+    const refreshKeyBtn = document.getElementById("refreshKey");
+    const changeKeyBtn = document.getElementById("changeKey");
+
+
+    // Attach wallet button handlers (if present)
+    if (refreshKeyBtn && changeKeyBtn) {
+        refreshKeyBtn.addEventListener("click", loadSolKey);
+        changeKeyBtn.addEventListener("click", async () => {
+            const newKey = prompt("Enter new Solana key:");
+            if (newKey) await updateSolKey(newKey);
+        });
+    }
+
+   
 
     if (window.appUser.isAuthenticated === true)
 
-    {
+        {
+            const adminBtn = document.getElementById("adminBtn");
 
-    const adminBtn = document.getElementById("adminBtn");
+                    if (!adminBtn) return;
 
- 
+                    try {
 
-    if (!adminBtn) return;
+                        const response = await fetch("/api/user/role", {
 
- 
+                            method: "GET",
 
-    try {
+                            credentials: "include" // needed if using Google cookies
 
-        const response = await fetch("/api/user/role", {
+                        });
 
-            method: "GET",
+                            if (!response.ok) {
 
-            credentials: "include" // needed if using Google cookies
+                            console.warn("Role check failed", response.status);
 
-        });
+                            return;
 
- 
+                        }
 
-        if (!response.ok) {
+                        const data = await response.json();
 
-            console.warn("Role check failed", response.status);
+                        console.log("admin data=>", data);
 
-            return;
+                        if (data.role && data.role.toLowerCase() === "admin") {
 
-        }
+                            adminBtn.style.display = "inline-block";
 
- 
+                        }
 
-        const data = await response.json();
+                    } catch (err) {
 
-        console.log("admin data=>", data);
+                        console.error("Error checking admin role:", err);
 
-        if (data.role && data.role.toLowerCase() === "admin") {
+                    }
 
-            adminBtn.style.display = "inline-block";
+                //====admin button click===
 
-        }
-
-    } catch (err) {
-
-        console.error("Error checking admin role:", err);
-
-    }
-
- 
-
- 
-
-    //====admin button click===
-
- 
-
-    adminBtn.addEventListener("click", e => {
-
-        if (e.target.id === "adminBtn") {
-
-            window.location.href = "/Admin/Dashboard"; // your admin page route
+                adminBtn.addEventListener("click", e => {
+                    if (e.target.id === "adminBtn") {
+                        window.location.href = "/Admin/Dashboard"; // your admin page route
+                        }
+                    });
 
         }
-
-    });
-
- 
-
- 
-
-}
-
-  
 
 });
+
