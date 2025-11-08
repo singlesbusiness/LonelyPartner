@@ -127,8 +127,10 @@ public class SolanaPaymentsController : ControllerBase
     public async Task<IActionResult> VerifyTransaction([FromBody] VerifySolDto dto)
     {
         if (string.IsNullOrWhiteSpace(dto.OrderId) || string.IsNullOrWhiteSpace(dto.TxSig))
+        {
             return BadRequest("Missing orderId or txSig");
-
+        }
+        Console.WriteLine($"dto.OrderId = {dto.OrderId}<--->dto.TxSig = {dto.TxSig}");
         //check if orderId created in Orderentity exists
         var order = await _db.OrderEntity.FirstOrDefaultAsync(o => o.OrderId == dto.OrderId);
         if (order == null) return NotFound("Order not found");
@@ -311,6 +313,7 @@ public class SolanaPaymentsController : ControllerBase
 
             await _db.SaveChangesAsync();
 
+            Console.WriteLine("payment successful, user saved as paid user.");
             // Notify user via SignalR (User identifier must be configured — we send to user's email)
             if (!string.IsNullOrEmpty(user?.CustomerEmail))
             {
@@ -324,6 +327,7 @@ public class SolanaPaymentsController : ControllerBase
                     });
             }
 
+            Console.WriteLine("Going to PlanActivated in main js.");
             return Ok(new { ok = true });
         }
         catch (Exception ex)

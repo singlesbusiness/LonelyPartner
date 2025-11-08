@@ -93,7 +93,7 @@ builder.Services.AddScoped<LonelyPartner.Services.SolanaRpcService>();
 builder.Services.AddHttpClient<CryptoPriceService>();
 
 //INR exchange
-builder.Services.AddHttpClient<INRExchangeRateService, INRExchangeRateService>();
+builder.Services.AddHttpClient<IINRExchangeRateService, INRExchangeRateService>();
 
 //Cleanup Orderentity
 builder.Services.AddHostedService<OrderCleanupService>();

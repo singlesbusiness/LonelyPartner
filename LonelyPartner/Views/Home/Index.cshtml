@@ -302,7 +302,7 @@
             <button id="phantomPayBtn" class="pay-btn">                
                 <span>Pay <span id="payAmt"></span>SOL</span>
             </button>
-            <div id="solStatus" class="sol-status"></div>
+            <div id="solStatus" class="verify-status"></div>
             <canvas id="solQrCanvas"></canvas>
             <div class="sol-footer">
             Secure payment powered by <span class="solona-test">Solana blockchain</span></div>
@@ -320,7 +320,7 @@
         window.appUser = {
             isAuthenticated: @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower()),
             email: '@(User.Identity?.Name ?? "")' ,
-            hasPlan: @( (Model.ProductId > 0  && Model.EndDate > DateTime.UtcNow).ToString().ToLower()) ,
+            hasPlan: @( (Model.ProductId > 0  && Model.EndDate > DateTime.Now).ToString().ToLower()) ,
             productId: @(Model.ProductId) ?? 0,
            // productName: 'Model.ProductName',
             endDate: "@( Model?.EndDate.ToString("o") ?? "" )"
@@ -338,20 +338,66 @@
         }
     </script>
 
-    <script src="https://unpkg.com/@@solana/web3.js@1.65.1/lib/index.iife.min.js"></script>
-    <!-- qrcode (optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-    <script src="~/js/videochat.js"></script>
-    <script src="~/js/accessButtons.js"></script>
-    <script src="~/js/menu.js"></script>
-    <script src="~/js/upgradeButton.js"></script>
+    <!--===================================================-->
     
-    <script src="~/js/adminUser.js"></script>
-    <script src ="~/js/verifyPayment.js"></script>
-    <script src="~/js/profile.js"></script>
-    @* 
-        <script src="~/js/maskCarousel.js"></script>
-    *@
+
+            <!-- ✅ 1. Load Solana Web3 (no require) -->
+        <script src="https://unpkg.com/@@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+
+            <!-- ✅ 2. Provide a minimal Buffer polyfill (manual, no external dependency) -->
+                <script>
+                    // Basic Buffer polyfill compatible with Solana Web3
+                    if (typeof window.Buffer === "undefined") {
+                        class SimpleBuffer extends Uint8Array {
+                            static from(input, encoding) {
+                                if (typeof input === "string") {
+                                    if (encoding === "hex") {
+                                        const pairs = input.match(/[\da-f]{2}/gi) || [];
+                                        return new SimpleBuffer(pairs.map(h => parseInt(h, 16)));
+                                    } else {
+                                        return new SimpleBuffer(new TextEncoder().encode(input));
+                                    }
+                                } else if (input instanceof ArrayBuffer || Array.isArray(input)) {
+                                    return new SimpleBuffer(input);
+                                } else if (input instanceof Uint8Array) {
+                                    return new SimpleBuffer(input);
+                                } else {
+                                    throw new TypeError("Unsupported input for Buffer.from()");
+                                }
+                            }
+                        }
+                        window.Buffer = SimpleBuffer;
+                        console.log("✅ Custom Buffer polyfill active");
+                    }
+
+                    // Needed by Solana’s internal utils
+                    window.global = window;
+                    window.process = { env: {} };
+
+                    console.log("✅ Solana + Buffer environment ready");
+                </script>
+    <!-- ✅ 3. (Optional) Verify environment -->
+        <script>
+        window.addEventListener("load", () => {
+            console.log("🔍 Post-load check: Buffer.from =", typeof Buffer.from);
+            console.log("🔍 SolanaWeb3 =", typeof solanaWeb3);
+        });
+        </script>
+    <!-- ✅ 3. QR and app scripts -->
+            <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+    <!-- ✅ 4. Your application scripts (after Solana init) -->
+            <script src="~/js/videochat.js"></script>
+            <script src="~/js/accessButtons.js"></script>
+            <script src="~/js/menu.js"></script>
+            <script src="~/js/upgradeButton.js"></script>
+            
+            <script src="~/js/adminUser.js"></script>
+            <script src ="~/js/verifyPayment.js"></script>
+            <script src="~/js/profile.js"></script>
+            @* 
+                <script src="~/js/maskCarousel.js"></script>
+            *@
     
     
     

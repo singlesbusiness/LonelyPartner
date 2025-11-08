@@ -34,10 +34,6 @@ function initUpgradeAccessControl() {
 
         const endDate = new Date(window.appUser.endDate);
 
-       
-
- 
-
         if (window.appUser.isAuthenticated === true
 
             && ( (window.appUser.productId != 0) && (endDate > now) ) ) {
@@ -172,7 +168,7 @@ function initUpgradeAccessControl() {
 
  
 
-    // showUpgradeModal should render upgrade cards; when a SOL plan is selected call onBuySol(...)
+    // showUpgradeModal should render upgrade cards; when a  plan is selected call onBuySol(...)
 
     async function onBuySol(productId, productName) {
 
@@ -193,26 +189,23 @@ function initUpgradeAccessControl() {
         if (!res.ok) {
 
             const txt = await res.text();
-
-            alert("Create order failed: " + txt);
+            console.log("Create order failed: " + txt);
+            alert("Create order failed: Please try again");
 
             return;
 
         }
 
         const data = await res.json();
-
-        console.log("create-order response==>", data);
+        //console.log("create-order response==>", data);
 
         //console.log(data.checkout.success);
-
-        if (data.checkout.success != true) alert( "Failed to create order");
-
- 
+        if (data.checkout.success != true) {
+            console.log("Create order failed: " ,data.checkout.success );
+            alert("Create order failed: Please try again");
+        }
 
         //document.getElementById("solAmount").innerText = `${data.checkout.amountSol} SOL (~$${data.checkout.usd})`;
-
- 
 
         const checkout = data.checkout;
 
@@ -222,34 +215,14 @@ function initUpgradeAccessControl() {
 
         if (upgradeModalEl) upgradeModalEl.style.display = "none";
 
- 
-
-       
-
-         showSolModal(checkout); // opens the modal and prepares UI
-
-         /*
-
-        // Now call showSolModal() to show payment popup
-
-        if (typeof showSolModal === "function") {
-
-            showSolModal(checkout);
-
-        } else {
-
-            console.error("showSolModal is not defined yet!");
-
-        }
-
-        */
-
-    }
+      showSolModal(checkout); // opens the modal and prepares UI
+  }
 
  
 
     function showSolModal(checkout) {
-
+        //orderId
+        const orderId = checkout.orderId;
         const modal = document.getElementById("solModal");
 
         if (!modal) {
@@ -259,12 +232,6 @@ function initUpgradeAccessControl() {
             return;
 
         }
-
- 
-
-       
-
- 
 
         // Fill data safely
 
@@ -304,19 +271,13 @@ function initUpgradeAccessControl() {
 
         };
 
- 
-
         document.getElementById("solModalClose").onclick = () => {
 
             modal.style.display = "none";
 
         };
 
- 
-
         modal.style.display = "flex";
-
-       
 
     }
 
@@ -468,161 +429,152 @@ function initUpgradeAccessControl() {
 
     async function doPhantomPay(checkout) {
 
-        const solAmount = parseFloat(checkout.amountSol);
-
-        const receiveAddress = checkout.receiveAddress;
-
-        const memo = checkout.memo;
-
-        const statusEl = document.getElementById("solStatus");
-
- 
-
-        if (!window.solana || !window.solana.isPhantom) {
-
-            alert("Phantom wallet not detected. Install Phantom extension or use a wallet that supports memos.");
-
-            return;
-
-        }
-
- 
-
         try {
 
-            // connect to user's phantom wallet and asks for approve this website
+            const solAmount = parseFloat(checkout.amountSol);
 
-            await window.solana.connect();
+            const receiveAddress = checkout.receiveAddress;
+
+            const memo = checkout.memo;
+
+            const orderid = checkout.orderId;
+
+            const statusEl = document.getElementById("solStatus");
+
+            console.log("orderid=>", orderid);
+
+            //check if phantom wallet is installed
+            const provider = window.solana;
+            if (!provider?.isPhantom) {
+                alert("Phantom wallet not detected. Install Phantom Wallet on mobile or browser extension or use a wallet that supports memos.");
+                throw new Error("Phantom wallet not found.");
+            }
+
+
+             // connect to user's phantom wallet and asks for approve this website
+            await provider.connect();
 
             //get user's public wallete address
-
             const publicKey = window.solana.publicKey.toString();
 
             statusEl.innerText = `Connected to Phantom: ${publicKey}. Preparing transaction...`;
+            
+            //free public RPC from Helius 1,000,000 free credits     
+            const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=89838007-1176-4814-bdff-a6daa27649da", "confirmed");
+            
+            // ✅ New API: getLatestBlockhash
+            const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
 
- 
+            const fromPubkey =new solanaWeb3.PublicKey(window.solana.publicKey.toString());// window.solana.publicKey; //user's wallet
 
-            // Use @solana/web3.js via CDN. Ensure you included <script src=https://unpkg.com/@solana/web3.js@1.65.1/lib/index.iife.js></script> in your layout
+            const toPubkey = new solanaWeb3.PublicKey(receiveAddress); // my sol wallet
 
-            const connection = new solanaWeb3.Connection("https://api.mainnet-beta.solana.com", "confirmed");
-
-            //confirmed =>use finalized later
-
-            // Build transaction: SystemProgram.transfer + Memo instruction
-
-            const fromPubkey = window.solana.publicKey; //user's wallet
-
-            const toPubkey = new solanaWeb3.PublicKey(receiveAddress); // my web app wallet
-
- 
-
-            const lamports = Math.round(solAmount * 1_000_000_000); // SOL -> lamports 1sol = 1,000,000,000 lamports
-
-            const transferInstruction = solanaWeb3.SystemProgram.transfer({
-
-                fromPubkey,
-
-                toPubkey,
-
-                lamports
-
+            
+            //const lamports = Math.round(Number(solAmount) * solanaWeb3.LAMPORTS_PER_SOL);
+            const lamports = BigInt(Math.round(solAmount * solanaWeb3.LAMPORTS_PER_SOL));
+            //solanaWeb3.LAMPORTS_PER_SOL === 1000000000
+            /*
+            console.log("solAmount =", solAmount, "typeof", typeof solAmount);
+            console.log("lamports =", lamports, "typeof", typeof lamports);
+            console.log("fromPubkey base 58=", fromPubkey.toBase58());
+            console.log("toPubkey  base 58=", toPubkey.toBase58());
+            */
+            
+           // Create transaction
+            const transaction = new solanaWeb3.Transaction({
+                recentBlockhash: blockhash,
+                feePayer: fromPubkey
             });
+            // Add transfer instruction
+            transaction.add(
+                solanaWeb3.SystemProgram.transfer({
+                    fromPubkey,
+                    toPubkey,
+                    lamports
+                })
+            );
 
- 
-
-            // Memo instruction (program id: MemoSq4gq... ; use base58 of memo bytes)
-
+            //add memo
+            if (memo) {
             const memoProgramId = new solanaWeb3.PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
-
-            const memoInstruction = new solanaWeb3.TransactionInstruction({
-
-                keys: [],
-
-                programId: memoProgramId,
-
-                data: Buffer.from(memo, "utf8")
-
-            });
-
- 
-
-            const tx = new solanaWeb3.Transaction().add(transferInstruction, memoInstruction);
-
-            tx.feePayer = fromPubkey;
-
- 
-
-            // recent blockhash
-
-            tx.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
-
- 
-
-            // Request user's Phantom to sign and send
-
-            const signed = await window.solana.signTransaction(tx);
-
-            //serialize and send to Solana
-
-            const rawTx = signed.serialize();
-
-            const sentSig = await connection.sendRawTransaction(rawTx, { skipPreflight: false, preflightCommitment: "confirmed" });
-
- 
-
-            statusEl.innerText = `Transaction submitted: ${sentSig}. Waiting for confirmation...`;
-
- 
-
-            // wait for confirmation
-
-            const confirmation = await connection.confirmTransaction(sentSig, "finalized");
-
-            if (!confirmation.value) {
-
-                statusEl.innerText = "Confirmation failed or timed out.";
-
-                return;
-
+            transaction.add(
+                        new solanaWeb3.TransactionInstruction({
+                            keys: [],
+                            programId: memoProgramId,
+                            data: Buffer.from(memo, "utf8")
+                        })
+                    );
             }
 
- 
+            // ✅ Sign and send via Phantom
+            const signedTx = await provider.signTransaction(transaction);
+            const signature = await connection.sendRawTransaction(signedTx.serialize());
 
-            statusEl.innerText = `Transaction confirmed: ${sentSig}. Verifying server-side...`;
+             console.log("Signature:", signature);
 
- 
+             // ✅ Modern confirmation style
+            const confirmation = await connection.confirmTransaction({
+                blockhash,
+                lastValidBlockHeight,
+                signature
+            });
+
+           if (confirmation.value.err) 
+            {
+                throw new Error("Transaction failed");
+            }
+            
+            //alert(`✅ Payment successful!! , Please save this Signature: ${signature}`);
+            console.log("🎉 web3 api Transaction confirmed!");
+
+            statusEl.innerText = `✅ Transaction confirmed: ${signature}. Verifying server-side...`;
+            statusEl.className = "text-green-600 text-sm";
 
             // Call server verify endpoint
 
-            const vRes = await fetch("/api/SolanaPayments/verify", {
+            const verifyRes = await fetch("/api/SolanaPayments/verify", {
 
                 method: "POST",
 
-                headers: { "Content-Type": "application/json" },
+                headers: {
 
-                body: JSON.stringify({ orderId: checkout.orderId, txSig: sentSig })
+                    "Content-Type": "application/json",
+
+                    "Accept": "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    orderId: orderid,
+
+                    txSig: signature
+
+                })
 
             });
 
- 
+            const result = await verifyRes.json();
 
-            const vJson = await vRes.json();
+            console.log("result=>", result);
 
-            if (vRes.ok) {
+            if (verifyRes.ok && result.ok ) {
 
-                statusEl.innerText = "Payment verified! Premium activated.";
+                statusEl.innerText = "✅ Payment verified successfully! Your plan is now active.";
+
+                statusEl.className = "text-green-600 text-sm";
+
+                //setTimeout(() => location.reload(), 1500);   //refresh-reload page
+
+                //statusEl.innerText = "✅ Payment verified successfully! Your plan is now active.";
 
                 // Optionally refresh user profile or update UI directly
 
                 // we expect server to call SignalR PlanActivated
 
- 
-
                 //reloads the page after 1.5 secs
 
                 setTimeout(() => location.reload(), 1500);
-
-                /*
 
                 //hide solModal
 
@@ -631,7 +583,7 @@ function initUpgradeAccessControl() {
                     document.getElementById("solModal").style.display = "none";
 
                 }, 1000);
-
+                /*
                 //hide upgrade button
 
                 if(upgradeBtn) upgradeBtn.style.display = "none";
@@ -642,47 +594,33 @@ function initUpgradeAccessControl() {
 
                 //show premiumBadge
 
-                
-
-                if (premiumBadge) premiumBadge.style.display = "inline-block";
+               if (premiumBadge) premiumBadge.style.display = "inline-block";
 
                 */
 
             } else {
-
-                statusEl.innerText = "Server verification failed: " + JSON.stringify(vJson);
-
+                statusEl.innerText = `❌ Server verification failed. Please verify from profile tab, with signature`;
+                statusEl.className = "text-red-500 text-sm";
             }
-
- 
 
         } catch (err) {
 
-            console.error(err);
-
-            alert("Payment failed: " + (err.message || JSON.stringify(err)));
+            console.error("Payment failed:", err);
+            statusEl.innerText = `❌ Payment failed. Please try again.`;
+            statusEl.className = "text-red-500 text-sm";
+            //alert("Payment failed: " + (err.message || JSON.stringify(err)));
 
         }
 
     }
 
- 
-
- 
-
- 
-
-
- 
+ //////////////Load plans modal//////////////
 
 async function loadPlans() {
 
     try {
 
-       
-
- 
-
+      
         //Upgrade Modal
 
         plansContainer.innerHTML = `<div class="loading">Loading plans...</div>`;
@@ -746,14 +684,11 @@ async function loadPlans() {
                 const amount = card.dataset.amount;
 
  
-
-               
-
                 // Send to backend for purchase update
 
                 await onBuySol(productId, productName);
 
-                /*
+                /* not using this anymore
 
                 const res = await fetch("/api/plans/purchase", {
 
