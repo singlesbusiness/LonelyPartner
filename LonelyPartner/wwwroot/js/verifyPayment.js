@@ -73,9 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const order = await orderRes.json();
 
            // console.log("orderRes=>", order);
-
- 
-
             // Call verify endpoint
 
             const verifyRes = await fetch("/api/solanapayments/verify", {

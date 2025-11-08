@@ -32,7 +32,7 @@ namespace LonelyPartner.Services
                 @params = new object[] { 
                     signature,
                     new { encoding = "jsonParsed",
-                         commitment = "finalized"
+                         commitment = "confirmed"
                         //maxSupportedTransactionVersion = 0  
                     } 
                 }

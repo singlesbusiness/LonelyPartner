@@ -142,14 +142,40 @@ public class SolanaPaymentsController : ControllerBase
         }
 
         // fetch on-chain tx
-        var tx = await _rpc.GetTransactionAsync(dto.TxSig);
-        if (tx == null) return BadRequest("Transaction not found on chain");
+        JsonElement txValue = default;
 
+        for (int i = 0; i < 5; i++) // try up to 5 times, 1s apart
+        {
+            var tx = await _rpc.GetTransactionAsync(dto.TxSig);
+
+            if (tx != null && tx.Value.ValueKind != JsonValueKind.Null)
+            {
+                txValue = tx.Value;
+                break;
+            }
+            Console.WriteLine($"⏳ Waiting for transaction confirmation... attempt {i + 1}");
+            await Task.Delay(1000);
+
+        }       
+            
+                // ✅ Defensive checks — tx.Value can be null or missing "meta"
+                if (txValue.ValueKind == JsonValueKind.Null)
+                    {
+                        Console.WriteLine("⚠️ tx.Value is null, transaction not yet confirmed");
+                        return BadRequest("Transaction not confirmed or still pending.");
+                    }
+        // Only proceed if meta exists and is not null
+        if (!txValue.TryGetProperty("meta", out var metaElem) || metaElem.ValueKind == JsonValueKind.Null)
+            {
+                Console.WriteLine("⚠️ meta missing or null for tx");
+                return BadRequest("Transaction metadata not available yet.");
+            }
         // parse transaction object for memo and amount
         // The RPC result has a 'transaction.message.instructions' array that can include memo and transfer.
         try
-        {
-            var meta = tx.Value.GetProperty("meta");
+        {   
+            var meta = metaElem;
+            //var meta = tx.Value.GetProperty("meta");
             //Check if transaction succeeded
             if(meta.TryGetProperty("err" , out var errProp) &&
                         errProp.ValueKind != JsonValueKind.Null)
@@ -157,7 +183,7 @@ public class SolanaPaymentsController : ControllerBase
                 return BadRequest("Transaction failed on-chain ( not successful).");
             }
 
-            var txMessage = tx.Value.GetProperty("transaction").GetProperty("message");
+            var txMessage = txValue.GetProperty("transaction").GetProperty("message");
             string foundMemo = null;
             decimal totalSolReceived = 0m;
             var instructions = txMessage.GetProperty("instructions");
@@ -250,12 +276,12 @@ public class SolanaPaymentsController : ControllerBase
 
             // fallback: parse meta.postBalances difference for receiving address
             if (totalSolReceived == 0m && 
-                         tx.Value.TryGetProperty("meta", out var meta2) && 
+                         txValue.TryGetProperty("meta", out var meta2) && 
                          meta2.TryGetProperty("postBalances", out var pb) &&
                          meta2.TryGetProperty("preBalances", out var preB))
             {
                 // try find index of account that matches your receive address
-                var accounts = tx.Value.GetProperty("transaction").GetProperty("message").GetProperty("accountKeys");
+                var accounts = txValue.GetProperty("transaction").GetProperty("message").GetProperty("accountKeys");
                 string receive = _cfg["Solana:ReceiveAddress"];
                 int idx = -1;
                 for (int i = 0; i < accounts.GetArrayLength(); i++)
@@ -314,6 +340,7 @@ public class SolanaPaymentsController : ControllerBase
             await _db.SaveChangesAsync();
 
             Console.WriteLine("payment successful, user saved as paid user.");
+            /*
             // Notify user via SignalR (User identifier must be configured — we send to user's email)
             if (!string.IsNullOrEmpty(user?.CustomerEmail))
             {
@@ -328,6 +355,7 @@ public class SolanaPaymentsController : ControllerBase
             }
 
             Console.WriteLine("Going to PlanActivated in main js.");
+            */
             return Ok(new { ok = true });
         }
         catch (Exception ex)

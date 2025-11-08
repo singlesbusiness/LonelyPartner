@@ -26,6 +26,7 @@ function initUpgradeAccessControl() {
 
     const premiumBadge = document.getElementById("premiumBadge");
 
+    const statusEl = document.getElementById("solStatus");
  
 
     function isActivePlan() {
@@ -176,7 +177,7 @@ function initUpgradeAccessControl() {
 
         // create order on server
 
-        const res = await fetch("/api/SolanaPayments/create-order", {
+        const res = await fetch("/api/solanapayments/create-order", {
 
             method: "POST",
 
@@ -247,7 +248,7 @@ function initUpgradeAccessControl() {
 
         document.getElementById("solStatus").innerText =
 
-            "Please use Phantom Wallet Only. DO NOT forget to add Memo";
+            "Please use Phantom Wallet Only.";
 
  
 
@@ -437,11 +438,11 @@ function initUpgradeAccessControl() {
 
             const memo = checkout.memo;
 
-            const orderid = checkout.orderId;
+            const orderId = checkout.orderId;
 
             const statusEl = document.getElementById("solStatus");
 
-            console.log("orderid=>", orderid);
+            console.log("orderid=>", orderId);
 
             //check if phantom wallet is installed
             const provider = window.solana;
@@ -532,7 +533,7 @@ function initUpgradeAccessControl() {
 
             // Call server verify endpoint
 
-            const verifyRes = await fetch("/api/SolanaPayments/verify", {
+            const verifyRes = await fetch("/api/solanapayments/verify", {
 
                 method: "POST",
 
@@ -543,10 +544,10 @@ function initUpgradeAccessControl() {
                     "Accept": "application/json"
 
                 },
-
+                
                 body: JSON.stringify({
 
-                    orderId: orderid,
+                    orderId: orderId,
 
                     txSig: signature
 
@@ -599,7 +600,7 @@ function initUpgradeAccessControl() {
                 */
 
             } else {
-                statusEl.innerText = `❌ Server verification failed. Please verify from profile tab, with signature`;
+                statusEl.innerText = `❌ Server verification failed. Please verify from profile tab, with signature ${signature}`;
                 statusEl.className = "text-red-500 text-sm";
             }
 
