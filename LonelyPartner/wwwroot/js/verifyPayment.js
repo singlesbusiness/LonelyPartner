@@ -125,7 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
-        } catch (err) {
+        } 
+        catch (err) {
 
             console.error(err);
 
@@ -133,7 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             statusMsg.className = "text-red-500 text-sm";
 
-        }
+         }
+
+         //reloads the page after 1.5 secs
+
+        setTimeout(() => location.reload(), 1500);
 
     });
 

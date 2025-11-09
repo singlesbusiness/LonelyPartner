@@ -471,7 +471,10 @@ function initUpgradeAccessControl() {
 
             statusEl.innerText = `Connected to Phantom: ${publicKey}. Preparing transaction...`;
             
-            //free public RPC from Helius 1,000,000 free credits     
+            //*******VERY IMPORTANT*********/
+            //free public RPC from Helius 1,000,000 free credits.
+            //after the credits are reached, login with a new gmail and get the new api-key
+            //from https://mainnet.helius-rpc.com  
             const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=89838007-1176-4814-bdff-a6daa27649da", "confirmed");
             
             // ✅ New API: getLatestBlockhash

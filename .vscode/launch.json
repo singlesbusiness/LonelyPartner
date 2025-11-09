@@ -16,7 +16,7 @@
       "console": "integratedTerminal",
       "serverReadyAction": {
             "action": "openExternally",
-             //"url": "http://localhost:5001",
+             "url": "http://localhost:5051",
              "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
              "browser": "brave",
              //"browser": "custom",
