@@ -320,10 +320,12 @@
         window.appUser = {
             isAuthenticated: @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower()),
             email: '@(User.Identity?.Name ?? "")' ,
-            hasPlan: @( (Model.ProductId > 0  && Model.EndDate > DateTime.Now).ToString().ToLower()) ,
+            //hasPlan: @( (Model.ProductId > 0  && Model.EndDate > DateTime.Now).ToString().ToLower()) ,
             productId: @(Model.ProductId) ?? 0,
            // productName: 'Model.ProductName',
-            endDate: "@( Model?.EndDate.ToString("o") ?? "" )"
+           //Do not create a JS Date on the server,so the date is in UTC only
+           startDate: "@(Model?.StartDate != null ? Model.StartDate.ToString("yyyy-MM-ddTHH:mm:ssZ") : "")",
+           endDate: "@(Model?.EndDate != null ? Model.EndDate.ToString("yyyy-MM-ddTHH:mm:ssZ") : "")"
             
         };
 

@@ -1127,7 +1127,7 @@ function clearStatus() {
  
 
         // --- SignalR PlanActivated handler: update UI when server notifies
-
+        //not using it for now
         connection.on("PlanActivated", (payload) => {
 
             console.log("PlanActivated payload:", payload);

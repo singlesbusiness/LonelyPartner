@@ -8,55 +8,36 @@
 
 console.log("🧭 profileHandler.js loaded.");
 
- 
 
 document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("🚀 DOM Ready in profileHandler.js");
 
  
+        function isActivePlan() {
+                if (!window.appUser?.isAuthenticated || !window.appUser?.endDate)
+                    return false;
 
-    function isActivePlan() {
+                const endDateLocal = new Date(window.appUser.endDate);
+                const nowLocal = new Date();
+                console.log("profile end date=>" , endDateLocal);
+                console.log("profile nowLocal=>" , nowLocal);
+                return (window.appUser.productId != 0) && (endDateLocal > nowLocal);
+            }
 
-        if (!window.appUser
+        if (!window.appUser) {
 
-            || !window.appUser.productId || window.appUser.productId === 0
+            console.error("❌ window.appUser not loggedin.");
 
-        ) {
-
-            return false;
+            return;
 
         }
 
-        //return true;
-
  
 
-        const now = new Date();
-
-        const endDate = new Date(window.appUser.endDate);
-
-        return endDate > now;
-
-    }
-
-if (!window.appUser) {
-
-    console.error("❌ window.appUser not loggedin.");
-
-    return;
-
-}
+        //console.table(window.appUser);
 
  
-
-console.table(window.appUser);
-
- 
-
- 
-
-///
 
     const profileBtn = document.getElementById("profileBtn");
 
@@ -113,9 +94,7 @@ profileBtn.addEventListener("click", async () => {
             const data = await response.json();
 
             console.log("✅ Profile data received:", data);
-
- 
-
+            console.log("date:", data.startDate);
             document.getElementById("profName").innerText = data.customerName || "N/A" ;
 
             document.getElementById("profEmail").innerText = data.customerEmail || "N/A" ;
@@ -130,33 +109,66 @@ profileBtn.addEventListener("click", async () => {
 
             }
 
-            else {
+            else {  
+                    console.log("✅ Profile data received:", data);
 
-               
+                
+/*
+            if (data.endDate) {
+                const endUtc = new Date(data.endDate + "Z");
+                const endLocal = endUtc.toLocaleString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                });
+                console.log("📅 end (UTC):", endUtc.toISOString());
+                console.log("🕓 end (local):", endLocal);
+                document.getElementById("profEnd").innerText = endLocal;
+            } else {
+                document.getElementById("profEnd").innerText = "—";
+            }
+*/
 
-                    document.getElementById("profStart").innerText = data.startDate ? new Date(data.startDate).toLocaleString() : "—";
+                    document.getElementById("profStart").innerText = data.startDate ? new Date(data.startDate + "Z")
+                                                                                                            .toLocaleString('en-GB', {
+                                                                                                            day: '2-digit',
+                                                                                                            month: '2-digit',
+                                                                                                            year: 'numeric',
+                                                                                                            hour: '2-digit',
+                                                                                                            minute: '2-digit',
+                                                                                                            hour12: false,
+                                                                                                            }) : "—";
 
-                    document.getElementById("profEnd").innerText = data.endDate ? new Date(data.endDate).toLocaleString() : "—";
+                    document.getElementById("profEnd").innerText = data.endDate ? new Date(data.endDate + "Z")
+                                                                                                    .toLocaleDateString('en-GB', {
+                                                                                                            day: '2-digit',
+                                                                                                            month: '2-digit',
+                                                                                                            year: 'numeric',
+                                                                                                            hour: '2-digit',
+                                                                                                            minute: '2-digit',
+                                                                                                            hour12: false,
+                                                                                                            }) : "—";
 
                     //document.getElementById("profAmount").innerText = data.totalAmount ? `$${data.totalAmount}` : "—";
-
-               
-
-            }
+                }
 
             profileModal.style.display = "flex";
+            console.log("✅ profileHandler.js fully loaded and parsed.");
 
         } catch (err) {
 
-            console.error("❌ Failed to load profile:", err);S
+            console.error("❌ Failed to load profile:", err);
 
             alert("Could not load profile.");
 
         }
-
+        console.log("✅ profileHandler.js fully loaded and parsed====.");
     });
 
- 
+    
 
     //  Close profile modal
 
@@ -164,7 +176,7 @@ profileBtn.addEventListener("click", async () => {
 
         profileModal.style.display = "none";
 
-        //empty the text box
+        //empty the signature verification text box
 
         txInput.value = "";
 
@@ -172,7 +184,7 @@ profileBtn.addEventListener("click", async () => {
 
         //reloads the page after 1.5 secs
 
-        setTimeout(() => location.reload(), 1500);
+        setTimeout(() => location.reload(), 1000);
 
     });
 

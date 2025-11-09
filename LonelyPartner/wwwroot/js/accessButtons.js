@@ -4,10 +4,6 @@
 
 // ===============================
 
- 
-
- 
-
 function initAccessControl() {
 
  
@@ -45,47 +41,54 @@ function initAccessControl() {
                 }
             });
             
-            
+        function isActivePlan() {
+                if (!window.appUser?.isAuthenticated || !window.appUser?.endDate)
+                    return false;
 
-    function isActivePlan() {
+                const endDateLocal = new Date(window.appUser.endDate);
+                const nowLocal = new Date();
+                console.log("accessbutton end date=>" , endDateLocal);
+                console.log("accessbutton nowLocal=>" , nowLocal);
+                return (window.appUser.productId != 0) && (endDateLocal > nowLocal);
+            }      
+            /*
+            function isActivePlan() {
 
-        const now = new Date();
+                const now = new Date();
 
-        const endDate = new Date(window.appUser.endDate);
+                const endDate = new Date(window.appUser.endDate);
 
-       
 
- 
+                if (window.appUser.isAuthenticated === true
 
-        if (window.appUser.isAuthenticated === true
+                    && (window.appUser.productId != 0) && (endDate > now)
 
-            && (window.appUser.productId != 0) && (endDate > now)
+                // && (window.appUser.isActivePlan === true)
 
-           // && (window.appUser.isActivePlan === true)
+                )
 
-        )
+                {
 
-          {
+                    return true;
 
-            return true;
+                }
 
-        }
+                else if (window.appUser.isAuthenticated === false
 
-        else if (window.appUser.isAuthenticated === false
+                    || !window.appUser.productId || window.appUser.productId === 0 || (endDate < now)) {
 
-            || !window.appUser.productId || window.appUser.productId === 0 || (endDate < now)) {
+                    return false;
 
-            return false;
+                }
 
-        }
+                else {
 
-        else {
+                    return false;
 
-            return false;
+                }
 
-        }
-
-    }
+            }
+            */
 
  
 

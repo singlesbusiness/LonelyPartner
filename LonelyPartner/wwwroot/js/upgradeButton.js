@@ -28,7 +28,17 @@ function initUpgradeAccessControl() {
 
     const statusEl = document.getElementById("solStatus");
  
+    function isActivePlan() {
+                if (!window.appUser?.isAuthenticated || !window.appUser?.endDate)
+                    return false;
 
+                const endDateLocal = new Date(window.appUser.endDate);
+                const nowLocal = new Date();
+                console.log("upgrade end date=>" , endDateLocal);
+                console.log("upgrade nowLocal=>" , nowLocal);
+                return (window.appUser.productId != 0) && (endDateLocal > nowLocal);
+            }
+    /*
     function isActivePlan() {
 
         const now = new Date();
@@ -42,6 +52,7 @@ function initUpgradeAccessControl() {
             return true;
 
         }
+        
 
         else if (window.appUser.isAuthenticated === false
 
@@ -58,7 +69,7 @@ function initUpgradeAccessControl() {
         }       
 
     }
-
+    */
  
 
     //load upgrade modal in backgroud
