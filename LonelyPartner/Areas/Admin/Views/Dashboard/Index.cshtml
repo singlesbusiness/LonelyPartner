@@ -1,0 +1,62 @@
+@model List<LonelyPartner.Models.UserEntity>
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    var searchEmail = Context.Request?.Query["searchEmail"].ToString() ?? "";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<h2>👩‍💼 Admin Dashboard</h2>
+
+<div class="summary-bar mb-3">
+    <span><b>Total Users:</b> @ViewBag.TotalUsers</span>
+    <span><b>Active Plans:</b> @ViewBag.ActivePlans</span>
+    <span><b>Total SOL:</b> @ViewBag.TotalSol</span>
+    <span><b>Total USD:</b> @ViewBag.AmountUSD</span>
+</div>
+
+<form method="get" class="mb-3">
+    <input type="text" name="searchEmail" placeholder="🔍 Search by email" value="@searchEmail" />
+    <button type="submit" class="btn btn-sm btn-primary">Search</button>
+</form>
+
+<table class="table table-bordered table-striped align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Id</th><th>Email</th><th>Name</th><th>Product</th>
+            <th>Product Id</th><th>Start</th><th>End</th><th>Order</th><th>Txn</th><th>Save</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model)
+        {
+            <tr>
+                <form asp-action="Edit" method="post">
+                    <td>@u.Id <input type="hidden" name="Id" value="@u.Id" /></td>
+                    <td><input name="CustomerEmail" value="@u.CustomerEmail" class="form-control form-control-sm" /></td>
+                    <td><input name="CustomerName" value="@u.CustomerName" class="form-control form-control-sm" /></td>
+                    <td><input name="ProductName" value="@u.ProductName" class="form-control form-control-sm" /></td>
+                    <td><input name="ProductId" value="@u.ProductId" class="form-control form-control-sm" /></td>
+                    <td><input name="StartDate" value="@u.StartDate.ToString("u")" class="form-control form-control-sm" /></td>
+                    <td><input name="EndDate" value="@u.EndDate.ToString("u")" class="form-control form-control-sm" /></td>
+                    <td><input name="OrderId" value="@u.OrderId" class="form-control form-control-sm" /></td>
+                    <td><input name="TransactionId" value="@u.TransactionId" class="form-control form-control-sm" /></td>
+                    <td><button class="btn btn-success btn-sm">💾</button></td>
+                </form>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <nav class="mt-3">
+        <ul class="pagination">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="?page=@i&searchEmail=@searchEmail">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}

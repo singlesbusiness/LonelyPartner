@@ -98,6 +98,10 @@ builder.Services.AddHttpClient<IINRExchangeRateService, INRExchangeRateService>(
 //Cleanup Orderentity
 builder.Services.AddHostedService<OrderCleanupService>();
 
+//Email Service
+builder.Services.AddScoped<LonelyPartner.Services.EmailService>();
+
+
 //for one session of the user
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
@@ -153,7 +157,12 @@ app.UseAuthorization();
 
 //app.MapRazorPages();
 
+// Add area route FIRST
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
+// Then your normal site route
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

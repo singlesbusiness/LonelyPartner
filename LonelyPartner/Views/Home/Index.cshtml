@@ -309,7 +309,16 @@
         </div>
     </div>
 
-
+    @* multiple tab / browser alert*@
+    <div id="tabAlertModal" style="display:none;">
+        <div id="tabAlertBackdrop"></div>
+        <div id="tabAlertBox">
+            <h3>Session Active</h3>
+            <p>You have started searching in another tab or browser.</p>
+            <p>Click the Start to retry.</p>
+            <button id="restartSearchBtn">Start</button>
+        </div>
+    </div>
   
     @*=====================Scripts=========================*@
       
@@ -389,6 +398,7 @@
             <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 
     <!-- ✅ 4. Your application scripts (after Solana init) -->
+            
             <script src="~/js/videochat.js"></script>
             <script src="~/js/accessButtons.js"></script>
             <script src="~/js/menu.js"></script>
@@ -397,6 +407,7 @@
             <script src="~/js/adminUser.js"></script>
             <script src ="~/js/verifyPayment.js"></script>
             <script src="~/js/profile.js"></script>
+            <script src="~/js/multiTabAccessBlock.js"></script>
             @* 
                 <script src="~/js/maskCarousel.js"></script>
             *@

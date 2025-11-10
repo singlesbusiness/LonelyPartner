@@ -942,6 +942,54 @@ nav {
     color: #4fc3f7;
 }
 
+/*==multiple tab browser alert*/
+
+#tabAlertModal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+#tabAlertBackdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+#tabAlertBox {
+    position: relative;
+    background: #1f084c;
+    color: #fff;
+    padding: 25px 35px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    text-align: center;
+    z-index: 10001;
+    max-width: 400px;
+}
+
+#tabAlertBox h3 {
+    margin-top: 0;
+    color: #ffcc00;
+}
+
+#tabAlertBox button {
+    background-color: #ffcc00;
+    color: #2e1065;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+#tabAlertBox button:hover {
+    background-color: #ffd633;
+}
 
 
 /*alert*/

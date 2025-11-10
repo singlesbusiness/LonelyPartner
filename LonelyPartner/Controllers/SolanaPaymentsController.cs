@@ -20,14 +20,16 @@ public class SolanaPaymentsController : ControllerBase
     private readonly CryptoPriceService _crypto;
     private readonly IHubContext<ChatHub> _hub; // your signalr hub
     private readonly IINRExchangeRateService _exchangeRateService; //INR rate
+    private readonly EmailService _emailService;//Email
 
     public SolanaPaymentsController(UserDBContext db,
-                                    IConfiguration cfg, 
-                                    ILogger<SolanaPaymentsController> logger, 
-                                    SolanaRpcService rpc, 
+                                    IConfiguration cfg,
+                                    ILogger<SolanaPaymentsController> logger,
+                                    SolanaRpcService rpc,
                                     IHubContext<ChatHub> hub,
                                     CryptoPriceService crypto,
-                                    IINRExchangeRateService exchangeRateService)
+                                    IINRExchangeRateService exchangeRateService,
+                                    EmailService emailService)
     {
         _db = db;
         _cfg = cfg;
@@ -36,6 +38,7 @@ public class SolanaPaymentsController : ControllerBase
         _hub = hub;
         _crypto = crypto;
         _exchangeRateService = exchangeRateService;
+        _emailService = emailService;
     }
 
     [HttpPost("create-order")]
@@ -340,6 +343,37 @@ public class SolanaPaymentsController : ControllerBase
             await _db.SaveChangesAsync();
 
             Console.WriteLine("payment successful, user saved as paid user.");
+
+            // Send invoice email=====================
+            //Using _ = Task.Run(...) makes the email send asynchronously in the background, 
+            // so your API response is fast and the user doesn’t wait for email transmission
+            // Load user info BEFORE background task
+                var paidUser = await _db.UserEntity
+                    .Where(u => u.Id == order.UserId)
+                    .Select(u => new { u.CustomerEmail, u.CustomerName })
+                    .FirstOrDefaultAsync();
+
+                if (!string.IsNullOrEmpty(paidUser.CustomerEmail))
+                {
+                    var simpleOrderInfo = new
+                    {
+                        Email = paidUser.CustomerEmail,
+                        Name = paidUser.CustomerName,
+                        ProductName = order.ProductName,
+                        AmountUSD = order.AmountUSD,
+                        AmountSol = order.AmountSol,
+                        TxId = order.TxId,
+                        OrderId = order.OrderId,
+                        PaidAt = order.PaidAt
+                    };
+                    // Background fire-and-forget email
+                    _ = Task.Run(async () =>
+                        await _emailService.SendInvoiceEmailAsync(simpleOrderInfo)
+                    );
+                }
+                Console.WriteLine("✅ Payment successful — email queued for sending.");
+
+
             /*
             // Notify user via SignalR (User identifier must be configured — we send to user's email)
             if (!string.IsNullOrEmpty(user?.CustomerEmail))
