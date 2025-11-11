@@ -1,62 +1,205 @@
-@model List<LonelyPartner.Models.UserEntity>
+@using LonelyPartner.Models
+@model IEnumerable<object>
 @{
-    ViewData["Title"] = "Admin Dashboard";
-    var searchEmail = Context.Request?.Query["searchEmail"].ToString() ?? "";
     Layout = "~/Areas/Admin/Views/Shared/_Layout_Admin.cshtml";
+    var tab = ViewBag.Tab as string ?? "users";
+    var search = ViewBag.Search as string ?? "";
+    var currentPage = (int)(ViewBag.CurrentPage ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
 }
 
-<h2>👩‍💼 Admin Dashboard</h2>
+<div class="container py-4">
+    <h2 class="mb-4">👩‍💼 Admin Dashboard</h2>
 
-<div class="summary-bar mb-3">
-    <span><b>Total Users:</b> @ViewBag.TotalUsers</span>
-    <span><b>Active Plans:</b> @ViewBag.ActivePlans</span>
-    <span><b>Total SOL:</b> @ViewBag.TotalSol</span>
-    <span><b>Total USD:</b> @ViewBag.AmountUSD</span>
-</div>
+    <!-- Summary Bar -->
+    @if (tab == "users")
+    {
+        <div class="card p-3 mb-3">
+            <div class="d-flex justify-content-around">
+                <span><b>Total Users:</b> @ViewBag.TotalUsers</span>
+                <span><b>Active Plans:</b> @ViewBag.ActivePlans</span>
+                <span><b>Total SOL:</b> @ViewBag.TotalSol</span>
+                <span><b>Total USD:</b> @ViewBag.TotalUsd</span>
+            </div>
+        </div>
 
-<form method="get" class="mb-3">
-    <input type="text" name="searchEmail" placeholder="🔍 Search by email" value="@searchEmail" />
-    <button type="submit" class="btn btn-sm btn-primary">Search</button>
-</form>
+        <!-- Solana Wallet Settings -->
+        <div class="card p-3 mb-4 text-center" style="max-width:700px; margin:auto;">
+            <h5 class="mb-3">💰 Solana Wallet Settings</h5>
+            <p><b>Current Public Key:</b> <span id="solKey" class="text-primary"></span></p>
+            <div class="d-flex justify-content-center gap-2">
+                <button id="refreshKey" type="button" class="btn btn-outline-info btn-sm px-3">🔄 Refresh</button>
+                <button id="changeKey" type="button" class="btn btn-outline-warning btn-sm px-3">✏️ Change</button>
+            </div>
+        </div>
+    }
 
-<table class="table table-bordered table-striped align-middle">
-    <thead class="table-dark">
-        <tr>
-            <th>Id</th><th>Email</th><th>Name</th><th>Product</th>
-            <th>Product Id</th><th>Start</th><th>End</th><th>Order</th><th>Txn</th><th>Save</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var u in Model)
-        {
-            <tr>
-                <form asp-action="Edit" method="post">
-                    <td>@u.Id <input type="hidden" name="Id" value="@u.Id" /></td>
-                    <td><input name="CustomerEmail" value="@u.CustomerEmail" class="form-control form-control-sm" /></td>
-                    <td><input name="CustomerName" value="@u.CustomerName" class="form-control form-control-sm" /></td>
-                    <td><input name="ProductName" value="@u.ProductName" class="form-control form-control-sm" /></td>
-                    <td><input name="ProductId" value="@u.ProductId" class="form-control form-control-sm" /></td>
-                    <td><input name="StartDate" value="@u.StartDate.ToString("u")" class="form-control form-control-sm" /></td>
-                    <td><input name="EndDate" value="@u.EndDate.ToString("u")" class="form-control form-control-sm" /></td>
-                    <td><input name="OrderId" value="@u.OrderId" class="form-control form-control-sm" /></td>
-                    <td><input name="TransactionId" value="@u.TransactionId" class="form-control form-control-sm" /></td>
-                    <td><button class="btn btn-success btn-sm">💾</button></td>
-                </form>
-            </tr>
-        }
-    </tbody>
-</table>
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link @(tab == "users" ? "active" : "")" href="@Url.Action("Index", new { tab = "users" })">Users</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(tab == "orders" ? "active" : "")" href="@Url.Action("Index", new { tab = "orders" })">Orders</a>
+        </li>
+    </ul>
 
-@if (ViewBag.TotalPages > 1)
+    <!-- Search -->
+    <form method="get" asp-action="Index" class="d-flex mb-3">
+        <input type="hidden" name="tab" value="@tab" />
+        <input type="text" class="form-control me-2" name="search"
+               placeholder="🔍 @(tab == "users" ? "Search by Email" : "Search by Customer ID")"
+               value="@search" />
+        <button type="submit" class="btn btn-primary btn-sm">Search</button>
+    </form>
+
+    <!-- USERS TABLE -->
+    @if (tab == "users")
 {
+    var users = Model.Cast<UserEntity>();
+
+    <table class="table table-striped table-bordered align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Product</th>
+                    <th>Product ID</th>
+                    <th>Start (UTC)</th>
+                    <th>End (UTC)</th>
+                    <th>Order ID</th>
+                    <th>Transaction ID</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in users)
+                {   <form asp-area="Admin" asp-controller="Dashboard" asp-action="EditUser" method="post" id="userEditForm">
+        
+                        <tr>
+                            <td>@u.Id <input type="hidden" name="Id" value="@u.Id" /></td>
+                            <td><input name="CustomerEmail" value="@u.CustomerEmail" class="form-control form-control-sm" /></td>
+                            <td><input name="CustomerName" value="@u.CustomerName" class="form-control form-control-sm" /></td>
+                            <td><input name="ProductName" value="@u.ProductName" class="form-control form-control-sm" /></td>
+                            <td><input name="ProductId" value="@u.ProductId" class="form-control form-control-sm" /></td>
+                            <td><input name="StartDate" value="@u.StartDate.ToString("u")" class="form-control form-control-sm" /></td>
+                            <td><input name="EndDate" value="@u.EndDate.ToString("u")" class="form-control form-control-sm" /></td>
+                            <td><input name="OrderId" value="@u.OrderId" class="form-control form-control-sm" /></td>
+                            <td><input name="TransactionId" value="@u.TransactionId" class="form-control form-control-sm" /></td>
+                            <td>
+                                <button type="submit" class="btn btn-success btn-sm" formaction="@Url.Action("EditUser","Dashboard", new { area="Admin" })">
+                                    💾 Save
+                                </button>
+                            </td>
+                        </tr>
+                    </form>
+                }
+            </tbody>
+        </table>
+    
+}
+
+
+    <!-- ORDERS TABLE -->
+    @if (tab == "orders")
+    {
+        var orders = Model.Cast<OrderEntity>();
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Customer ID</th>
+                    <th>Order ID</th>
+                    <th>Product ID</th>
+                    <th>Product</th>
+                    <th>Amount SOL</th>
+                    <th>Amount USD</th>
+                    <th>Status</th>
+                    <th>PaidAt</th>
+                    <th>Created</th>
+                    <th>Transaction Id</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in orders)
+                {
+                    <tr>
+                        <td>@o.Id</td>
+                        <td>@o.OrderId</td>
+                        <td>@o.ProductId</td>
+                        <td>@o.ProductName</td>
+                        <td>@o.AmountSol</td>
+                        <td>@o.AmountUSD</td>
+                        <td>@o.Status</td>
+                        <td>@o.PaidAt?.ToLocalTime().ToString("g")</td>
+                        <td>@o.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>@o.TxId</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <!-- Pagination -->
     <nav class="mt-3">
-        <ul class="pagination">
-            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= totalPages; i++)
             {
-                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a class="page-link" href="?page=@i&searchEmail=@searchEmail">@i</a>
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { tab = tab, search = search, page = i })">@i</a>
                 </li>
             }
         </ul>
     </nav>
+
+    @*save record*@
+    @if (TempData["SaveMessage"] != null)
+    {
+        <div id="saveToast" class="toast-message">@TempData["SaveMessage"]</div>
+
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                const toast = document.getElementById('saveToast');
+                if (toast) {
+                         toast.style.position = 'fixed';
+                        toast.style.bottom = '30px';
+                        toast.style.right = '30px';
+                        toast.style.background = '#28a745';
+                        toast.style.color = 'white';
+                        toast.style.padding = '12px 18px';
+                        toast.style.borderRadius = '8px';
+                        toast.style.boxShadow = '0 3px 6px rgba(0,0,0,0.2)';
+                        toast.style.zIndex = '9999';
+                        toast.style.opacity = '0';
+                        toast.style.transition = 'opacity 0.5s';
+                        setTimeout(() => toast.style.opacity = '1', 200);
+                        setTimeout(() => toast.style.opacity = '0', 4000);
+                    }
+                });
+            </script>
+        }
+
+</div>
+
+@*give access to js if user is loggedin*@
+    <script>
+        window.appUser = {
+            isAuthenticated: @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower()),
+            email: '@(User.Identity?.Name ?? "")' ,
+            
+        };
+
+        console.log("🔹 window.appUser initialized:");
+        console.table(window.appUser);
+
+        // Check if Razor values came through
+        if (!window.appUser.isAuthenticated || window.appUser.isAuthenticated === "false") {
+            console.warn("⚠️ User not authenticated according to Razor context.");
+        } else {
+            console.log("✅ User is authenticated according to Razor context.");
+        }
+    </script>
+
+@section Scripts {
+    <script src="~/js/adminuser.js"></script>
 }

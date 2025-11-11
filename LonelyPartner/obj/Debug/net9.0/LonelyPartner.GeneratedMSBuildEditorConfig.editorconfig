@@ -36,8 +36,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvU2hhcmVkL19MYXlvdXRfQWRtaW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/Views/Admin/Dashboard.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW4vRGFzaGJvYXJkLmNzaHRtbA==
+[/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/Views/Adminnotused/Dashboardnotused.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5ub3R1c2VkL0Rhc2hib2FyZG5vdHVzZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/Views/Home/Index.cshtml]

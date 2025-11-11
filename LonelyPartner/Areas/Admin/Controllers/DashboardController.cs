@@ -7,73 +7,104 @@ using Microsoft.EntityFrameworkCore;
 namespace LonelyPartner.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    //[Authorize(Roles = "Admin")]
     [Authorize]
     public class DashboardController : Controller
     {
         private readonly UserDBContext _context;
+        private const int PageSize = 20;
 
         public DashboardController(UserDBContext context)
         {
             _context = context;
         }
 
-        // GET: /Admin/Dashboard
-        public async Task<IActionResult> Index(string? searchEmail, int page = 1, int pageSize = 25)
-        {   
-            // 🔍 Get current user
-            var email = User?.Claims.FirstOrDefault(c => c.Type.Contains("email"))?.Value;
-            var current = await _context.UserEntity.FirstOrDefaultAsync(u => u.CustomerEmail == email);
-
-            if (current == null || current.Role != "Admin")
-                return Forbid(); // manual admin check ✅
-                
-            var query = _context.UserEntity.AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchEmail))
-                query = query.Where(u => u.CustomerEmail!.Contains(searchEmail));
-
-            var totalUsers = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalUsers / (double)pageSize);
-
-            var users = await query
-                .OrderBy(u => u.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            ViewBag.TotalUsers = await _context.UserEntity.CountAsync();
-            ViewBag.ActivePlans = await _context.UserEntity
-                .CountAsync(u => u.ProductId != null && u.EndDate > DateTime.UtcNow);
-            ViewBag.TotalPages = totalPages;
+        public async Task<IActionResult> Index(string tab = "users", string? search = null, int page = 1)
+        {
+            ViewBag.Tab = tab;
+            ViewBag.Search = search;
             ViewBag.CurrentPage = page;
+            ViewBag.PageSize = PageSize;
 
-            // Orders summary
-            var paidOrders = await _context.OrderEntity.Where(o => o.Status == "Paid").ToListAsync();
-            ViewBag.TotalSol = paidOrders.Sum(o => o.AmountSol).ToString("N9");
-            ViewBag.AmountUSD = paidOrders.Sum(o => o.AmountUSD).ToString("N2");
+            // ✅ USERS TAB
+            if (tab == "users")
+            {
+                var query = _context.UserEntity.AsQueryable();
 
-            return View(users);
+                if (!string.IsNullOrWhiteSpace(search))
+                    query = query.Where(u => u.CustomerEmail.ToLower().Contains(search.ToLower()));
+
+                var totalUsers = await query.CountAsync();
+                var users = await query.OrderBy(u => u.Id)
+                                       .Skip((page - 1) * PageSize)
+                                       .Take(PageSize)
+                                       .ToListAsync();
+
+                ViewBag.TotalPages = (int)Math.Ceiling(totalUsers / (double)PageSize);
+
+                // Summary metrics
+                ViewBag.TotalUsers = await _context.UserEntity.CountAsync();
+                ViewBag.ActivePlans = await _context.UserEntity
+                    .CountAsync(u => u.ProductId > 0 && u.EndDate > DateTime.UtcNow);
+
+                var paidOrders = await _context.OrderEntity.Where(o => o.Status.ToLower() == "paid").ToListAsync();
+                ViewBag.TotalSol = paidOrders.Sum(o => o.AmountSol).ToString("N9");
+                ViewBag.TotalUsd = paidOrders.Sum(o => o.AmountUSD).ToString("N2");
+
+                return View(users);
+            }
+
+            // ✅ ORDERS TAB — show only PAID orders
+            if (tab == "orders")
+            {
+                var query = _context.OrderEntity
+                    .Where(o => o.Status.ToLower() == "paid")
+                    .AsQueryable();
+
+                if (int.TryParse(search, out int orderId))
+                    query = query.Where(o => o.UserId == orderId && o.Status != null && o.Status.ToLower() == "paid");
+
+                var totalOrders = await query.CountAsync();
+                var orders = await query.OrderByDescending(o => o.Id)
+                                        .Skip((page - 1) * PageSize)
+                                        .Take(PageSize)
+                                        .ToListAsync();
+
+                ViewBag.TotalPages = (int)Math.Ceiling(totalOrders / (double)PageSize);
+                return View(orders);
+            }
+
+            // fallback
+            return RedirectToAction(nameof(Index), new { tab = "users" });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, [FromForm] UserEntity updated)
+        public async Task<IActionResult> EditUser(int id, [FromForm] UserEntity updated)
         {
             var user = await _context.UserEntity.FindAsync(id);
-            if (user == null) return NotFound();
-
+            if (user == null) 
+            {
+                TempData["SaveMessage"] = "❌ User not found!";
+                return RedirectToAction(nameof(Index), new { tab = "users" });
+            }
+            //Console.WriteLine("🟢 Update user by admin started");
+            //Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(updated));
             user.CustomerEmail = updated.CustomerEmail;
-            user.CustomerName = updated.CustomerName ?? updated.CustomerEmail;
+            user.CustomerName = updated.CustomerName;
             user.ProductId = updated.ProductId;
-            user.ProductName = updated.ProductName ?? "";
+            user.ProductName = updated.ProductName;
             user.StartDate = updated.StartDate;
             user.EndDate = updated.EndDate;
-            user.OrderId = updated.OrderId ?? "";
-            user.TransactionId = updated.TransactionId ?? "";
+            user.OrderId = updated.OrderId;
+            user.TransactionId = updated.TransactionId;
             user.Role = "User";
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            Console.WriteLine($"🟢 update userid={id}, by admin done");
+            // ✅ show in admin portal at right bottom success message
+            TempData["SaveMessage"] = "✅ User details saved successfully!";
+
+            return RedirectToAction(nameof(Index), new { tab = "users" });
         }
     }
 }

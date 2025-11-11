@@ -72,6 +72,7 @@ namespace LonelyPartner.Controllers
             user.Role =  "User";
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Dashboard));
+            
         }
     }
 }

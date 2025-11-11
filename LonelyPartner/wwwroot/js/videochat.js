@@ -1,4 +1,5 @@
-// wwwroot/js/videochat.js
+// wwwroot/j
+// /videochat.js
 
 // Combined SignalR + WebRTC + Chat + Emoji + Age check + Resizing
 
@@ -346,8 +347,9 @@
 
  
 
-    function stopCamera() {
+    function stopCamera(calledfrom = "") {
 
+        // 1️⃣ Stop local video stream
         if (localStream) {
 
             localStream.getTracks().forEach(t => t.stop());
@@ -355,7 +357,7 @@
             localStream = null;
 
         }
-
+        // 2️⃣ Hide local video preview
         if (localVideo) {
 
             localVideo.srcObject = null;
@@ -367,7 +369,33 @@
         }
 
         console.log("Local camera stopped");
-        endCallLocal();
+        //stops pc connection and stops remote camera
+        //if called from multitab, neeed not call endCallLocal, as the flow goes 
+        // to hub->Stop->Partnerleft->endCallLocal
+        
+        // 3️⃣ Handle disconnect logic
+        if (calledfrom === "multitab") {
+            console.log("call came from multiTab");
+            
+            // In multitab case, just tell the hub user left
+            try {
+                    if (connection && connection.state === signalR.HubConnectionState.Connected) 
+                        {
+                         connection.invoke("Stop");
+                    } else 
+                        {
+                        console.warn("SignalR not connected when multi tab opened");
+                    }
+                } catch (e) {
+                    console.error("Stop failed:", e);
+                }
+        }
+        else 
+            {
+            // Normal flow: stop call locally 
+            endCallLocal();
+            }
+   
 
     }
 
@@ -663,10 +691,13 @@ function clearStatus() {
 
  
 
-    // teardown current call
+    // end current call
 
     function endCallLocal() {
         
+        //set status empty set when app opened in two tabs.
+        setStatus("", "info");
+        statusText.style.display = "none";
         //clear chat
         if (infoDiv) {
             infoDiv.textContent = "";
@@ -713,7 +744,7 @@ function clearStatus() {
 
        
 
-        log("Call ended locally");
+        console.log("Call ended locally");
 
     }
 
@@ -1410,7 +1441,8 @@ function clearStatus() {
         setStatus("You left the chat.", "info");
         // stop camera and local call
         stopCamera();
-        endCallLocal();
+        // not needed ast stopeCamera calls endCallLocal in side it
+        //endCallLocal();
         //Next button hide
         nextBtn.style.display = "none";
         //myGenderSelect dispaly
@@ -1789,29 +1821,28 @@ function clearStatus() {
 
  
 
-        log("UI initialized");
+        console.log("UI initialized");
 
     });
 
  
 
-    // expose some helpers for debugging from console
+    // expose some helpers globally
+    // Always define LP immediately
+    window.LP = window.LP || {};
 
-    window.LP = {
-
-        getConnection: () => connection,
-
-        getPartner: () => currentPartnerId,
-
-        getPC: () => pc,
-
-        startCamera,
-
-        stopCamera,
-
-        endCallLocal
-
+    //window.LP.startCamera = startCamera;
+    window.LP.stopCamera = stopCamera;
+    //window.LP.endCallLocal = endCallLocal;
+    // Optional: attach more methods
+    window.LP.disconnectSignalR = function () {
+        console.log("🔌 LP.disconnectSignalR() called");
+        if (window.connection?.stop) {
+            window.connection.stop();
+        }
     };
+
+   
 
  
 

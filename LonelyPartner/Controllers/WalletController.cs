@@ -23,7 +23,7 @@ namespace LonelyPartner.Controllers
             try
             {
                 var key = await _settings.GetSolanaPublicKeyAsync();
-            return Ok(new { SolanaPublicKey = key });
+                return Ok(new { SolanaPublicKey = key });
             }
             catch (Exception ex)
                 {
@@ -38,11 +38,13 @@ namespace LonelyPartner.Controllers
             if (string.IsNullOrWhiteSpace(request.NewKey))
                 return BadRequest("Invalid key.");
 
-            //Console.WriteLine("In update sol address api");
             try
             {
                 var updatedBy = User.Identity?.Name ?? "Admin";
                 await _settings.UpdateSolanaPublicKeyAsync(request.NewKey, updatedBy);
+                Console.WriteLine("🟢  Updated Solana public key by admin");
+                // ✅ show in admin portal at right bottom success message
+                
                 return Ok(new { Message = "Solana key updated successfully." });
             }
             catch (Exception ex)

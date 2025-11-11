@@ -18,13 +18,14 @@
                             });
 
                             const data = await res.json();
-                            alert(data.message || "✅ Solana key updated.");
+                            alert(data.message || "✅ Solana public key updated.");
+                            
                             await loadSolKey(); // refresh displayed key
-                     } catch (err) {
-                        console.error("❌ updateSolKey() failed:", err);
-                        alert("Error updating Solana key. Check console.");
+                        } catch (err) {
+                            console.error("❌ updateSolKey() failed:", err);
+                            alert("Error updating Solana public key. Check console.");
+                            }
                         }
-                    }
                     
                     
                     async function loadSolKey() {

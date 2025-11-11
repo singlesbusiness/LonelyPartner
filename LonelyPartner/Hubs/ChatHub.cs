@@ -328,15 +328,21 @@ namespace LonelyPartner.Hubs
             await Clients.Client(targetId).SendAsync("ReceiveSignal", senderId, type, data);
         }
 
+
         // 🔹 Handle disconnect
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var connectionId = Context.ConnectionId;
-            
-            WaitingUsers.TryRemove(connectionId, out _);
-            await Clients.All.SendAsync("PartnerLeft", connectionId);
-            Console.WriteLine($"❌ Disconnected: {connectionId}");
 
+            WaitingUsers.TryRemove(connectionId, out _);
+            if (ActivePairs.TryRemove(connectionId, out var partnerId))
+                {
+                    ActivePairs.TryRemove(partnerId, out _);
+                    await Clients.Client(partnerId).SendAsync("PartnerLeft");
+                    Console.WriteLine($"💔 Disconnected: notified partner {partnerId}");
+                }
+            Console.WriteLine($"❌ Disconnected: {connectionId}");
+            
             await base.OnDisconnectedAsync(exception);
         }
 
