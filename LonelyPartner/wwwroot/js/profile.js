@@ -162,7 +162,85 @@ profileBtn.addEventListener("click", async () => {
 
             console.error("❌ Failed to load profile:", err);
 
-            alert("Could not load profile.");
+            //alert("Could not load profile.");
+            showTabAlert();
+            ////////////////////////////////
+                // Display alert modal
+             function showTabAlert() {
+                let modal = document.getElementById("tabAlertModal");
+                if (!modal) {
+                    modal = document.createElement("div");
+                    modal.id = "tabAlertModal";
+                    modal.style.position = "fixed";
+                    modal.style.top = 0;
+                    modal.style.left = 0;
+                    modal.style.width = "100%";
+                    modal.style.height = "100%";
+                    modal.style.background = "rgba(0, 0, 0, 0.6)";
+                    modal.style.display = "flex";
+                    modal.style.justifyContent = "center";
+                    modal.style.alignItems = "center";
+                    modal.style.zIndex = "9999";
+                    modal.style.backdropFilter = "blur(3px)";
+
+                    modal.innerHTML = `
+                        <div style="
+                            background:#2e1065;
+                            color:#fff;
+                            padding:30px 35px;
+                            border-radius:14px;
+                            text-align:center;
+                            max-width:400px;
+                            width:90%;
+                            box-shadow:0 0 20px rgba(0,0,0,0.5);
+                            animation: fadeIn 0.3s ease;
+                            font-family: 'Segoe UI', Arial, sans-serif;
+                        ">
+                            <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Session Moved</h3>
+                            <p style="line-height:1.6;">
+                                Could not load profile. Please login again.
+                            </p>
+                            <button id="profileLoadOkBtn" style="
+                                margin-top:18px;
+                                background-color:#ffcc00;
+                                color:#2e1065;
+                                border:none;
+                                border-radius:6px;
+                                padding:10px 24px;
+                                font-weight:bold;
+                                cursor:pointer;
+                                transition: background-color 0.2s ease, transform 0.1s ease;
+                            ">
+                                Ok
+                            </button>
+                        </div>
+                    `;
+
+                    document.body.appendChild(modal);
+
+                    // Add fade-in animation dynamically
+                    const style = document.createElement("style");
+                    style.textContent = `
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: scale(0.95); }
+                        to { opacity: 1; transform: scale(1); }
+                    }
+                    #profileLoadOkBtn:hover {
+                        background-color: #ffd633 !important;
+                        transform: scale(1.05);
+                    }
+                `;
+                document.head.appendChild(style);
+                } else {
+                modal.style.display = "flex";
+                }
+
+            document.getElementById("profileLoadOkBtn")?.addEventListener("click", () => {
+                modal.style.display = "none";
+            });
+
+            }
+            ////////////////////////////////
 
         }
         console.log("✅ profileHandler.js fully loaded and parsed====.");

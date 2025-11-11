@@ -1,4 +1,5 @@
-﻿
+﻿@using Org.BouncyCastle.Tls
+
 @model LonelyPartner.Models.UserEntity
 @{
     Layout = null;
@@ -27,13 +28,20 @@
     </div>
 
     <!-- logout user and give alert if user login into second browser  -->
-        @if (Context.Request.Query["expired"] == "true")
-    {  <!-- 
-        <div class="alert1 alert-warning1">
-            You’ve been signed out because your account was used in another browser.
-        </div>
-        -->
-    } 
+     @if (TempData["ExpiredAlert"] != null)
+        {
+            <div class="alert alert-warning fade show" id="sessionAlert" role="alert" 
+                style="position: fixed; top: 10px; right: 10px; z-index: 1050;">
+                @TempData["ExpiredAlert"]
+            </div>
+
+            <script>
+                setTimeout(() => {
+                    const alertBox = document.getElementById("sessionAlert");
+                    if (alertBox) alertBox.style.display = "none";
+                }, 10000);
+            </script>
+        }
     
     <!-- Slide-Down Menu -->
     <div class="overlay-menu" id="overlayMenu">

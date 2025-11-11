@@ -93,6 +93,13 @@ public async Task<IActionResult> GoogleResponse()
     var newSessionId = Guid.NewGuid().ToString("N");
     HttpContext.Session.SetString("SessionId", newSessionId);
 
+            // ✅ Check if the user was already logged in elsewhere
+            if (!string.IsNullOrEmpty(user.CurrentSessionId) && user.CurrentSessionId != newSessionId)
+            {
+                // Invalidate old session
+                TempData["ExpiredAlert"] = "You’ve been signed out because your account was used in another browser.";
+            }
+            
     // ✅ Update it in database
     user.CurrentSessionId = newSessionId;
     await _userManager.UpdateAsync(user);
