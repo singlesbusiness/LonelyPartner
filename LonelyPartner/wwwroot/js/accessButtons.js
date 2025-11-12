@@ -1,6 +1,6 @@
 // ===============================
 
-// 🔹 Feature Access Control Logic
+// 🔹 Select drop down access logic
 
 // ===============================
 
@@ -8,14 +8,14 @@ function initAccessControl() {
 
  
 
-    const girlsBtn = document.getElementById("girlsBtn");
+    //const girlsBtn = document.getElementById("girlsBtn");
 
     const genderSelect = document.getElementById("genderSelect");
 
     const continentSelect = document.getElementById("continentSelect");
 
  
-
+    //modals
     const loginModal = document.getElementById("loginModal");
 
     const upgradeModal = document.getElementById("upgradeModal");
@@ -51,47 +51,8 @@ function initAccessControl() {
                 console.log("accessbutton nowLocal=>" , nowLocal);
                 return (window.appUser.productId != 0) && (endDateLocal > nowLocal);
             }      
-            /*
-            function isActivePlan() {
-
-                const now = new Date();
-
-                const endDate = new Date(window.appUser.endDate);
-
-
-                if (window.appUser.isAuthenticated === true
-
-                    && (window.appUser.productId != 0) && (endDate > now)
-
-                // && (window.appUser.isActivePlan === true)
-
-                )
-
-                {
-
-                    return true;
-
-                }
-
-                else if (window.appUser.isAuthenticated === false
-
-                    || !window.appUser.productId || window.appUser.productId === 0 || (endDate < now)) {
-
-                    return false;
-
-                }
-
-                else {
-
-                    return false;
-
-                }
-
-            }
-            */
-
- 
-
+    
+    //Login Modal
     function showLoginModal() {
 
         if (loginModal) {
@@ -102,8 +63,8 @@ function initAccessControl() {
 
     }
 
- 
-
+    
+    //Upgrade Modal
     function showUpgradeModal() {
 
         if (upgradeModal){
@@ -128,15 +89,7 @@ function initAccessControl() {
 
         }
 
-        
-
     }
-
- 
-
-   
-
- 
 
     // When plan is clicked
 
@@ -163,20 +116,11 @@ function initAccessControl() {
     console.log("accessButton=> isLoggedIn=>", isLoggedIn, "==hasActivePlan=>", hasActivePlan);
 
  
-
- 
-
-   
-
- 
-
     // 🔸 Condition 2: Logged in but no active plan
 
     if (isLoggedIn && !hasActivePlan) {
 
- 
-
-        [girlsBtn, genderSelect, continentSelect].forEach(el => {
+        [genderSelect, continentSelect].forEach(el => {
 
             if (!el) return;
 
@@ -206,10 +150,7 @@ function initAccessControl() {
 
         });
 
-       
-
-        
-
+   
         return;
 
     }
@@ -217,10 +158,9 @@ function initAccessControl() {
     else // 🔸 Condition 1: User not logged in
 
         if (!isLoggedIn) {
+      
 
-           
-
-            [girlsBtn, genderSelect, continentSelect].forEach(el => {
+            [genderSelect, continentSelect].forEach(el => {
 
                 if (!el) return;
 
@@ -236,7 +176,7 @@ function initAccessControl() {
 
                 if (el.tagName === "SELECT") {
 
-                    el.addEventListener("chnage", e => {
+                    el.addEventListener("change", e => {
 
                         e.preventDefault();
 
@@ -264,9 +204,7 @@ function initAccessControl() {
 
             //Hide Girls Only Button
 
-            if (girlsBtn) girlsBtn.style.display = "none";
-
- 
+            //if (girlsBtn) girlsBtn.style.display = "none";
 
             // Ensure filters  are enabled
 
@@ -288,7 +226,7 @@ function initAccessControl() {
 
            
 
-               [girlsBtn, genderSelect, continentSelect].forEach(el => {
+               [genderSelect, continentSelect].forEach(el => {
 
                 if (!el) return;
 

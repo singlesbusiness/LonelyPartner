@@ -233,31 +233,12 @@ video {
 }
 
 
-.google-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: white;
-    color: #444;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-weight: 600;
-    margin-top: 1rem;
-    cursor: pointer;
-    width: 100%;
-    transition: background 0.2s ease;
-}
 
-    .google-btn:hover {
-        background: #f0f0f0;
-    }
 
 .close-btn1 {
     margin-top: 1rem;
     background: transparent;
-    color: #aaa;
+    color: #ffff00;
     border: none;
     cursor: pointer;
     text-decoration: underline;
@@ -426,6 +407,8 @@ video {
     top: 0;
     width: 100%;
     height: 100%;
+    align-items: center;
+    justify-content: center;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(3px);
@@ -437,6 +420,8 @@ video {
     padding: 20px 30px;
     border-radius: 12px;
     max-width: 420px;
+    align-items: center;
+    justify-content: center;
     box-shadow: 0 4px 16px rgba(0,0,0,0.25);
     text-align: center;
     animation: fadeIn 0.3s ease;
@@ -444,10 +429,10 @@ video {
 
 .modal-content h2 {
         margin-top: 0;
-        color: #d63031;
+        color: #ffff00;
     }
 .h4 {
-    color: #e50914;
+    color: #ffff00;
 }
 
 
@@ -589,7 +574,7 @@ video {
 .plan-card .price {
         font-weight: bold;
         font-size: 1.1rem;
-        color: #2e8b57;
+        color: #ffff00;
         text-align: center;
         margin: 4px 0;
     }
@@ -960,4 +945,161 @@ nav {
 }
 
 
+/* === Mobile-first Responsive Fixes (for ≤ 768 px) === */
+@media (max-width: 768px) {
 
+    html, body {
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .container {
+        flex-direction: column;
+        height: auto;
+        padding: 10px;
+    }
+
+    .left-panel, .right-panel {
+        width: 100%;
+        min-width: unset;
+        padding: 8px;
+    }
+
+    .left-panel {
+        order: 1;
+    }
+
+    .right-panel {
+        order: 2;
+    }
+
+    .video-block {
+        height: 250px;
+    }
+
+    .controls {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .btn, .select-box {
+        flex: 1 1 45%;
+        font-size: 0.85rem;
+        padding: 8px 10px;
+    }
+
+    .chat-section {
+        height: auto;
+        max-height: 400px;
+    }
+
+    .messages {
+        max-height: 240px;
+    }
+
+    .menu-toggle {
+        top: 0.6rem;
+        right: 0.6rem;
+    }
+
+    .overlay-menu {
+        width: 85%;
+        height: 100%;
+        border-radius: 0;
+        right: 0;
+    }
+
+    .overlay-content {
+        padding-top: 80px;
+    }
+
+    video {
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Session alert */
+    #sessionAlert {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        text-align: center;
+        font-size: 0.85rem;
+    }
+}
+
+/*login modal*/
+.loginmodal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+}
+
+.loginmodal-content {
+    background-color: #150726;
+    margin: 10% auto;
+    padding: 20px 30px;
+    border-radius: 12px;
+    max-width: 420px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Social Button Base */
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  border: 1px solid #dcdcdc;
+  border-radius: 50px;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 300;
+  color: #000;
+  background: #fff;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background-color 0.2s ease;
+}
+
+.social-btn:hover {
+  background-color: #f7f7f7;
+}
+
+.social-btn img {
+  height: 20px;
+  margin-right: 10px;
+}
+
+
+
+
+
+/* Disclaimer Text */
+.disclaimer {
+  font-size: 10px;
+  color: #666;
+  line-height: 1.4;
+  margin-top: 10px;
+}
+
+.disclaimer a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.disclaimer a:hover {
+  text-decoration: underline;
+}

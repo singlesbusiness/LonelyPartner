@@ -34,10 +34,11 @@ namespace LonelyPartner.Services
                     var port = Convert.ToInt32(emailCfg["Port"]);
                     var username = emailCfg["Username"];
                     var password = emailCfg["Password"];
-                    var from = emailCfg["FromEmailAddress"];
+                    //var from = emailCfg["FromEmailAddress"];
+                    var from = string.Concat(emailCfg["FromEmailAddress"] , "LonelyPartner" ) ;
 
                     // Build email body
-                    var subject = $"Invoice for {orderInfo.ProductName}";
+                    var subject = $"LonelyPartner Invoice for {orderInfo.ProductName}";
                     var body = $@"
                 <html>
                     <body style='font-family: ""Segoe UI"", Arial, sans-serif; background-color: #1a0826; margin: 0; padding: 0; color: #eee;'>

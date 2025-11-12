@@ -97,7 +97,7 @@ public async Task<IActionResult> GoogleResponse()
             if (!string.IsNullOrEmpty(user.CurrentSessionId) && user.CurrentSessionId != newSessionId)
             {
                 // Invalidate old session
-                TempData["ExpiredAlert"] = "You’ve been signed out because your account was used in another browser.";
+                TempData["ExpiredAlert"] = "You’ve been signed out in another browser, You can continue here.";
             }
             
     // ✅ Update it in database
@@ -114,8 +114,22 @@ public async Task<IActionResult> GoogleResponse()
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
+            // 1️⃣ Get current user
+            var user = await _userManager.GetUserAsync(User);
+            if (user != null)
+            {
+                // 2️⃣ Clear CurrentSessionId
+                user.CurrentSessionId = null;
+                await _userManager.UpdateAsync(user);
+            }
+
+            // 3️⃣ Sign out & clear session
             await _signInManager.SignOutAsync();
             HttpContext.Session.Remove("SessionId");
+
+            // 4️⃣ Optional: clear auth cookies
+            Response.Cookies.Delete(".AspNetCore.Identity.Application");
+
             return RedirectToAction("Index", "Home");
         }
     }

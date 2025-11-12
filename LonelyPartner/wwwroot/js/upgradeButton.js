@@ -1,6 +1,6 @@
 // ===============================
 
-// 🔹 Upgrade Button + Modal Logic
+// 🔹 Upgrade Button / GrielyOnly Button + Modal Logic + Payment
 
 // ===============================
 
@@ -11,9 +11,6 @@ console.log("🧭 upgradeButton.js loaded.");
 function initUpgradeAccessControl() {
 
  
-
- 
-
     const upgradeBtn = document.getElementById("upgradeBtn");
 
     const girlsBtn = document.getElementById("girlsBtn");
@@ -38,38 +35,6 @@ function initUpgradeAccessControl() {
                 console.log("upgrade nowLocal=>" , nowLocal);
                 return (window.appUser.productId != 0) && (endDateLocal > nowLocal);
             }
-    /*
-    function isActivePlan() {
-
-        const now = new Date();
-
-        const endDate = new Date(window.appUser.endDate);
-
-        if (window.appUser.isAuthenticated === true
-
-            && ( (window.appUser.productId != 0) && (endDate > now) ) ) {
-
-            return true;
-
-        }
-        
-
-        else if (window.appUser.isAuthenticated === false
-
-            || !window.appUser.productId || window.appUser.productId === 0 || (endDate < now)) {
-
-            return false;
-
-        }
-
-        else {
-
-            return false;
-
-        }       
-
-    }
-    */
  
 
     //load upgrade modal in backgroud
@@ -104,23 +69,16 @@ function initUpgradeAccessControl() {
 
     console.log("Upgrade button===> isLoggedIn=>", isLoggedIn, "==hasActivePlan=>", hasActivePlan);
 
- 
-
- 
-
- 
-
- 
 
     // 🔸 Condition 2: Logged in but no active plan
 
     if (isLoggedIn && !hasActivePlan) {
 
  
-
+        if (girlsBtn) girlsBtn.style.display = "inline-block";
         if (upgradeBtn) upgradeBtn.style.display = "inline-block";
 
-        [upgradeBtn].forEach(el => {
+        [upgradeBtn, girlsBtn].forEach(el => {
 
             if (!el) return;
 
@@ -132,13 +90,11 @@ function initUpgradeAccessControl() {
 
     }
 
- 
-
     // 🔸 Condition 1: User not logged in
 
     else if (!isLoggedIn) {
 
-        [upgradeBtn].forEach(el => {
+        [upgradeBtn, girlsBtn].forEach(el => {
 
             if (!el) return;
 
@@ -147,7 +103,6 @@ function initUpgradeAccessControl() {
         });
 
  
-
         return;
 
     }
@@ -160,16 +115,16 @@ function initUpgradeAccessControl() {
 
  
 
-        // Hide upgrade button
-
+        // Hide upgrade  and girls only buttons
+        if (girlsBtn) upgradeBtn.style.display = "none";
         if (upgradeBtn) upgradeBtn.style.display = "none";
 
     }
 
     else {
 
-        // Hide upgrade button
-
+        // Hide upgrade and girls only buttons
+        if (girlsBtn) girlsBtn.style.display = "inline-block";
         if (upgradeBtn) upgradeBtn.style.display = "inline-block";
 
     }
@@ -202,7 +157,86 @@ function initUpgradeAccessControl() {
 
             const txt = await res.text();
             console.log("Create order failed: " + txt);
-            alert("Create order failed: Please try again");
+            //alert("Create order failed: Please try again.");
+            showTabAlert();
+                ////////////////////////////////
+                // Display alert modal
+                function showTabAlert() {
+                        let modal = document.getElementById("tabAlertModal");
+                        if (!modal) {
+                            modal = document.createElement("div");
+                            modal.id = "tabAlertModal";
+                            modal.style.position = "fixed";
+                            modal.style.top = 0;
+                            modal.style.left = 0;
+                            modal.style.width = "100%";
+                            modal.style.height = "100%";
+                            modal.style.background = "rgba(0, 0, 0, 0.6)";
+                            modal.style.display = "flex";
+                            modal.style.justifyContent = "center";
+                            modal.style.alignItems = "center";
+                            modal.style.zIndex = "9999";
+                            modal.style.backdropFilter = "blur(3px)";
+
+                            modal.innerHTML = `
+                                <div style="
+                                    background:#2e1065;
+                                    color:#fff;
+                                    padding:30px 35px;
+                                    border-radius:14px;
+                                    text-align:center;
+                                    max-width:400px;
+                                    width:90%;
+                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
+                                    animation: fadeIn 0.3s ease;
+                                    font-family: 'Segoe UI', Arial, sans-serif;
+                                ">
+                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Create Order</h3>
+                                    <p style="line-height:1.6;">
+                                        Create Order failed: Please try again.
+                                    </p>
+                                    <button id="createOrderfailBtn" style="
+                                        margin-top:18px;
+                                        background-color:#ffcc00;
+                                        color:#2e1065;
+                                        border:none;
+                                        border-radius:6px;
+                                        padding:10px 24px;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                        transition: background-color 0.2s ease, transform 0.1s ease;
+                                    ">
+                                        Ok
+                                    </button>
+                                </div>
+                            `;
+
+                            document.body.appendChild(modal);
+
+                            // Add fade-in animation dynamically
+                            const style = document.createElement("style");
+                            style.textContent = `
+                            @keyframes fadeIn {
+                                from { opacity: 0; transform: scale(0.95); }
+                                to { opacity: 1; transform: scale(1); }
+                            }
+                            #createOrderfailBtn:hover {
+                                background-color: #ffd633 !important;
+                                transform: scale(1.05);
+                            }
+                        `;
+                        document.head.appendChild(style);
+                        } else {
+                        modal.style.display = "flex";
+                        }
+
+                    document.getElementById("createOrderfailBtn")?.addEventListener("click", () => {
+                        modal.style.display = "none";
+                        //reloads the page after 1.5 secs
+                        //setTimeout(() => location.reload(), 200);
+                    });
+
+            }
 
             return;
 
@@ -214,7 +248,86 @@ function initUpgradeAccessControl() {
         //console.log(data.checkout.success);
         if (data.checkout.success != true) {
             console.log("Create order failed: " ,data.checkout.success );
-            alert("Create order failed: Please try again");
+            //alert("Create order failed: Please try again");
+            showTabAlert();
+                ////////////////////////////////
+                // Display alert modal
+                function showTabAlert() {
+                        let modal = document.getElementById("tabAlertModal");
+                        if (!modal) {
+                            modal = document.createElement("div");
+                            modal.id = "tabAlertModal";
+                            modal.style.position = "fixed";
+                            modal.style.top = 0;
+                            modal.style.left = 0;
+                            modal.style.width = "100%";
+                            modal.style.height = "100%";
+                            modal.style.background = "rgba(0, 0, 0, 0.6)";
+                            modal.style.display = "flex";
+                            modal.style.justifyContent = "center";
+                            modal.style.alignItems = "center";
+                            modal.style.zIndex = "9999";
+                            modal.style.backdropFilter = "blur(3px)";
+
+                            modal.innerHTML = `
+                                <div style="
+                                    background:#2e1065;
+                                    color:#fff;
+                                    padding:30px 35px;
+                                    border-radius:14px;
+                                    text-align:center;
+                                    max-width:400px;
+                                    width:90%;
+                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
+                                    animation: fadeIn 0.3s ease;
+                                    font-family: 'Segoe UI', Arial, sans-serif;
+                                ">
+                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Create Order</h3>
+                                    <p style="line-height:1.6;">
+                                        Create Order failed: Please try again.
+                                    </p>
+                                    <button id="createOrderfailBtn1" style="
+                                        margin-top:18px;
+                                        background-color:#ffcc00;
+                                        color:#2e1065;
+                                        border:none;
+                                        border-radius:6px;
+                                        padding:10px 24px;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                        transition: background-color 0.2s ease, transform 0.1s ease;
+                                    ">
+                                        Ok
+                                    </button>
+                                </div>
+                            `;
+
+                            document.body.appendChild(modal);
+
+                            // Add fade-in animation dynamically
+                            const style = document.createElement("style");
+                            style.textContent = `
+                            @keyframes fadeIn {
+                                from { opacity: 0; transform: scale(0.95); }
+                                to { opacity: 1; transform: scale(1); }
+                            }
+                            #createOrderfailBtn1:hover {
+                                background-color: #ffd633 !important;
+                                transform: scale(1.05);
+                            }
+                        `;
+                        document.head.appendChild(style);
+                        } else {
+                        modal.style.display = "flex";
+                        }
+
+                    document.getElementById("createOrderfailBtn1")?.addEventListener("click", () => {
+                        modal.style.display = "none";
+                        //reloads the page after 1.5 secs
+                        //setTimeout(() => location.reload(), 200);
+                    });
+
+            }
         }
 
         //document.getElementById("solAmount").innerText = `${data.checkout.amountSol} SOL (~$${data.checkout.usd})`;
@@ -259,7 +372,7 @@ function initUpgradeAccessControl() {
 
         document.getElementById("solStatus").innerText =
 
-            "Please use Phantom Wallet Only.";
+            "Install Phantom Wallet browser extension or Phantom Wallet app on mobile.";
 
  
 
@@ -295,151 +408,11 @@ function initUpgradeAccessControl() {
 
  
 
-    /*
-
-    function showSolModal(checkout) {
-
- 
-
-        // Hide upgrade button
-
-        //document.getElementById("upgradeBtn").style.display = "none";
-
- 
-
-        // build modal HTML (append to body or reuse existing modal)
-
- 
-
-        let modal = document.getElementById("solModal");
-
-        if (!modal) {
-
-            modal = document.createElement("div");
-
-            modal.id = "solModal";
-
-            modal.className = "sol-modal";
-
-            modal.innerHTML = `
-
-            <div class="sol-modal-inner">
-
-                <button id="solModalClose" class="close-x">✕</button>
-
-                <h2>Premium Access - 1 Month</h2>
-
-                <div class="sol-amount"><span id="solAmountDisplay"></span> <small>SOL</small></div>
-
-                <div class="sol-usd" id="solUsdHint"></div>
-
- 
-
-                <h3>What you get:</h3>
-
-                <ul class="features">
-
-                  <li>Access to Girls Only filter</li>
-
-                  <li>Priority matching</li>
-
-                  <li>Ad-free experience</li>
-
-                  <li>30 days unlimited access</li>
-
-                </ul>
-
- 
-
-                <label>Your Solana Wallet Address (optional, for convenience)</label>
-
-                <input id="buyerWallet" placeholder="Enter your SOL wallet address (optional)">
-
- 
-
-                <div class="send-to">
-
-                  <div>Send to:</div>
-
-                  <div id="receiveAddress" class="receive-address"></div>
-
-                </div>
-
-                <div class="memo">Memo: <code id="orderMemo"></code></div>
-
- 
-
-                <div>
-
-                  <button id="phantomPayBtn" class="pay-btn">Pay <span id="payAmt"></span> SOL</button>
-
-                </div>
-
- 
-
-                <div id="solStatus" class="sol-status"></div>
-
-                <canvas id="solQrCanvas"></canvas>
-
-            </div>
-
-        `;
-
-            document.body.appendChild(modal);
-
-            //modal.appendChild(div);
-
- 
-
-            modal.querySelector("#solModalClose").onclick = () => modal.style.display = "none";
-
-        }
-
- 
-
-        modal.style.display = "flex";
-
-        //scoped selectors avoid null
-
-        modal.querySelector("#solAmountDisplay").innerText = checkout.amountSol;
-
-        modal.querySelector("#payAmt").innerText = checkout.amountSol;
-
-        modal.querySelector("#receiveAddress").innerText = checkout.receiveAddress;
-
-        modal.querySelector("#orderMemo").innerText = checkout.memo;
-
-        modal.querySelector("#solStatus").innerText = "Waiting for you to send the transaction (use Phantom or another wallet).";
-
- 
-
-        // QR code (solana:<addr>?amount=...)
-
-        const uri = `solana:${checkout.receiveAddress}?amount=${checkout.amountSol}&memo=${checkout.memo}`;
-
-        if (window.QRCode) {
-
-            QRCode.toCanvas(document.getElementById("solQrCanvas"), uri, err => { if (err) console.error(err); });
-
-        }
-
- 
-
-        // Phantom pay button
-
-        modal.querySelector("#phantomPayBtn").onclick = async () => {
-
-            await doPhantomPay(checkout);
-
-        };
-
-    }
-
-    */
-
     // Build and send transaction via Phantom, then call server verify endpoint with tx signature
 
     async function doPhantomPay(checkout) {
+
+        const statusEl = document.getElementById("solStatus");
 
         try {
 
@@ -451,10 +424,209 @@ function initUpgradeAccessControl() {
 
             const orderId = checkout.orderId;
 
-            const statusEl = document.getElementById("solStatus");
-
             console.log("orderid=>", orderId);
 
+                // -----------------------------
+                // 🧩 Detect Phantom Wallet
+                // -----------------------------
+                const provider = window?.phantom?.solana || window?.solana;
+                if (!provider) {
+                    // 📱 On mobile, try deep linking to Phantom app
+                    if (/Mobi|Android/i.test(navigator.userAgent)) {
+                        const dappUrl = encodeURIComponent(window.location.href);
+                        const deepLink = `https://phantom.app/ul/browse/${dappUrl}`;
+                        //alert("Redirecting to Phantom app...");
+
+                        showTabAlert();
+                    ////////////////////////////////
+                        // Display alert modal
+                    function showTabAlert() {
+                        let modal = document.getElementById("tabAlertModal");
+                        if (!modal) {
+                            modal = document.createElement("div");
+                            modal.id = "tabAlertModal";
+                            modal.style.position = "fixed";
+                            modal.style.top = 0;
+                            modal.style.left = 0;
+                            modal.style.width = "100%";
+                            modal.style.height = "100%";
+                            modal.style.background = "rgba(0, 0, 0, 0.6)";
+                            modal.style.display = "flex";
+                            modal.style.justifyContent = "center";
+                            modal.style.alignItems = "center";
+                            modal.style.zIndex = "9999";
+                            modal.style.backdropFilter = "blur(3px)";
+
+                            modal.innerHTML = `
+                                <div style="
+                                    background:#2e1065;
+                                    color:#fff;
+                                    padding:30px 35px;
+                                    border-radius:14px;
+                                    text-align:center;
+                                    max-width:400px;
+                                    width:90%;
+                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
+                                    animation: fadeIn 0.3s ease;
+                                    font-family: 'Segoe UI', Arial, sans-serif;
+                                ">
+                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Phantom Wallet</h3>
+                                    <p style="line-height:1.6;">
+                                        Redirecting to Phantom Wallet.
+                                    </p>
+                                    <button id="redirectToWalletBtn" style="
+                                        margin-top:18px;
+                                        background-color:#ffcc00;
+                                        color:#2e1065;
+                                        border:none;
+                                        border-radius:6px;
+                                        padding:10px 24px;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                        transition: background-color 0.2s ease, transform 0.1s ease;
+                                    ">
+                                        Ok
+                                    </button>
+                                </div>
+                            `;
+
+                                    document.body.appendChild(modal);
+
+                                    // Add fade-in animation dynamically
+                                    const style = document.createElement("style");
+                                    style.textContent = `
+                                    @keyframes fadeIn {
+                                        from { opacity: 0; transform: scale(0.95); }
+                                        to { opacity: 1; transform: scale(1); }
+                                    }
+                                    #redirectToWalletBtn:hover {
+                                        background-color: #ffd633 !important;
+                                        transform: scale(1.05);
+                                    }
+                                `;
+                                document.head.appendChild(style);
+                                } else {
+                                modal.style.display = "flex";
+                                }
+
+                            document.getElementById("redirectToWalletBtn")?.addEventListener("click", () => {
+                                modal.style.display = "none";
+                                window.location.href = deepLink;
+                                //reloads the page after 1.5 secs
+                                //setTimeout(() => location.reload(), 200);
+                            });
+
+                            }
+                        
+                        return;
+                    }
+
+                    // 💻 No Phantom detected on desktop
+                    //alert("Phantom Wallet not detected. Please install it to continue.");
+                            showTabAlert();
+                    ////////////////////////////////
+                        // Display alert modal
+                    function showTabAlert() {
+                        let modal = document.getElementById("tabAlertModal");
+                        if (!modal) {
+                            modal = document.createElement("div");
+                            modal.id = "tabAlertModal";
+                            modal.style.position = "fixed";
+                            modal.style.top = 0;
+                            modal.style.left = 0;
+                            modal.style.width = "100%";
+                            modal.style.height = "100%";
+                            modal.style.background = "rgba(0, 0, 0, 0.6)";
+                            modal.style.display = "flex";
+                            modal.style.justifyContent = "center";
+                            modal.style.alignItems = "center";
+                            modal.style.zIndex = "9999";
+                            modal.style.backdropFilter = "blur(3px)";
+
+                            modal.innerHTML = `
+                                <div style="
+                                    background:#2e1065;
+                                    color:#fff;
+                                    padding:30px 35px;
+                                    border-radius:14px;
+                                    text-align:center;
+                                    max-width:400px;
+                                    width:90%;
+                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
+                                    animation: fadeIn 0.3s ease;
+                                    font-family: 'Segoe UI', Arial, sans-serif;
+                                ">
+                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Phantom Wallet</h3>
+                                    <p style="line-height:1.6;">
+                                        Phantom Wallet not detected. Please install it to continue..
+                                    </p>
+                                    <button id="noWalletBtn" style="
+                                        margin-top:18px;
+                                        background-color:#ffcc00;
+                                        color:#2e1065;
+                                        border:none;
+                                        border-radius:6px;
+                                        padding:10px 24px;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                        transition: background-color 0.2s ease, transform 0.1s ease;
+                                    ">
+                                        Ok
+                                    </button>
+                                </div>
+                            `;
+
+                            document.body.appendChild(modal);
+
+                            // Add fade-in animation dynamically
+                            const style = document.createElement("style");
+                            style.textContent = `
+                            @keyframes fadeIn {
+                                from { opacity: 0; transform: scale(0.95); }
+                                to { opacity: 1; transform: scale(1); }
+                            }
+                            #noWalletBtn:hover {
+                                background-color: #ffd633 !important;
+                                transform: scale(1.05);
+                            }
+                        `;
+                        document.head.appendChild(style);
+                        } else {
+                        modal.style.display = "flex";
+                        }
+
+                    document.getElementById("noWalletBtn")?.addEventListener("click", () => {
+                        modal.style.display = "none";
+                        window.open("https://phantom.app/", "_blank");
+                        //reloads the page after 1.5 secs
+                        setTimeout(() => location.reload(), 200);
+                    });
+
+                    }
+                    //window.open("https://phantom.app/", "_blank");
+                    throw new Error("Phantom wallet not found.");
+                }
+
+            // -----------------------------
+            // 🔐 Connect to Phantom Wallet
+            // -----------------------------
+            let connectResponse;
+            try {
+                    connectResponse = await provider.connect({ onlyIfTrusted: false });
+                } catch (e) {
+                    if (e.message?.includes("User rejected")) {
+                        statusEl.innerText = "❌ Wallet connection cancelled by user.";
+                        return;
+                    }
+                    throw e;
+                }
+
+                const publicKey = connectResponse?.publicKey?.toString() || provider.publicKey?.toString();
+                if (!publicKey) throw new Error("Failed to get Phantom public key.");
+
+                console.log("✅ Connected Phantom wallet:", publicKey);
+            /*
+            *************************Working for desktop START***********
             //check if phantom wallet is installed
             const provider = window.solana;
             if (!provider?.isPhantom) {
@@ -462,13 +634,13 @@ function initUpgradeAccessControl() {
                 throw new Error("Phantom wallet not found.");
             }
 
-
              // connect to user's phantom wallet and asks for approve this website
             await provider.connect();
 
             //get user's public wallete address
             const publicKey = window.solana.publicKey.toString();
-
+            //********************Working for desktop END*******************************
+            */
             statusEl.innerText = `Connected to Phantom: ${publicKey}. Preparing transaction...`;
             
             //*******VERY IMPORTANT*********/
@@ -579,13 +751,8 @@ function initUpgradeAccessControl() {
 
                 statusEl.className = "text-green-600 text-sm";
 
-                //setTimeout(() => location.reload(), 1500);   //refresh-reload page
-
-                //statusEl.innerText = "✅ Payment verified successfully! Your plan is now active.";
-
+                
                 // Optionally refresh user profile or update UI directly
-
-                // we expect server to call SignalR PlanActivated
 
                 //reloads the page after 1.5 secs
 
@@ -623,8 +790,7 @@ function initUpgradeAccessControl() {
             console.error("Payment failed:", err);
             statusEl.innerText = `❌ Payment failed. Please try again.`;
             statusEl.className = "text-red-500 text-sm";
-            //alert("Payment failed: " + (err.message || JSON.stringify(err)));
-
+           
         }
 
     }
@@ -636,49 +802,49 @@ async function loadPlans() {
     try {
 
       
-        //Upgrade Modal
+            //Upgrade Modal
 
-        plansContainer.innerHTML = `<div class="loading">Loading plans...</div>`;
+            plansContainer.innerHTML = `<div class="loading">Loading plans...</div>`;
 
-        const response = await fetch("/api/plans");
+            const response = await fetch("/api/plans");
 
-        const plans = await response.json();
+            const plans = await response.json();
 
-        console.log("plans===>", plans);
+            console.log("plans===>", plans);
 
-        plansContainer.innerHTML = ""; // clear previous
+            plansContainer.innerHTML = ""; // clear previous
 
-        plans.forEach(plan => {
+            plans.forEach(plan => {
 
-            const div = document.createElement("div");
+                const div = document.createElement("div");
 
-            div.className = "plan-card";
+                div.className = "plan-card";
 
-            div.dataset.productid = plan.id;
+                div.dataset.productid = plan.id;
 
-            div.dataset.name = plan.name;
+                div.dataset.name = plan.name;
 
-            div.dataset.amount = plan.price;
-
- 
-
-            div.innerHTML = `
-
-                  <h3>${plan.name.replace("Plan", " Plan")}</h3>
-
-                  <div class="features">${plan.features}</div>
-
-                  <p style="text-align:center;">Save ${plan.savePercent}%</p>
-
-                  <p class="price">$${plan.price.toFixed(2)}/~₹${plan.priceINR}</p>
-
-                  <button class="buyBtn">Buy</button>
-
-                `;
+                div.dataset.amount = plan.price;
 
  
 
-            plansContainer.appendChild(div);
+                div.innerHTML = `
+
+                    <h3>${plan.name.replace("Plan", " Plan")}</h3>
+
+                    <div class="features">${plan.features}</div>
+
+                    <p style="text-align:center;">Save ${plan.savePercent}%</p>
+
+                    <p class="price">$${plan.price.toFixed(2)}/~₹${plan.priceINR}</p>
+
+                    <button class="buyBtn">Buy</button>
+
+                    `;
+
+ 
+
+                plansContainer.appendChild(div);
 
         });
 
@@ -703,87 +869,50 @@ async function loadPlans() {
 
                 await onBuySol(productId, productName);
 
-                /* not using this anymore
-
-                const res = await fetch("/api/plans/purchase", {
-
-                    method: "POST",
-
-                    headers: { "Content-Type": "application/json" },
-
-                    body: JSON.stringify({
-
-                        productId,
-
-                        productName: planName,
-
-                        totalAmount: amount
-
-                    })
+                
 
                 });
 
- 
-
-                if (res.ok) {
-
-                    alert("✅ Purchase successful!");
-
-                    upgradeModal.style.display = "none";
-
-                    location.reload();
-
-                } else {
-
-                    alert("❌ Purchase failed. Please try again.");
-
-                }
-
- 
-
-                */
-
             });
 
-        });
+        } catch (err) {
 
-    } catch (err) {
+            console.error("Error loading plans:", err);
 
-        console.error("Error loading plans:", err);
+            plansContainer.innerHTML = `<p style="color:red;">Error loading plans.</p>`;
 
-        plansContainer.innerHTML = `<p style="color:red;">Error loading plans.</p>`;
-
-    }
+        }
 
 }
 
  
+        /*
+        // Show Upgrade modal on girlsOnly button and upgrade button
 
- 
+        document.getElementById("girlsBtn")?.addEventListener("click", () => {
 
- 
+            upgradeModal.style.display = "flex";
 
-// Show modal
+            loadPlans();
 
-document.getElementById("upgradeBtn")?.addEventListener("click", () => {
+        });
 
-    upgradeModal.style.display = "flex";
+        document.getElementById("upgradeBtn")?.addEventListener("click", () => {
 
-    loadPlans();
+            upgradeModal.style.display = "flex";
 
-});
+            loadPlans();
 
- 
+        });   */
 
- 
+        
+        // Close Upgrade modal , closeUpgradeModal
 
-// Close modal
+        closeUpgradeModal.addEventListener("click", () => {
 
-closeUpgradeModal.addEventListener("click", () => {
+            upgradeModal.style.display = "none";
 
-    upgradeModal.style.display = "none";
-
-});
+        });
 
  
 

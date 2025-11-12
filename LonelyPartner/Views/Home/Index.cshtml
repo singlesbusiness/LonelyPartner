@@ -29,19 +29,42 @@
 
     <!-- logout user and give alert if user login into second browser  -->
      @if (TempData["ExpiredAlert"] != null)
-        {
-            <div class="alert alert-warning fade show" id="sessionAlert" role="alert" 
-                style="position: fixed; top: 10px; right: 10px; z-index: 1050;">
-                @TempData["ExpiredAlert"]
-            </div>
+            {
+                <div id="sessionAlert"
+                    style="
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        z-index: 99999;
+                        background-color: #ffc107;
+                        color: #212529;
+                        padding: 14px 22px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                        font-weight: 500;
+                        opacity: 0;
+                        transition: opacity 0.6s ease;
+                    ">
+                    ⚠️ @TempData["ExpiredAlert"]
+                </div>
 
-            <script>
-                setTimeout(() => {
-                    const alertBox = document.getElementById("sessionAlert");
-                    if (alertBox) alertBox.style.display = "none";
-                }, 10000);
-            </script>
-        }
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        const alertBox = document.getElementById("sessionAlert");
+                        if (alertBox) {
+                            // Fade in
+                            setTimeout(() => alertBox.style.opacity = "1", 100);
+
+                            // Fade out after 5 seconds
+                            setTimeout(() => {
+                                alertBox.style.opacity = "0";
+                                setTimeout(() => alertBox.remove(), 700);
+                            }, 5000);
+                        }
+                    });
+                </script>
+            }
+
     
     <!-- Slide-Down Menu -->
     <div class="overlay-menu" id="overlayMenu">
@@ -108,7 +131,7 @@
                 <button id="nextBtn" class="btn blue" style="display:none;">⏭ Next</button>
                  
                 <button id="girlsBtn" class="btn pink">💖 Girls only</button>
-                <button id="upgradeBtn" class="btn red">Upgrade</button>
+                @*<button id="upgradeBtn" class="btn red">Upgrade</button>*@
 
                 <select id="myGenderSelect" class="select-box">
                     <option value="All">I Am</option>
@@ -202,19 +225,26 @@
     <!-- 🔹 Google Login Modal   was here -->
 
     <!-- 🔹 Google Login Modal -->
-   
+  
     <div id="loginModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h2>Login to Continue</h2>
-            <p>Please sign in with your Google account.</p>
-            <button id="googleLoginBtn" class="google-btn">
+            <p>LonelyPartner an anonymous video chatting platform.</p>
+            <button id="googleLoginBtn" class="social-btn">
                 <img src="~/images/google-sign.svg" alt="Google" />
                 Continue with Google
             </button>
+            <!-- Disclaimer Text -->
+            <p class="disclaimer">
+            By clicking on the above option you hereby certify that you have read and agree to the 
+            <a href="/Info/Terms" target="_blank">terms of use</a>.
+            </p>
             <button id="closeModal" class="close-btn1">Close</button>
         </div>
     </div>
-    
+   
+
+   
    
 
 
@@ -399,6 +429,7 @@
     <!-- ✅ 4. Your application scripts (after Solana init) -->
             
             <script src="~/js/videochat.js"></script>
+            <script src="~/js/loginLogoutButtons.js"></script>
             <script src="~/js/accessButtons.js"></script>
             <script src="~/js/menu.js"></script>
             <script src="~/js/upgradeButton.js"></script>

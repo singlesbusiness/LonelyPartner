@@ -33,105 +33,21 @@
 
     let fallbackTimer = null; //for fallback match,set to 5sec in on.waiting
 
-    const loginBtn = document.getElementById('loginBtn');
-
-    const loginModal = document.getElementById("loginModal");
-
-    const closeModal = document.getElementById("closeModal");
-
-    const googleLoginBtn = document.getElementById("googleLoginBtn");
-
-    const logoutBtn = document.getElementById("logoutBtn");
-
  
+    // Close Upgrade modal, when below close modal code is put un upgradeButton.js , its not working
+    const closeUpgradeModal = document.getElementById("closeUpgradeModal");
+        closeUpgradeModal.addEventListener("click", () => {
 
-   
+            upgradeModal.style.display = "none";
 
- 
-
-    // Show modal when login clicked
-
-    loginBtn?.addEventListener("click", () => {
-
-        loginModal.style.display = "flex";
-
-    });
-
- 
-
-    // Close modal
-
-    closeModal?.addEventListener("click", () => {
-
-        loginModal.style.display = "none";
-
-    });
-
- 
-
-    // Close modal
-
-    closeUpgradeModal?.addEventListener("click", () => {
-
-        upgradeModal.style.display = "none";
-
-    });
-
+        });
  
 
  
 
-    // Simulated Google login
-
-    googleLoginBtn?.addEventListener("click", async () => {
-
-        try {
-
-            //window.location.href = "/Login/Login";
-
-            window.location.href = "/Login/GoogleLogin";
-
-            // Hide modal and swap buttons
-
-            loginModal.style.display = "none";
-
-            loginBtn.style.display = "none";
-
-            document.querySelectorAll(".btn.gray")[0]?.classList.remove("hidden"); // show Logout if hidden
-
-        } catch (err) {
-
-            alert("Login failed: " + err.message);
-
-        }
-
-    });
-
- 
-
-    // Simulated Google logout
-
-    logoutBtn?.addEventListener("click", async () => {
-
-        try {
-
-            window.location.href = "/Login/Logout";
-
-         } catch (err) {
-
-            alert("Logout failed: " + err.message);
-
-        }
-
-    });
-
-  
-
- 
-
-    //=================================================
-
-    // SignalR + WebRTC state
+    //=================================================//
+    //*******SignalR + WebRTC state********************//
+    //=================================================//
 
     let connection = null;
 
@@ -1292,6 +1208,11 @@ function clearStatus() {
 
             //enable Next button       
             nextBtn.style.display = "inline-block";
+            //start button hide
+            startBtn.style.display = "none";
+            //enable stop button
+            stopBtn.disabled = false;
+            //stopBtn.Enabled = true;
 
             }
 
@@ -1445,6 +1366,10 @@ function clearStatus() {
         //endCallLocal();
         //Next button hide
         nextBtn.style.display = "none";
+        //start button hide
+        startBtn.style.display = "inline-block";
+        //disable stop button
+        stopBtn.disabled = true;
         //myGenderSelect dispaly
         myGenderSelect.style.display = "inline-block"; 
         try {
@@ -1791,13 +1716,14 @@ function clearStatus() {
 
             // if not OK, redirect or stop further initialization
 
-            log("Age verification failed - interactive usage disabled.");
+            console.log("Age verification failed - interactive usage disabled.");
 
             return;
 
         }
 
- 
+        //Disable stop button on page load
+        stopBtn.disabled = true;
 
         // wire UI
 
