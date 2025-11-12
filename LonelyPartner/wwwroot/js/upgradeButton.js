@@ -116,7 +116,7 @@ function initUpgradeAccessControl() {
  
 
         // Hide upgrade  and girls only buttons
-        if (girlsBtn) upgradeBtn.style.display = "none";
+        if (girlsBtn) girlsBtn.style.display = "none";
         if (upgradeBtn) upgradeBtn.style.display = "none";
 
     }

@@ -111,6 +111,24 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+
+//to make local testing browser SSL
+// 👇 Add this before builder.Build()
+
+/*
+if (builder.Environment.IsDevelopment())
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(7051, listenOptions =>
+        {
+            listenOptions.UseHttps("lonelypartner.local.pfx", "password123");
+        });
+    });
+}
+*/
+
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

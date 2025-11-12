@@ -54,7 +54,7 @@ namespace LonelyPartner.Services
                             <p style='font-size: 16px; color: #eee;'>Dear {orderInfo.Name ?? "Customer"},</p>
                             <p style='font-size: 16px; color: #eee;'>Thank you for your payment! Here are your payment details:</p>
 
-                        <table style='border-collapse: collapse; width: 100%; margin-top: 15px; border-radius: 8px; overflow: hidden;'>
+                        <table style='border-collapse: collapse; width: 70%; margin-top: 15px; border-radius: 8px; overflow: hidden;'>
                         <tr style='background-color: #3b1557;'>
                             <td style='padding: 10px 15px; border-bottom: 1px solid #4b1e70; font-weight: bold; color: #d1aaff;'>Product:</td>
                             <td style='padding: 10px 15px; border-bottom: 1px solid #4b1e70; color: #f1e6ff;'>{orderInfo.ProductName}</td>
@@ -98,18 +98,33 @@ namespace LonelyPartner.Services
                 </body>
                 </html>";
 
-                    using var client = new SmtpClient(host, port)
-                    {
-                        EnableSsl = true,
-                        Credentials = new NetworkCredential(username, password)
-                    };
+                using var client = new SmtpClient(host, port)
+                {
+                    EnableSsl = true,
+                    Credentials = new NetworkCredential(username, password)
+                };
+                    //////////////
+                    var mail = new MailMessage
+                {
+                    From = new MailAddress(from, "LonelyPartner"),
+                    Subject = subject,
+                    Body = body,
+                    IsBodyHtml = true
+                };
 
-                    using var message = new MailMessage(from, orderInfo.Email, subject, body)
+                mail.To.Add(orderInfo.Email);
+
+                await client.SendMailAsync(mail);
+                    /// ////////////////////////////////////
+                    /*
+                     using var message = new MailMessage(
+                         from, orderInfo.Email, subject, body)
                     {
                         IsBodyHtml = true
                     };
 
-                    await client.SendMailAsync(message);
+                await client.SendMailAsync(message);
+                    */
                     Console.WriteLine($"✅ Invoice email sent to {orderInfo.Email}");
                     return true;
                 }
