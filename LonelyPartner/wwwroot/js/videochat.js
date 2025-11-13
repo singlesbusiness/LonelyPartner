@@ -181,7 +181,7 @@
 
                 modal.style.display = "none";
 
-                alert("You must be 18+ to use this service.");
+                //alert("You must be 18+ to use this service.");
 
                 resolve(false);
 
