@@ -18,15 +18,23 @@
     -->
 </head>
 <body>
-    <div class="center"> <h3>LonelyPartner</h3> </div>
-    
-    <!-- Hamburger Icon -->
-    <div class="menu-toggle" id="menuToggle">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-
+    <!-- HEADER -->
+    <header>
+        
+        <div class="center"> <h3>LonelyPartner</h3> </div>
+        @*
+        <div class="header">
+        <a href="/" class="logo-link">
+            <img src="~/images/lpmain-logo.svg" alt="Logo" class="logo">
+        </a>*@
+        </div>   
+        <!-- Hamburger Icon -->
+        <div class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
     <!-- logout user and give alert if user login into second browser  -->
      @if (TempData["ExpiredAlert"] != null)
             {
@@ -229,7 +237,7 @@
     <div id="loginModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h2>Login to Continue</h2>
-            <p>LonelyPartner an anonymous video chatting platform.</p>
+            @*<p>LonelyPartner an anonymous video chatting platform.</p>*@
             <button id="googleLoginBtn" class="social-btn">
                 <img src="~/images/google-sign.svg" alt="Google" />
                 Continue with Google
