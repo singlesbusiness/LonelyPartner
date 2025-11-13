@@ -11,6 +11,11 @@
             @Html.AntiForgeryToken()
 
             <div class="mb-3">
+                <label for="fromemail" class="form-label">Youremail</label>
+                <input name="fromemail" id="fromemail" rows="5" class="form-control" required></textarea>
+            </div>
+
+            <div class="mb-3">
                 <label for="reason" class="form-label">Reason</label>
                 <select name="reason" id="reason" class="form-select" required>
                     <option value="">-- Select a reason --</option>

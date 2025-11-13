@@ -27,7 +27,7 @@ namespace LonelyPartner.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ContactUs(string reason, string message )
+        public async Task<IActionResult> ContactUs(string fromemail, string reason, string message )
         {
             
 
@@ -66,7 +66,7 @@ namespace LonelyPartner.Controllers
             {   
                 var emailSettings = _config.GetSection("EmailConfig");
                 string to = emailSettings["ToEmailAddress"];
-                string from = emailSettings["FromEmailAddress"];
+                //string from = emailSettings["FromEmailAddress"];//
                 string host = emailSettings["Host"];
                 int port = Convert.ToInt32(emailSettings["Port"]);
                 string username = emailSettings["Username"];
@@ -81,7 +81,7 @@ namespace LonelyPartner.Controllers
    
                 var mail = new MailMessage
                 {
-                    From = new MailAddress(from, "LonelyPartner Contact"),
+                    From = new MailAddress(fromemail.Trim(), "LonelyPartner Contact"),
                     Subject = $"Contact Form: {reason}",
                     Body = $"Reason: {reason}\n\nMessage:\n{message}\n\nSent at: {DateTime.UtcNow}",
                     IsBodyHtml = false
