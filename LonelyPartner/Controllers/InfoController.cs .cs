@@ -66,7 +66,7 @@ namespace LonelyPartner.Controllers
             {   
                 var emailSettings = _config.GetSection("EmailConfig");
                 string to = emailSettings["ToEmailAddress"];
-                //string from = emailSettings["FromEmailAddress"];//
+                string from = emailSettings["FromEmailAddress"];//
                 string host = emailSettings["Host"];
                 int port = Convert.ToInt32(emailSettings["Port"]);
                 string username = emailSettings["Username"];
@@ -81,9 +81,9 @@ namespace LonelyPartner.Controllers
    
                 var mail = new MailMessage
                 {
-                    From = new MailAddress(fromemail.Trim(), "LonelyPartner Contact"),
+                    From = new MailAddress(from, "LonelyPartner Contact"),
                     Subject = $"Contact Form: {reason}",
-                    Body = $"Reason: {reason}\n\nMessage:\n{message}\n\nSent at: {DateTime.UtcNow}",
+                    Body = $"From: {fromemail.Trim()} \n\n Reason: {reason}\n\nMessage:\n{message}\n\nSent at: {DateTime.UtcNow}",
                     IsBodyHtml = false
                 };
 

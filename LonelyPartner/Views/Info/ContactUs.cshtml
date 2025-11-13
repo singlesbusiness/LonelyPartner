@@ -12,7 +12,8 @@
 
             <div class="mb-3">
                 <label for="fromemail" class="form-label">Youremail</label>
-                <input name="fromemail" id="fromemail" rows="5" class="form-control" required></textarea>
+                <input type="email" name="fromemail" id="fromemail" rows="5" class="form-control" placeholder="you@example.com" required pattern="[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+       title="Please enter a valid email address (e.g. user@example.com)"></textarea>
             </div>
 
             <div class="mb-3">
@@ -33,10 +34,11 @@
 
             <!-- Google reCAPTCHA -->
             <div class="mb-3">
-                <div class="g-recaptcha" data-sitekey="@siteKey"></div>
+                <div class="g-recaptcha" data-sitekey="@siteKey" data-callback="onRecaptchaSuccess" 
+                 data-expired-callback="onRecaptchaExpired"></div>
             </div>
 
-            <button type="submit" class="btn btn-danger w-100">Send Message</button>
+            <button type="submit" id ="submitBtn" class="btn btn-danger w-100" disabled>Send Message</button>
 
             @if (ViewBag.Status != null)
             {
@@ -57,5 +59,16 @@
     </div>
 </div>
 
+<script>
+        // Called when reCAPTCHA is completed
+        function onRecaptchaSuccess() {
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        // Called when reCAPTCHA expires
+        function onRecaptchaExpired() {
+            document.getElementById('submitBtn').disabled = true;
+        }
+    </script>
 <!-- reCAPTCHA JS -->
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
