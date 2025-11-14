@@ -122,12 +122,12 @@ if (builder.Environment.IsDevelopment())
     {
         options.ListenAnyIP(7051, listenOptions =>
         {
-            listenOptions.UseHttps("lonelypartner.local.pfx", "password123");
+            listenOptions.UseHttps("lonelypartner.com.pfx", "password123");
         });
     });
 }
-*/
 
+*/
 
 var app = builder.Build();
 

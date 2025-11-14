@@ -24,7 +24,8 @@ public class OrderCleanupService : BackgroundService
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
+    {   
+        //default intervalhours = 24 , retentionDays = 7, if values not coming from appsetting
         var intervalHours = _config.GetValue<int>("OrderCleanupSettings:IntervalHours", 24);
         var retentionDays = _config.GetValue<int>("OrderCleanupSettings:RetentionDays", 7);
 

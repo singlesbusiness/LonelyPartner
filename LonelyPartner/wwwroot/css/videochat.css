@@ -50,27 +50,7 @@ html, body {
         margin-left: 20px;
     }
 
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-        .nav {
-            display: none;
-            flex-direction: column;
-            background-color: #333;
-            position: absolute;
-            top: 60px;
-            right: 0;
-            width: 200px;
-            padding: 10px;
-        }
-
-        .hamburger {
-            display: block;
-        }
-
-        .nav.show {
-            display: flex;
-        }
-    }
+   
 /************/
 
 
@@ -1139,7 +1119,7 @@ nav {
     position: fixed;
     z-index: 1000;
     left: 20%;
-    top: 1%;
+    top: 5%;
     width: 800px;
     height: 600px;
     align-items: center;
@@ -1184,40 +1164,3 @@ nav {
         font-weight: bold;
     }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.error-border {
-    border: 2px solid red !important;
-}
-
-@keyframes shake {
-    0%, 100% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-6px);
-    }
-
-    50% {
-        transform: translateX(6px);
-    }
-
-    75% {
-        transform: translateX(-6px);
-    }
-}
-
-.shake {
-    animation: shake 0.4s ease;
-}

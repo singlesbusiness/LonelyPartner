@@ -1125,12 +1125,6 @@ function clearStatus() {
 
     }
 
-   
-
- 
-
-      
-
         //===============================
 
  
@@ -1733,8 +1727,6 @@ function clearStatus() {
 
         stopBtn.addEventListener("click", onStopClicked);
         
-        
-
         // init chat, emoji, resizers, signalr
 
         initChat();
@@ -1744,8 +1736,6 @@ function clearStatus() {
         initResizers();
 
         initSignalR();
-
- 
 
         console.log("UI initialized");
 
@@ -1757,8 +1747,16 @@ function clearStatus() {
     // Always define LP immediately
     window.LP = window.LP || {};
 
+    //startCamera
+    window.LP.startCamera = startCamera;
     //window.LP.startCamera = startCamera;
     window.LP.stopCamera = stopCamera;
+    //onStartClicked
+    window.LP.onStartClicked = onStartClicked;
+    //onNextClicked
+    window.LP.onNextClicked = onNextClicked;
+    //
+
     //window.LP.endCallLocal = endCallLocal;
     // Optional: attach more methods
     window.LP.disconnectSignalR = function () {

@@ -1,0 +1,163 @@
+/* -------------------------------------------------------------------
+   GLOBAL MOBILE CONTAINER & VIDEO LAYOUT
+------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #12002b;
+    }
+
+    .container {
+        display: none !important; /* hide desktop layout */
+    }
+
+    #mobileAppWrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+        background: #0f0020;
+    }
+
+    /* ---------------- TOP BUTTONS ---------------- */
+    #mobileTopControls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px;
+        background: #1b0135;
+        z-index: 20;
+    }
+    #mobileTopControls button,
+    #mobileTopControls select {
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 14px;
+        border: none;
+    }
+
+    /* ---------------- REMOTE VIDEO ---------------- */
+    #mobileRemoteBlock {
+        flex: 1;
+        position: relative;
+        background: black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #mobileRemoteBlock video {
+        width: 100%;
+        height: auto;
+        max-height: 60vh;
+    }
+
+    /* ---------------- LOCAL VIDEO ---------------- */
+    #mobileLocalBlock {
+        padding: 10px;
+        background: #12002b;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #mobileLocalBlock video {
+        width: 150px;
+        height: 110px;
+        border-radius: 10px;
+        background-color: black;
+    }
+
+    /* Chat Button */
+    #mobileChatBtn {
+        margin-top: 10px;
+        background: #8645ff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: none;
+        font-size: 15px;
+    }
+
+    /* -------------------------------------------------------------------
+       UNIVERSAL MOBILE MODAL FIXES (Option C)
+    ------------------------------------------------------------------- */
+   /* ============================================================
+       MOBILE-SPECIFIC MODAL BEHAVIOR (SEPARATE CONFIGS)
+       — Every modal can be edited independently
+    ============================================================ */
+
+    /* ---- GENERAL FIX FOR ALL modal overlays ---- */
+    .cs-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.70);
+        display: none;              /* hidden unless JS shows it */
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        padding: 0 12px;
+    }
+
+    .cs-modal-content {
+        width: 90%;
+        max-height: 85vh;
+        overflow-y: auto;
+        border-radius: 14px;
+        padding: 16px;
+        background: #1e003b;
+        position: relative;
+    }
+
+    .cs-modal-close {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        font-size: 26px;
+        cursor: pointer;
+        color: #fff;
+        z-index: 5;
+    }
+
+    /* ---- CONSENT MODAL ---- */
+    #consentModal.cs-modal-overlay {
+        display: flex !important; /* ONLY modal visible on load */
+    }
+    #consentModal .cs-modal-content {
+        background: #24004d;
+    }
+
+    /* ---- LOGIN MODAL ---- */
+    #loginModal .cs-modal-content {
+        background: #26005a;
+    }
+
+    /* ---- PROFILE MODAL ---- */
+    #profileModal .cs-modal-content {
+        background: #1a0038;
+    }
+
+    /* ---- UPGRADE MODAL ---- */
+    #upgradeModal .cs-modal-content {
+        background: #32006b;
+    }
+
+    /* ---- SOLANA PAYMENT MODAL ---- */
+    #solModal .cs-modal-content {
+        background: #1f0033;
+    }
+
+    /* QR size fix */
+    #solQrCanvas {
+        width: 220px !important;
+        height: 220px !important;
+        display: block;
+        margin: 10px auto;
+    }
+}

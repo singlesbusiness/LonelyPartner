@@ -26,6 +26,7 @@ namespace LonelyPartner.Controllers
         {
             var plans = _config.GetSection("Plans").Get<List<Plan>>() ?? new();
             //Console.WriteLine("plans=>", plans);
+            
             return Ok(plans);
         }
 

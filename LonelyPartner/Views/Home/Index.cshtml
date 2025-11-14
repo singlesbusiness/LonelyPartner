@@ -96,7 +96,7 @@
     <div class="container">
         <div class="left-panel" id="leftPanel">
             <div id="remoteVideoBlock" class="video-block">
-                <div class="label">LoneyPartner</div>
+                <div class="label">Partner</div>
                 <video id="remoteVideo" autoplay playsinline></video>
                 <div class="placeholder" id="remotePlaceholder">
                     <div class="avatar">👤</div>
@@ -214,8 +214,8 @@
 
    
     <!-- 🔞 Age Verification and consent Modal -->
-    <div id="ageModal" class="consentmodal">
-        <div class="consentmodal-content">
+    <div id="ageModal" class="cs-modal-overlay">
+        <div class="cs-modal-content">
             <h2>🔞 Caution: It is  Adults Only website!</h2>
             <p>
                 You are entering an <strong>ADULT (18+) video chat</strong>. <br /><br />
@@ -370,7 +370,12 @@
         </div>
     </div>
 
-   
+    @*=========================Mobile Wrapper=============================*@
+   <!-- MOBILE UI WRAPPER (do not remove) -->
+        <div id="mobileAppWrapper"></div>
+        <link rel="stylesheet" href="~/css/mobile/mobile-ui.css">
+        <script src="~/js/mobile/mobile-ui.js" defer></script>
+
   
     @*=====================Scripts=========================*@
       
