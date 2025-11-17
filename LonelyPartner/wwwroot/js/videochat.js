@@ -1820,9 +1820,36 @@ function clearStatus() {
 
  
 
-    /*
+    
 
     //remote mic toggle
+
+    // --- REMOTE VOLUME SLIDER CONTROL ---
+            /*
+            document.getElementById("remoteVolumeSlider").addEventListener("input", () => {
+                const slider = document.getElementById("remoteVolumeSlider");
+                const remoteVideo = document.getElementById("remoteVideo");
+
+                // Convert slider (0–100) to media volume (0–1)
+                const volumeValue = slider.value / 100;
+
+                remoteVideo.volume = volumeValue;
+                remoteVideo.muted = volumeValue === 0;
+            });
+            */
+            
+            // --- REMOTE AUDIO TOGGLE LIKE YOUR ORIGINAL EXAMPLE ---
+            document.getElementById("remoteToggleMic").addEventListener("click", () => {
+                const btn = document.getElementById("remoteToggleMic");
+                const remoteVideo = document.getElementById("remoteVideo");
+                
+                // Toggle mute on remote video output
+                remoteVideo.muted = !remoteVideo.muted;
+
+                btn.classList.toggle("off", remoteVideo.muted);
+            }); 
+
+/*
 
     document.getElementById("remoteToggleMic").addEventListener("click", () => {
 
