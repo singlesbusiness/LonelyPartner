@@ -113,10 +113,8 @@ public class SolanaPaymentsController : ControllerBase
                     _logger.LogError("No helius url found in database.");
                     return BadRequest(new { error = "❌ No helius url found. Please contact support ." });
                 }
-        //var MainnetHeliusRPC = heliusRPC.ValueText.ToString();
-        //Console.WriteLine("MainnetHeliusRPC=>", MainnetHeliusRPC, ".");
+        
         var mainnetHeliusRPC = heliusRPC.ValueText.Trim();
-        //Console.WriteLine("MainnetHeliusRPC-trim=>", MainnetHeliusRPC, ".");
         
         //var inrAmount = (selectPlan.Price * 87 );
         //INR value to i USD

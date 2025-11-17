@@ -53,7 +53,7 @@ namespace LonelyPartner.Services
 
             await _context.SaveChangesAsync();
 
-            Console.WriteLine($"Update solana address done by , {updatedBy} at {DateTime.UtcNow}");
+            Console.WriteLine($"Update solana address done by  {updatedBy} at {DateTime.UtcNow}");
             return true;
         }
 
@@ -98,7 +98,7 @@ namespace LonelyPartner.Services
 
             await _context.SaveChangesAsync();
 
-            Console.WriteLine($"Update helius url done by , {updatedBy} at {DateTime.UtcNow}");
+            Console.WriteLine($"Update helius url done by  {updatedBy} at {DateTime.UtcNow}");
             return true;
         }
     }

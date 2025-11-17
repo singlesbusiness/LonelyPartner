@@ -814,21 +814,23 @@ async function loadPlans() {
 
     try {
 
-      
             //Upgrade Modal
 
-            plansContainer.innerHTML = `<div class="loading">Loading plans...</div>`;
+            plansContainer.innerHTML = `<div class="upgrademodal">Loading plans...</div>`;
 
             const response = await fetch("/api/plans");
 
             const plans = await response.json();
 
-            console.log("plans===>", plans);
+            //console.log("plans===>", plans);
+            // Sort plans by plan.id to ensure they are in the correct order (ascending)
+            plans.sort((a, b) => a.id - b.id);
 
             plansContainer.innerHTML = ""; // clear previous
 
-            plans.forEach(plan => {
-
+            //plans.forEach(async plan => {
+                // Loop through each plan to create a plan card
+            for (const plan of plans) {
                 const div = document.createElement("div");
 
                 div.className = "plan-card";
@@ -838,8 +840,25 @@ async function loadPlans() {
                 div.dataset.name = plan.name;
 
                 div.dataset.amount = plan.price;
+                ////get real time INR value start////
+                
+                    // Construct the API URL with the usdAmount as a query parameter
+                    const inrresponse =  await fetch(`/api/plans/inrofusd?usdAmount=${plan.price.toFixed(2)}`);
+                    
+                    
+                    // Check if the response is successful
+                    if (!inrresponse.ok) {
+                        //do not throw error as we can use default values from appsetting
+                        console.log("failed to get INR vlaue of USD");
+                    }
 
- 
+                    // Parse the response body to get the INR amount not asyn to keep the order ot cards
+                    const inrAmount =  await inrresponse.json();
+
+                    // Log the INR amount to the console
+                    //console.log("INR Amount:", inrAmount);
+
+                ///end////
 
                 div.innerHTML = `
 
@@ -849,17 +868,16 @@ async function loadPlans() {
 
                     <p style="text-align:center;">Save ${plan.savePercent}%</p>
 
-                    <p class="price">$${plan.price.toFixed(2)}/~₹${plan.priceINR}</p>
+                    <p class="price">$${plan.price.toFixed(2)}/₹${inrAmount ? inrAmount.toFixed(2) : plan.priceINR}</p>
 
                     <button class="buyBtn">Buy</button>
 
                     `;
 
- 
-
                 plansContainer.appendChild(div);
 
-        });
+        //});
+                }
 
  
 
