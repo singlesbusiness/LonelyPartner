@@ -546,6 +546,8 @@ video {
     background: rgba(0,0,0,0.7);
     justify-content: center;
     align-items: center;
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.25);
+    border-radius: 16px;
 }
 
 .modal-content.large {
@@ -1113,7 +1115,8 @@ nav {
   text-decoration: underline;
 }
 
-/*age Consent Modal*/
+/* Consent Modal*/
+/*
 .consentmodal {
     display: none;
     position: fixed;
@@ -1162,5 +1165,112 @@ nav {
         padding: 10px 18px;
         border-radius: 8px;
         font-weight: bold;
-    }
+    } */
 
+/* new consent Modal*/
+/* Modal Overlay */
+.consentmodal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 20%;
+    top: 7%;
+    width: 800px;
+    height: 480px;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.25);
+    border-radius: 16px;
+        }
+
+.consentmodal-content {
+            
+    background-color: #150726;
+    padding: 2px 3px;
+    border-radius: 12px;
+    width: 100%;
+    height: 100%;
+    max-width: 800px;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.25);
+    text-align: center;
+    animation: fadeIn 0.3s ease;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 24px;
+            color: yellow;
+        }
+        h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: yellow;
+        }
+        h4 {
+            margin-top: 0;
+            font-size: 14px;
+            color: yellow;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: yellow;
+        }
+
+        .terms-scroll {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+            background-color: rgb(255, 253, 253);
+        }
+
+        .terms-scroll ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .terms-scroll li {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: black;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+
+        #consentConfirmNo {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        #consentConfirmYes {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        /* Scrollbar styles */
+        .terms-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .terms-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(160, 157, 157, 0.934);
+            border-radius: 4px;
+        }

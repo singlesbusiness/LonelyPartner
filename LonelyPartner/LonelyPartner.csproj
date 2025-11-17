@@ -27,6 +27,7 @@
     <Folder Include="Migrations/" />
     <Folder Include="Migrations\" />
     <Folder Include="Pages\" />
+    <Folder Include="wwwroot/js/mobile/" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 

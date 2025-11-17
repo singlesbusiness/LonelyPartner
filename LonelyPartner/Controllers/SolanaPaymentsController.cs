@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using LonelyPartner.Services;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -103,7 +102,22 @@ public class SolanaPaymentsController : ControllerBase
         var receiveAddress = wallet.ValueText.Trim();
                 //get address from appsetting
                 //var receiveAddress = _cfg["Solana:ReceiveAddress"];
+        //Console.WriteLine("receiveAddress=>", receiveAddress, ".");
+        // ✅ Fetch Helius RPC dynamically from DB, takes 1st record
+        var heliusRPC = await _db.WalletEntity
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.KeyName == "MainnetHeliusRPC"); 
 
+                if (heliusRPC == null || string.IsNullOrWhiteSpace(heliusRPC.ValueText))
+                {
+                    _logger.LogError("No helius url found in database.");
+                    return BadRequest(new { error = "❌ No helius url found. Please contact support ." });
+                }
+        //var MainnetHeliusRPC = heliusRPC.ValueText.ToString();
+        //Console.WriteLine("MainnetHeliusRPC=>", MainnetHeliusRPC, ".");
+        var mainnetHeliusRPC = heliusRPC.ValueText.Trim();
+        //Console.WriteLine("MainnetHeliusRPC-trim=>", MainnetHeliusRPC, ".");
+        
         //var inrAmount = (selectPlan.Price * 87 );
         //INR value to i USD
         var inrRate = await _exchangeRateService.GetUsdToInrAsync();
@@ -116,6 +130,7 @@ public class SolanaPaymentsController : ControllerBase
                 success = true,
                 orderId = order.OrderId,
                 receiveAddress,
+                mainnetHeliusRPC,
                 memo = order.Memo,
                 amountSol = Math.Round(solAmount, 6),
                 usd = selectPlan.Price,

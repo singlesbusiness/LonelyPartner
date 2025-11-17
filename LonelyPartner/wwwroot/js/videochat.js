@@ -141,17 +141,17 @@
 
  
 
-        const modal = document.getElementById("ageModal");
+        const modal = document.getElementById("consentModal");
 
-        const yesBtn = document.getElementById("ageConfirmYes");
+        const yesBtn = document.getElementById("consentConfirmYes");
 
-        const noBtn = document.getElementById("ageConfirmNo");
+        const noBtn = document.getElementById("consentConfirmNo");
 
  
 
         if (!modal || !yesBtn || !noBtn) {
 
-            console.error("Age verification modal not found in DOM.");
+            console.error("Consent verification modal not found in DOM.");
 
             return false;
 

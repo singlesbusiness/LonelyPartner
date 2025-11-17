@@ -69,7 +69,7 @@ public class OrderCleanupService : BackgroundService
             {
                 db.OrderEntity.RemoveRange(oldOrders);
                 await db.SaveChangesAsync(token);
-                _logger.LogInformation($"🗑️ Deleted {oldOrders.Count} old orders older than {cutoffDate:yyyy-MM-dd}.");
+                _logger.LogInformation($"🗑️ Deleted {oldOrders.Count} old orders, older than {cutoffDate:yyyy-MM-dd}.");
             }
             else
             {

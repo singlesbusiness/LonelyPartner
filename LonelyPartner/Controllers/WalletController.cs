@@ -54,7 +54,52 @@ namespace LonelyPartner.Controllers
                 }
         }
 
+        ///////////For Helius URL
+        [HttpGet("heliusurl")]
+        public async Task<IActionResult> GetHeliusURL()
+        {
+            //Console.WriteLine("In get sol address api");
+            try
+            {
+                var key = await _settings.GetHeliusUrlServiceAsync();
+                return Ok(new { heliusURL = key });
+            }
+            catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ GetHeliusURL() Error: {ex.Message}");
+                    return StatusCode(500, new { message = "Error retrieving Helius URL." });
+                }
+        }
+
+        [HttpPost("heliusurl/update")]
+        public async Task<IActionResult> UpdateHeliusURL([FromBody] UpdateHeliusURLRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.NewKey))
+                return BadRequest("Invalid key.");
+
+            try
+            {
+                var updatedBy = User.Identity?.Name ?? "Admin";
+                await _settings.UpdateHeliusUrlServiceAsync(request.NewKey, updatedBy);
+                Console.WriteLine("🟢  Updated Helius URL by admin");
+                // ✅ show in admin portal at right bottom success message
+                
+                return Ok(new { Message = "Helius URL updated successfully." });
+            }
+            catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ GetHeliusURL() Error: {ex.Message}");
+                    return StatusCode(500, new { message = "Error updating Heius URL." });
+                }
+        }
+
         public class UpdateSolKeyRequest
+        {
+            public string NewKey { get; set; } = string.Empty;
+        }
+
+        //for helius url
+        public class UpdateHeliusURLRequest
         {
             public string NewKey { get; set; } = string.Empty;
         }

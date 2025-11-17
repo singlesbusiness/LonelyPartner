@@ -213,19 +213,20 @@
     </div>
 
    
-    <!-- 🔞 Age Verification and consent Modal -->
-    <div id="ageModal" class="cs-modal-overlay">
-        <div class="cs-modal-content">
+    <!-- 🔞 Age Verification and consent Modal 
+    <div id="consentModal" class="consentmodal"> -->
+    <div id="consentModal" class="consentmodal-overlay">
+        <div class="consentmodal-content">
             <h2>🔞 Caution: It is  Adults Only website!</h2>
-            <p>
-                You are entering an <strong>ADULT (18+) video chat</strong>. <br /><br />
-                You are <strong> responsible</strong> for your choices or any
+            
+                <h3>You are entering an ADULT (18+) video chat.</h3> 
+                <h4>You are responsible for your choices or any
                 interactions that occur here. Visiting this Website if you are under 
                 18-years old and the age of majority may be prohibited by the law of 
-                your jurisdiction.<br /><br />
-                <strong>By clicking “Yes, I agree” below, you agree that the following statements below:</strong>
+                your jurisdiction.</h4>
+                <p><strong>By clicking “Yes, I agree” below, you agree that the following statements below:</strong>
             </p>
-            <div class="scroll-box">
+            <div class="terms-scroll">
                 <ul>
                 <li>I am an adult, at least 18-years old, I have the legal right to access 
                     and access adult material of this website.</li>
@@ -241,9 +242,9 @@
             </div>
             
             <p style="color: rgb(148, 6, 11); font-size: 20px;"><strong>Click "No,Exit" button, If you do not agree, and leave the website, thanks.</strong></p>
-            <div class="consentmodal-actions">
-                <button id="ageConfirmYes" class="btn green">Yes, I agree</button>
-                <button id="ageConfirmNo" class="btn red">No, Exit</button>
+            <div class="modal-footer">
+                <button id="consentConfirmYes" class="btn">Yes, I agree</button>
+                <button id="consentConfirmNo" class="btn">No, Exit</button>
             </div>
         </div>
     </div>
@@ -374,7 +375,7 @@
    <!-- MOBILE UI WRAPPER (do not remove) -->
         <div id="mobileAppWrapper"></div>
         <link rel="stylesheet" href="~/css/mobile/mobile-ui.css">
-        <script src="~/js/mobile/mobile-ui.js" defer></script>
+      <!--  <script src="~/js/mobile/mobile-ui.js" defer></script> -->
 
   
     @*=====================Scripts=========================*@

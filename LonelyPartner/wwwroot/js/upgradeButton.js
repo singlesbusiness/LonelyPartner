@@ -243,7 +243,7 @@ function initUpgradeAccessControl() {
         }
 
         const data = await res.json();
-        //console.log("create-order response==>", data);
+        console.log("create-order response==>", data);
 
         //console.log(data.checkout.success);
         if (data.checkout.success != true) {
@@ -333,7 +333,7 @@ function initUpgradeAccessControl() {
         //document.getElementById("solAmount").innerText = `${data.checkout.amountSol} SOL (~$${data.checkout.usd})`;
 
         const checkout = data.checkout;
-
+        //console.log("before solModal data=>" , checkout);
         // Hide upgrade modal
 
         const upgradeModalEl = document.getElementById("upgradeModal");
@@ -346,8 +346,13 @@ function initUpgradeAccessControl() {
  
 
     function showSolModal(checkout) {
+        //console.log("solModal data=>" , checkout);
         //orderId
         const orderId = checkout.orderId;
+        //MainnetHeliusRPC
+        const mainnetHeliusRPC = checkout.mainnetHeliusRPC;
+        //console.log("mainnetHeliusRPC in solmodal=>", mainnetHeliusRPC);
+
         const modal = document.getElementById("solModal");
 
         if (!modal) {
@@ -420,11 +425,15 @@ function initUpgradeAccessControl() {
 
             const receiveAddress = checkout.receiveAddress;
 
+            const heliusurlwithkey = checkout.mainnetHeliusRPC;
+
             const memo = checkout.memo;
 
             const orderId = checkout.orderId;
 
-            console.log("orderid=>", orderId);
+            //console.log("orderid=>", orderId);
+            //console.log("receiveAddress=>", receiveAddress);
+            //console.log("heliusurlwithkey=>", heliusurlwithkey);
 
                 // -----------------------------
                 // 🧩 Detect Phantom Wallet
@@ -647,7 +656,11 @@ function initUpgradeAccessControl() {
             //free public RPC from Helius 1,000,000 free credits.
             //after the credits are reached, login with a new gmail and get the new api-key
             //from https://mainnet.helius-rpc.com  
-            const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=89838007-1176-4814-bdff-a6daa27649da", "confirmed");
+            //Update Wallete DB record Value whose Name is  MainnetHeliusRPC, with new gmail-account
+            //you will get new key url.
+            //console.log("heliusurlwithkey=>", heliusurlwithkey);
+            //const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=89838007-1176-4814-bdff-a6daa27649da", "confirmed");
+            const connection = new solanaWeb3.Connection(heliusurlwithkey, "confirmed");
             
             // ✅ New API: getLatestBlockhash
             const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
