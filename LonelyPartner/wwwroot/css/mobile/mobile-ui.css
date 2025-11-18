@@ -3,78 +3,141 @@
 ----------------------------------------------------------*/
 @media (max-width: 768px) {
 
-    /* Disable side-by-side layout */
+     /* make main container vertical */
     .container {
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
         height: auto !important;
+    }
+
+/* Remove all gaps */
+    .container,
+    .left-panel,
+    .right-panel {
         padding: 0 !important;
         margin: 0 !important;
     }
-
-    .left-panel,
-    .right-panel {
+   
+     .center {
+        margin: auto;
+        width: 85%;
+        padding: 1px;
+    }
+    .header-link{
+        width: 80%;
+        font-size: 22px;
+        font-style: normal;
+        text-decoration: none;
+        color: inherit; 
+    }
+    .menu-toggle {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05px;
+    cursor: pointer;
+    }
+     .menu-toggle span {
+        width: 16px;
+        height: 0.5px;
+        background: white;
+        display: block;
+    }
+    /* Left panel contains ONLY videos */
+    .left-panel {
+        display: flex !important;
+        flex-direction: column !important;
         width: 100% !important;
-        height: auto !important;
-        padding: 0 !important;
+        order: 1; /* BELOW controls */
     }
 
+/* Right panel contains controls + chat  */
+    .right-panel {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        order: 0 !important; /* buttons on top */
+        padding: 10px 10px 0 10px;
+    } 
     /* ---------------------------------------------------------
        🔹 1. CONTROLS MUST COME FIRST — ON TOP
     ----------------------------------------------------------*/
-    #rightPanel .controls {
+    
+    .controls {
         order: 1 !important;
         width: 100%;
-        padding: 12px;
+        padding: 5px 5px !important;
+        margin: 0 !important;
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 5px;
         justify-content: center;
         background: rgba(0, 0, 0, 0.35);
         z-index: 10;
     }
+   
 
-    /* Buttons + selects layout */
-    #rightPanel .controls .btn,
-    #rightPanel .controls select {
-        flex: 1 1 48%;
-        padding: 14px;
-        font-size: 17px !important;
+   
+    /* Buttons + selects layout */ 
+    .controls .btn,
+    .controls select {
+        flex: 1 1 30%;
+        padding: 1px;
+        font-size: 12px !important;
         border-radius: 12px;
         text-align: center;
+        height: 26px;
     }
-
-    /* Full-width Login */
-    #loginBtn {
-        flex: 1 1 100% !important;
-    }
-
+     
+    .chat-section {
+        display: flex; 
+        order: 2 !important;
+        width: 100%;
+  } 
+  #statusText{
+    display: flex; 
+    order: 1;
+  }
+  #partnerInfo{
+    display: flex; 
+    order: 2;
+  }
+  #chatinput {
+    display: none; /* hide separate chat section on mobile */
+  }
+    #messages{
+    display: none; /* hide separate chat section on mobile */
+  }
+  #emojiPicker{
+    display: none; /* hide separate chat section on mobile */
+  }
+ 
     /* ---------------------------------------------------------
        🔹 2. REMOTE VIDEO — LARGE & PRIORITY
     ----------------------------------------------------------*/
     #remoteVideoBlock {
-        order: 2 !important;
-        width: 100%;
-        margin: 0;
-        padding: 0 10px;
-        margin-top: 10px;
+        order: 1 !important;
+        width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        margin-top: 5px;
         position: relative;
     }
 
     #remoteVideo {
         width: 100% !important;
-        height: 60vh !important;
+        height: auto !important;
         object-fit: cover !important;
-        border-radius: 14px;
+        border-radius: 0 !important;
         background: black;
     }
 
     /* Remote controls */
     #remoteControls {
         position: absolute;
-        bottom: 10px;
-        left: 10px;
+        bottom: 1px;
+        right: 22px;
         display: flex;
         gap: 10px;
     }
@@ -83,20 +146,20 @@
        🔹 3. LOCAL VIDEO — BELOW REMOTE
     ----------------------------------------------------------*/
     #localVideoBlock {
-        order: 3 !important;
-        width: 100%;
-        padding: 0 10px;
-        margin-top: 15px;
+        order: 2 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
         position: relative;
     }
-
+    
     #localVideo {
         width: 100% !important;
-        height: 30vh !important;
+        height: 200px !important;
         object-fit: cover !important;
-        border-radius: 14px;
         background: black;
-    }
+    } 
+     
 
     #localControls {
         position: absolute;
@@ -106,11 +169,68 @@
         gap: 8px;
     }
 
+     /* ===============================
+       📌 TEXT CHAT OVERLAY ON LOCAL VIDEO
+       Displays when user types
+    ==================================*/
+    #mobileChatOverlay {
+        display: none;
+        position: absolute;
+        bottom: 50px; /* above bottom bar */
+        left: 0;
+        right: 0;
+        max-height: 45%;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.55);
+        color: white;
+        padding: 10px;
+        font-size: 14px;
+        z-index: 9999;
+    }
+    #mobileChatInput {
+        display: none;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 95%;
+        padding: 5px;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 99999;
+    }
+    #mobileChatInput #input #sendChatmobile{
+        width: 100%;
+        padding: 8px;
+        border-radius: 2px;
+        border: none;
+        font-size: 16px;
+    }
+     /* ===============================
+       📌 FIXED BOTTOM ICON BAR
+    ==================================*/
+    #mobileBottomBar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 12px 0;
+        background: rgba(0, 0, 0, 0.75);
+        display: flex;
+        justify-content: center;
+        z-index: 99999;
+    }
+    #mobileBottomBar .chat-icon {
+        font-size: 28px;
+        color: white;
+        cursor: pointer;
+    }
     /* ---------------------------------------------------------
        🔹 4. CHAT — BELOW LOCAL VIDEO
     ----------------------------------------------------------*/
-    .chat-section {
-        order: 4 !important;
+    /* Right panel (chat container) comes AFTER videos */
+
+/*
+     .chat-section {
+        order: 3 !important;
         width: 100%;
         padding: 10px;
         margin-top: 15px;
@@ -133,10 +253,10 @@
     .chat-input input {
         flex: 1;
     }
-
+*/
     /* Clean up */
-    .vertical-divider,
-    .splitter {
+    .vertical-divider
+    {
         display: none !important;
     }
 
@@ -149,6 +269,8 @@
     }
 
 
+   
+   
 
   /* ============================================================
        MOBILE-SPECIFIC MODAL BEHAVIOR (SEPARATE CONFIGS)
@@ -160,8 +282,8 @@
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 60%;
+        height: 70%;
         background: rgba(0,0,0,0.70);
         display: none;              /* hidden unless JS shows it */
         justify-content: center;

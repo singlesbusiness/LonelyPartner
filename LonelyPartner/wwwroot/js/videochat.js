@@ -1744,7 +1744,8 @@ function clearStatus() {
     window.LP.onStartClicked = onStartClicked;
     //onNextClicked
     window.LP.onNextClicked = onNextClicked;
-    //
+    //for chat mobile
+    window.LP.initChat = initChat;
 
     //window.LP.endCallLocal = endCallLocal;
     // Optional: attach more methods

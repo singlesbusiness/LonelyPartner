@@ -192,8 +192,8 @@
                     }
                     
                 </div>
-                
-                <div class="chat-section">
+            
+                <div class="chat-section" id="chatsection">
                     
                     <!-- 🔹 Status Message -->
                         <div id="statusText"
@@ -209,7 +209,7 @@
                         <!--<div class="message system"></div> -->
                     </div>   
                     
-                    <div class="chat-input">
+                    <div id = "chatinput" class="chat-input">
                         <button id="emojiBtn">😊</button>
                         <input id="chatText" placeholder="Type your message..." />
                         <button id="sendChat" class="btn blue">📨 Send</button>
@@ -381,8 +381,22 @@
         @*=========================Mobile Wrapper=============================*@
     <!-- MOBILE UI WRAPPER (do not remove) -->
             <div id="mobileAppWrapper"></div>
+            <!-- Bottom Message Bar -->
+                <div id="mobileBottomBar" class="chat-icon">
+                    <div class="chat-icon" id="mobileChatBtn">💬</div>
+                </div>
+
+                <!-- Chat overlay area -->
+                <div id="mobileChatOverlay"></div>
+
+                <!-- Chat input overlay -->
+                <div id="mobileChatInput">
+                    <input type="text" id="mobileChatText" placeholder="Type a message...">
+                    <button id="sendChatmobile" class="btn blue">📨 Send</button>
+                </div>
+
             <link rel="stylesheet" href="~/css/mobile/mobile-ui.css">
-            @*<script src="~/js/mobile/mobile-ui.js" defer></script> *@
+            <script src="~/js/mobile/mobile-ui.js" defer></script> 
 
     
         @*=====================Scripts=========================*@
