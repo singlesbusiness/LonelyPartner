@@ -1,94 +1,159 @@
-/* -------------------------------------------------------------------
-   GLOBAL MOBILE CONTAINER & VIDEO LAYOUT
-------------------------------------------------------------------- */
+/* ---------------------------------------------------------
+   📱 FINAL MOBILE LAYOUT (≤ 768px)
+----------------------------------------------------------*/
 @media (max-width: 768px) {
-    body, html {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        overflow: hidden;
-        background: #12002b;
-    }
 
+    /* Disable side-by-side layout */
     .container {
-        display: none !important; /* hide desktop layout */
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        height: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
-    #mobileAppWrapper {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
+    .left-panel,
+    .right-panel {
+        width: 100% !important;
+        height: auto !important;
+        padding: 0 !important;
+    }
+
+    /* ---------------------------------------------------------
+       🔹 1. CONTROLS MUST COME FIRST — ON TOP
+    ----------------------------------------------------------*/
+    #rightPanel .controls {
+        order: 1 !important;
         width: 100%;
-        background: #0f0020;
-    }
-
-    /* ---------------- TOP BUTTONS ---------------- */
-    #mobileTopControls {
+        padding: 12px;
         display: flex;
         flex-wrap: wrap;
+        gap: 10px;
         justify-content: center;
-        gap: 8px;
-        padding: 10px;
-        background: #1b0135;
-        z-index: 20;
-    }
-    #mobileTopControls button,
-    #mobileTopControls select {
-        padding: 8px 14px;
-        border-radius: 8px;
-        font-size: 14px;
-        border: none;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 10;
     }
 
-    /* ---------------- REMOTE VIDEO ---------------- */
-    #mobileRemoteBlock {
-        flex: 1;
-        position: relative;
-        background: black;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    /* Buttons + selects layout */
+    #rightPanel .controls .btn,
+    #rightPanel .controls select {
+        flex: 1 1 48%;
+        padding: 14px;
+        font-size: 17px !important;
+        border-radius: 12px;
+        text-align: center;
     }
-    #mobileRemoteBlock video {
+
+    /* Full-width Login */
+    #loginBtn {
+        flex: 1 1 100% !important;
+    }
+
+    /* ---------------------------------------------------------
+       🔹 2. REMOTE VIDEO — LARGE & PRIORITY
+    ----------------------------------------------------------*/
+    #remoteVideoBlock {
+        order: 2 !important;
         width: 100%;
-        height: auto;
-        max-height: 60vh;
-    }
-
-    /* ---------------- LOCAL VIDEO ---------------- */
-    #mobileLocalBlock {
-        padding: 10px;
-        background: #12002b;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    #mobileLocalBlock video {
-        width: 150px;
-        height: 110px;
-        border-radius: 10px;
-        background-color: black;
-    }
-
-    /* Chat Button */
-    #mobileChatBtn {
+        margin: 0;
+        padding: 0 10px;
         margin-top: 10px;
-        background: #8645ff;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 10px;
-        border: none;
-        font-size: 15px;
+        position: relative;
     }
 
-    /* -------------------------------------------------------------------
-       UNIVERSAL MOBILE MODAL FIXES (Option C)
-    ------------------------------------------------------------------- */
-   /* ============================================================
+    #remoteVideo {
+        width: 100% !important;
+        height: 60vh !important;
+        object-fit: cover !important;
+        border-radius: 14px;
+        background: black;
+    }
+
+    /* Remote controls */
+    #remoteControls {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        display: flex;
+        gap: 10px;
+    }
+
+    /* ---------------------------------------------------------
+       🔹 3. LOCAL VIDEO — BELOW REMOTE
+    ----------------------------------------------------------*/
+    #localVideoBlock {
+        order: 3 !important;
+        width: 100%;
+        padding: 0 10px;
+        margin-top: 15px;
+        position: relative;
+    }
+
+    #localVideo {
+        width: 100% !important;
+        height: 30vh !important;
+        object-fit: cover !important;
+        border-radius: 14px;
+        background: black;
+    }
+
+    #localControls {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        display: flex;
+        gap: 8px;
+    }
+
+    /* ---------------------------------------------------------
+       🔹 4. CHAT — BELOW LOCAL VIDEO
+    ----------------------------------------------------------*/
+    .chat-section {
+        order: 4 !important;
+        width: 100%;
+        padding: 10px;
+        margin-top: 15px;
+    }
+
+    .messages {
+        max-height: 32vh;
+        padding: 12px;
+        overflow-y: auto;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.25);
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .chat-input input {
+        flex: 1;
+    }
+
+    /* Clean up */
+    .vertical-divider,
+    .splitter {
+        display: none !important;
+    }
+
+    /* Menu toggle stays fixed */
+    .menu-toggle {
+        top: 12px;
+        right: 12px;
+        position: fixed !important;
+        z-index: 9999;
+    }
+
+
+
+  /* ============================================================
        MOBILE-SPECIFIC MODAL BEHAVIOR (SEPARATE CONFIGS)
        — Every modal can be edited independently
-    ============================================================ */
+============================================================ */
 
     /* ---- GENERAL FIX FOR ALL modal overlays ---- */
     .cs-modal-overlay {

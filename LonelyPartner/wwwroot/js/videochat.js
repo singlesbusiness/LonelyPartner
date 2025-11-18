@@ -34,13 +34,6 @@
     let fallbackTimer = null; //for fallback match,set to 5sec in on.waiting
 
  
-    // Close Upgrade modal, when below close modal code is put un upgradeButton.js , its not working
-    const closeUpgradeModal = document.getElementById("closeUpgradeModal");
-        closeUpgradeModal.addEventListener("click", () => {
-
-            upgradeModal.style.display = "none";
-
-        });
  
 
  
@@ -162,9 +155,6 @@
         return new Promise((resolve) => {
 
             modal.style.display = "block";
-
- 
-
             yesBtn.onclick = () => {
 
                 modal.style.display = "none";
@@ -175,7 +165,6 @@
 
             };
 
- 
 
             noBtn.onclick = () => {
 

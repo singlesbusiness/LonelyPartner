@@ -58,6 +58,13 @@ function initUpgradeAccessControl() {
         if (typeof loadPlans === "function") loadPlans();
 
     }
+    
+    /* close upgrade modal*/
+    closeUpgradeModal?.addEventListener("click", () => {
+
+            upgradeModal.style.display = "none";
+
+        });
 
  
 

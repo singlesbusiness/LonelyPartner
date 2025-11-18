@@ -32,9 +32,9 @@ header {
     justify-content: space-between;
     align-items: center;
     justify-items: center;
-    height: 45px;       
+    height: 35px;       
     padding: 0 20px;
-    background-color: #030008;
+    background-color: #2d0272;
 }
 
 /* Make logo fill header height exactly */
@@ -46,7 +46,7 @@ header {
     object-fit: contain; /* removes SVG padding effect */
 }
 .header-link {
-    font-size: 30px;
+    font-size: 25px;
     font-style: normal;
     text-decoration: none;
     color: inherit;       /* keeps same text color */
@@ -70,12 +70,7 @@ header {
     display: block;
 }
 
-/* Show hamburger on mobile */
-@media (max-width: 768px) {
-    .menu-toggle {
-        display: flex;
-    }
-}
+
 
 
    
@@ -285,16 +280,6 @@ video {
         color: white
     }
 
-/* small responsiveness */
-@media (max-width:900px) {
-    .left-panel {
-        width: 48%
-    }
-
-    .splitter {
-        display: none
-    }
-}
 
 
 
@@ -337,7 +322,7 @@ video {
     padding: 2rem;
     z-index: 999;
     left: 30%;
-    top: 0;
+    top: 35px;
     position: fixed;
     border-radius: 1.25rem;
     box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
@@ -382,12 +367,7 @@ video {
     gap: 0.75rem;
 }
 
-@media (min-width: 640px) {
-    .verify-section {
-        flex-direction: row;
-        justify-content: center;
-    }
-}
+
 
 .verify-input {
     background-color: #2a213a;
@@ -468,7 +448,7 @@ video {
     position: fixed;
     z-index: 2000;
     left: 0;
-    top: 0;
+    top: 10px;
     width: 100%;
     height: 100%;
     align-items: center;
@@ -705,29 +685,9 @@ video {
 /* ===== Solana Payment Modal ===== */
 
 
-/* Responsive( mobile adaptive*/
-@media (max-height: 70px) {
-    .sol-modal-inner {
-        margin: 40px 0;
-    }
-}
 
-@media ( max-width : 480px) {
-    .sol-modal-inner {
-        width: 95%;
-        padding: 18px;
-        font-size: 0.9rem;
-    }
 
-        .sol-modal-inner .sol-amount {
-            font-size: 1.5rem;
-        }
 
-    #solQrCanvas {
-        width: 140px !important;
-        height: 140px !important;
-    }
-}
 
 .sol-modal {
     position: fixed;
@@ -862,18 +822,7 @@ video {
     font-weight:600;
 }
 
-/* Responsive for mobile */
-@media (max-width: 600px) {
-    .sol-modal-inner {
-        max-width: 92%;
-        padding: 18px;
-        max-height: 85vh;
-    }
 
-    .sol-amount {
-        font-size: 1.4rem;
-    }
-}
 
 /*admin dashboard*/
 
@@ -980,12 +929,7 @@ nav {
             color: #243188;
         }
 
-/* === Responsive === */
-@media (max-width: 768px) {
-    .overlay-content {
-        padding-top: 60px;
-    }
-}
+
 /*status text*/
 .statusText {
     transition: all 0.3s ease;
@@ -1011,89 +955,7 @@ nav {
 }
 
 
-/* === Mobile-first Responsive Fixes (for ≤ 768 px) === */
-@media (max-width: 768px) {
 
-    html, body {
-        height: auto;
-        overflow-y: auto;
-    }
-
-    .container {
-        flex-direction: column;
-        height: auto;
-        padding: 10px;
-    }
-
-    .left-panel, .right-panel {
-        width: 100%;
-        min-width: unset;
-        padding: 8px;
-    }
-
-    .left-panel {
-        order: 1;
-    }
-
-    .right-panel {
-        order: 2;
-    }
-
-    .video-block {
-        height: 250px;
-    }
-
-    .controls {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .btn, .select-box {
-        flex: 1 1 45%;
-        font-size: 0.85rem;
-        padding: 8px 10px;
-    }
-
-    .chat-section {
-        height: auto;
-        max-height: 400px;
-    }
-
-    .messages {
-        max-height: 240px;
-    }
-
-    .menu-toggle {
-        top: 0.6rem;
-        right: 0.6rem;
-    }
-
-    .overlay-menu {
-        width: 85%;
-        height: 100%;
-        border-radius: 0;
-        right: 0;
-    }
-
-    .overlay-content {
-        padding-top: 80px;
-    }
-
-    video {
-        height: 100%;
-        object-fit: cover;
-    }
-
-    /* Session alert */
-    #sessionAlert {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        text-align: center;
-        font-size: 0.85rem;
-    }
-}
 
 /*login button*/
 /* Social Button Base */
