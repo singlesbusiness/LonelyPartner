@@ -9,6 +9,8 @@
         flex-direction: column !important;
         width: 100% !important;
         height: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
 /* Remove all gaps */
@@ -21,26 +23,32 @@
    
      .center {
         margin: auto;
+        height: 28px !important;
         width: 85%;
-        padding: 1px;
+        padding: 0 !important;
     }
     .header-link{
         width: 80%;
-        font-size: 22px;
-        font-style: normal;
+        font-size: 16px;
         text-decoration: none;
         color: inherit; 
     }
     .menu-toggle {
-    display: flex;
-    flex-direction: column;
-    gap: 0.05px;
-    cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        position: fixed !important;
+        top: 10px;
+        right: 12px;
+        z-index: 9999;
+        transform: scale(0.75); /* smaller */
+        opacity: 0.85;
+        cursor: pointer;
     }
      .menu-toggle span {
-        width: 16px;
-        height: 0.5px;
+        width: 14px;
+        height: 2px;
         background: white;
+        margin: 2px 0;
         display: block;
     }
     /* Left panel contains ONLY videos */
@@ -118,16 +126,16 @@
     #remoteVideoBlock {
         order: 1 !important;
         width: 100% !important;
-        height: 100% !important;
+        height: 62vh !important; /* bigger */
         margin: 0 !important;
         padding: 0 !important;
-        margin-top: 5px;
+        
         position: relative;
     }
 
     #remoteVideo {
         width: 100% !important;
-        height: auto !important;
+        height: 100% !important;
         object-fit: cover !important;
         border-radius: 0 !important;
         background: black;
@@ -151,6 +159,7 @@
         padding: 0 !important;
         width: 100% !important;
         position: relative;
+        height: 30vh !important; /* bigger local video */
     }
     
     #localVideo {
@@ -158,6 +167,8 @@
         height: 200px !important;
         object-fit: cover !important;
         background: black;
+        margin: 0 !important;
+        padding: 0 !important;
     } 
      
 

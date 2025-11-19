@@ -97,14 +97,16 @@
     function clearChatMessages() {
             //const chatArea = document.getElementById("chatMessages");
             if (messagesDiv) messagesDiv.innerHTML = "";
+            if(mobileBox) mobileBox.innerHTML ="";
     }
     //append message for mobile
-    function appendMobile(sender, msg) {
+    function appendMobile(sender, text) {
         if (!mobileBox) return;
 
         const bubble = document.createElement("div");
-        bubble.className = "mobile-msg " + (sender === "You" ? "me" : "other");
-        bubble.textContent = msg;
+        bubble.className = `message ${sender === "You" ? "me" : "other"}`;
+        bubble.innerHTML = `<strong>${escapeHtml(sender)}:</strong> ${escapeHtml(text)}`;
+        //bubble.textContent = msg;
 
         mobileBox.appendChild(bubble);
         mobileBox.style.display = "block";
@@ -117,17 +119,15 @@
     window.appendMessage = function (sender, text) {
 
         // mobile 
-        /*
+        
         if (window.innerWidth <= 768) {        
-            appendMobile(sender, msg);
-        } */
+            appendMobile(sender, text);
+        } 
         //for desktop
         if (!messagesDiv) return;
 
         const el = document.createElement("div");
-
         el.className = `message ${sender === "You" ? "me" : "other"}`;
-
         el.innerHTML = `<strong>${escapeHtml(sender)}:</strong> ${escapeHtml(text)}`;
 
         messagesDiv.appendChild(el);
