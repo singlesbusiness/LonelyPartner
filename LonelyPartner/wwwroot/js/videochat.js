@@ -25,7 +25,7 @@
 
     let genderSelect, continentSelect;
 
-    let chatInput, sendChatBtn, messagesDiv, statusText, infoDiv, emojiBtn, emojiPicker;
+    let chatInput, sendChatBtn, messagesDiv, statusText, infoDiv, emojiBtn, emojiPicker , mobileBox;
 
     let leftPanel, verticalDivider, localBlock, remoteBlock, splitter, rightPanel;
 
@@ -44,7 +44,8 @@
 
     let connection = null;
 
-    let currentPartnerId = null;
+    //let currentPartnerId = null;
+    window.currentPartnerId = null;
 
     let isInitiator = false;
 
@@ -97,11 +98,30 @@
             //const chatArea = document.getElementById("chatMessages");
             if (messagesDiv) messagesDiv.innerHTML = "";
     }
+    //append message for mobile
+    function appendMobile(sender, msg) {
+        if (!mobileBox) return;
 
+        const bubble = document.createElement("div");
+        bubble.className = "mobile-msg " + (sender === "You" ? "me" : "other");
+        bubble.textContent = msg;
+
+        mobileBox.appendChild(bubble);
+        mobileBox.style.display = "block";
+
+        mobileBox.scrollTop = mobileBox.scrollHeight;
+    }
     // append message
+    //function appendMessage(sender, text) {
+    // MAKE GLOBAL — so mobile.js can use it
+    window.appendMessage = function (sender, text) {
 
-    function appendMessage(sender, text) {
-
+        // mobile 
+        /*
+        if (window.innerWidth <= 768) {        
+            appendMobile(sender, msg);
+        } */
+        //for desktop
         if (!messagesDiv) return;
 
         const el = document.createElement("div");
@@ -345,7 +365,9 @@ function showStoppedMessage() {
 
 // For status message
 
-function setStatus(message, type = "info") {
+//function setStatus(message, type = "info") {
+// MAKE GLOBAL — used by mobile.js also
+window.setStatus = function (message, type = "info") {
     
     if (!statusText) return;
     
@@ -679,7 +701,9 @@ function clearStatus() {
 
     // send chat with graceful fallback to other method name variants
 
-    async function sendChatToPartner(partnerId, message) {
+   // async function sendChatToPartner(partnerId, message) {
+   // MAKE GLOBAL — send chat to partner from mobile & desktop
+    window.sendChatToPartner = async function (partnerId, message) {
 
         if (!connection) { error("SignalR connection missing"); return; }
 
@@ -1367,18 +1391,10 @@ function clearStatus() {
 }
 
 
-
- 
-
     // --- Emoji picker wiring ---
-
- 
-
-    function initEmojiPicker() {
+     function initEmojiPicker() {
 
         if (!emojiBtn) return;
-
- 
 
         // Create emoji picker container dynamically if not already present
 
@@ -1408,8 +1424,6 @@ function clearStatus() {
 
         ];
 
- 
-
         // Build emoji elements
 
         emojiPicker.innerHTML = emojis
@@ -1418,25 +1432,23 @@ function clearStatus() {
 
             .join("");
 
- 
+            emojiPicker.style.display = "none";
 
-        emojiPicker.style.display = "none";
+            emojiPicker.style.position = "absolute";
 
-        emojiPicker.style.position = "absolute";
+            emojiPicker.style.background = "#fff";
 
-        emojiPicker.style.background = "#fff";
+            emojiPicker.style.border = "1px solid #ccc";
 
-        emojiPicker.style.border = "1px solid #ccc";
+            emojiPicker.style.borderRadius = "8px";
 
-        emojiPicker.style.borderRadius = "8px";
+            emojiPicker.style.padding = "8px";
 
-        emojiPicker.style.padding = "8px";
+            emojiPicker.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
 
-        emojiPicker.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+            emojiPicker.style.userSelect = "none";
 
-        emojiPicker.style.userSelect = "none";
-
-        emojiPicker.style.zIndex = "999";
+            emojiPicker.style.zIndex = "999";
 
  
 
@@ -1506,6 +1518,8 @@ function clearStatus() {
 
     function initChat() {
 
+
+        //for desktop
         if (!sendChatBtn || !chatInput) return;
 
         sendChatBtn.addEventListener("click", async () => {
@@ -1679,7 +1693,8 @@ function clearStatus() {
 
         rightPanel = document.getElementById("rightPanel");
 
- 
+        //for mobile
+        mobileBox = document.getElementById("mobileChatMessages");
 
         // sanity check
 
@@ -1744,8 +1759,7 @@ function clearStatus() {
     window.LP.onStartClicked = onStartClicked;
     //onNextClicked
     window.LP.onNextClicked = onNextClicked;
-    //for chat mobile
-    window.LP.initChat = initChat;
+    
 
     //window.LP.endCallLocal = endCallLocal;
     // Optional: attach more methods
@@ -1756,7 +1770,10 @@ function clearStatus() {
         }
     };
 
-   
+   //for mobile-ui.js
+    window.appendMessage = appendMessage;
+    window.sendChatToPartner = sendChatToPartner;
+    window.setStatus = setStatus;
 
  
 

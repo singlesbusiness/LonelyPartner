@@ -10,58 +10,59 @@ document.addEventListener("DOMContentLoaded", () => {
     const chatInputWrap = document.getElementById("mobileChatInput");
     const chatInput = document.getElementById("mobileChatText");
     const overlay = document.getElementById("mobileChatOverlay");
-    const chatWindow = document.getElementById("chatWindow"); // where messages show
+    const sendBtn = document.getElementById("sendChatmobile");
+    const mobileMessages = document.getElementById("mobileChatMessages");
+   // const chatWindow = document.getElementById("messages"); // USE DESKTOP CHAT WINDOW
 
-    /* ------------------------------------------------------------
-       OPEN CHAT FROM MOBILE BUTTON
-    ------------------------------------------------------------ */
+    //chatInputWrap.style.display = true;
+    //overlay.style.display = true;
+
+    /* ---------------------------------------------
+       OPEN CHAT POPUP
+    --------------------------------------------- */
     btn.addEventListener("click", () => {
+        
+
+        // Make visible
         chatInputWrap.style.display = "block";
         overlay.style.display = "block";
 
-        setTimeout(() => chatInput.focus(), 160);
+        //setTimeout(() => chatInput.focus(), 160);
+        // MUST BE SAME CLICK TICK FOR MOBILE
+        chatInput.focus({ preventScroll: true });
+
+        // Force keyboard open by scrolling input into view
+        setTimeout(() => {
+            chatInput.scrollIntoView({ block: "center", behavior: "auto" });
+        }, 50);
     });
 
-    /* ------------------------------------------------------------
+    /* ---------------------------------------------
        TYPING PREVIEW
-    ------------------------------------------------------------ */
-    chatInput.addEventListener("input", () => {
+    --------------------------------------------- */
+  /*  chatInput.addEventListener("input", () => {
         const txt = chatInput.value.trim();
-        if (txt.length > 0) {
-            overlay.style.display = "block";
-            overlay.innerHTML = `<div>${txt}</div>`;
-        } else {
-            hideOverlay();
-        }
+        overlay.style.display = txt.length > 0 ? "block" : "none";
+        overlay.innerHTML = txt ? `<div>${txt}</div>` : "";
     });
-
-    /* ------------------------------------------------------------
-       FIX: MOBILE SEND BUTTON (ENTER) WORKING
-       - works on Android / iOS / all keyboards
-    ------------------------------------------------------------ */
+*/
+    /* ---------------------------------------------
+       SEND ON ENTER / DONE / SEND
+    --------------------------------------------- */
     chatInput.addEventListener("keyup", (e) => {
-        // For Android Chrome → e.key === "Enter"
-        if (e.key === "Enter") {
+        if (e.key === "Enter" || e.key === "Done" || e.key === "Go" || e.key === "Send") {
             sendMobileMessage();
-            return;
-        }
-
-        // iOS Safari sometimes gives key === "Done"
-        if (e.key === "Done" || e.key === "Go" || e.key === "Send") {
-            sendMobileMessage();
-            return;
         }
     });
 
-    // Additional safety fallback for iOS (pressed “send” but key does not fire)
-    chatInput.addEventListener("change", () => {
-        sendMobileMessage();
-    });
+    //chatInput.addEventListener("change", sendMobileMessage);
 
-    /* ------------------------------------------------------------
-       SEND MOBILE MESSAGE
-       → same behavior as desktop initChat()
-    ------------------------------------------------------------ */
+    // Fallback button
+    sendBtn.addEventListener("click", sendMobileMessage);
+
+    /* ---------------------------------------------
+       SEND CHAT (MOBILE → DESKTOP BRIDGE)
+    --------------------------------------------- */
     async function sendMobileMessage() {
         const msg = chatInput.value.trim();
         if (!msg) {
@@ -70,11 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (!window.currentPartnerId) {
-            setStatus("Click Start, connect to a partner.", "info");
+            window.setStatus("Click Start, connect to a partner.", "info");
             return;
         }
 
-        // identical to desktop logic
+        // Desktop function + mobile
         window.appendMessage("You", msg);
         chatInput.value = "";
         hideOverlay();
@@ -82,31 +83,30 @@ document.addEventListener("DOMContentLoaded", () => {
         await window.sendChatToPartner(window.currentPartnerId, msg);
     }
 
-    /* ------------------------------------------------------------
-       RECEIVING PARTNER MESSAGES ON MOBILE
-       Desktop version updates the DOM.
-       Mobile needs to reflect updates → observe new messages.
-    ------------------------------------------------------------ */
+    /* ---------------------------------------------
+       AUTO-SCROLL MOBILE ON NEW MESSAGES
+    --------------------------------------------- */
     if (chatWindow) {
         const observer = new MutationObserver(() => {
-            // auto-scroll so mobile always sees the newest message
             chatWindow.scrollTop = chatWindow.scrollHeight;
         });
 
         observer.observe(chatWindow, { childList: true, subtree: true });
     }
 
-    /* ------------------------------------------------------------
-       CLICK OUTSIDE → HIDE OVERLAY
-    ------------------------------------------------------------ */
+    /* ---------------------------------------------
+       CLICK OUTSIDE TO HIDE CHAT POPUP
+    --------------------------------------------- */
     document.addEventListener("click", (e) => {
-        if (!chatInputWrap.contains(e.target) && !overlay.contains(e.target)) {
-            hideOverlay();
-        }
+        if (chatBtn.contains(e.target)) return;
+        if (chatWrap.contains(e.target)) return;
+        if (overlay.contains(e.target)) return;
+        hideOverlay();
     });
 
     function hideOverlay() {
         overlay.style.display = "none";
         overlay.innerHTML = "";
+        chatInputWrap.style.display = "none";
     }
 });

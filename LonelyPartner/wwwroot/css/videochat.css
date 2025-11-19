@@ -1169,3 +1169,13 @@ nav {
 
         /* remote mic control*/
 
+/* Hide whole mobile UI on desktop */
+@media (min-width: 769px) {
+    #mobileAppWrapper,
+    #mobileChatInput,
+    #mobileChatOverlay,
+    #mobileChatMessages,
+    #mobileBottomBar {
+        display: none !important;
+    }
+}
