@@ -128,34 +128,50 @@
     #remoteVideoBlock {
         order: 1 !important;
         width: 100% !important;
+        height: 75vh !important;   /* bigger placeholder */
+        min-height: 260px !important;
         margin: 0 !important;
         padding: 0 !important;
-        position: relative;
-        height: 55vh !important;   /* bigger placeholder */
-        min-height: 260px !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        position: relative !important;
+        
+        
+        
         background: black;
+        overflow: hidden;  /* keeps button inside */
+        display: block !important;
     }
 
     #remoteVideo {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100% !important;
-        height: 40% !important;
-        object-fit: cover !important;
-        border-radius: 0 !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        object-fit: cover !important;  /* BEST for full fill without distortion */
         background: black;
     }
 
     /* Remote controls */
     #remoteControls {
         position: absolute;
-        bottom: 1px;
-        right: 22px;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        bottom: 2px !important;   /* was 1px — pushes block height visually */
+        right: 1px !important;
+        z-index: 99999;
         display: flex;
         gap: 10px;
+        pointer-events: auto;
+        border: 1px solid rgba(255, 255, 255, 0.4);
     }
-
+    /* Extra protection to remove invisible spacing below video */
+    #remoteVideoBlock > * {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
     /* ---------------------------------------------------------
        🔹 3. LOCAL VIDEO — BELOW REMOTE
     ----------------------------------------------------------*/
@@ -167,6 +183,7 @@
         position: relative !important;
         height: 20vh !important;   /* larger placeholder */
         min-height: 130px !important;
+        max-height: 260px !important;
         display: flex;
         justify-content: center;
         align-items: center;

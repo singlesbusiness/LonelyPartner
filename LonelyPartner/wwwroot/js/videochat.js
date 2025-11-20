@@ -581,7 +581,7 @@ function clearStatus() {
 
         if (!localStream) {
 
-            try { await startCamera(); } catch (e) { error("no local stream for offer"); return; }
+            try { await startCamera(); } catch (e) { console.error("no local stream for offer"); return; }
 
         }
 

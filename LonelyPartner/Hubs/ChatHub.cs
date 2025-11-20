@@ -148,10 +148,20 @@ namespace LonelyPartner.Hubs
             if (!isAdmin)
             {
                 var httpContext = Context.GetHttpContext();
-                var ip = httpContext?.Connection?.RemoteIpAddress?.ToString();
-                if (string.IsNullOrEmpty(ip) || ip == "::1" || ip == "127.0.0.1")
+                string ip = httpContext?.Connection?.RemoteIpAddress?.ToString();
+                //Console.WriteLine($"ip=> {ip}");
+                if (string.IsNullOrEmpty(ip) || ip == "::1" || ip == "127.0.0.1" || ip.StartsWith("127.")|| ip.StartsWith("::ffff:127."))
+                {   //Console.WriteLine(" in 1st if");
                     ip = httpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                } 
 
+                // Normalize IPv6-mapped IPv4 (e.g., ::ffff:192.168.1.5 → 192.168.1.5)
+                if (!string.IsNullOrWhiteSpace(ip) && ip.Contains("::ffff:"))
+                {       //Console.WriteLine(" in 2nd if");
+                    ip = ip.Replace("::ffff:", "");
+                }
+
+                
                 (country, city) = await GetLocationFromIp(ip);
             }
 
@@ -364,11 +374,11 @@ namespace LonelyPartner.Hubs
                 http.Timeout = TimeSpan.FromSeconds(3);
                 //a16664ac16ea19 is the token from ininfo.io
                 var json = await http.GetStringAsync($"https://ipinfo.io/{ip}/json?token=a16664ac16ea19");
-                //Console.WriteLine(json);
+                //Console.WriteLine("json=>" , json);
                 using var doc = JsonDocument.Parse(json);
-                //Console.WriteLine(doc);
+                //Console.WriteLine("doc=>" ,doc);
                 var root = doc.RootElement;
-                //Console.WriteLine(root);
+                //Console.WriteLine("root=>" ,root);
                 var country = root.TryGetProperty("country", out var c) ? c.GetString() : "Unknown";
                 var city = root.TryGetProperty("city", out var ci) ? ci.GetString() : "Unknown";
                 //Console.WriteLine($" country=> {country}, city=>{city}");
