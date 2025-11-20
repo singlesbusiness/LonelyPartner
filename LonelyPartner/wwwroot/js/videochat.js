@@ -25,7 +25,7 @@
 
     let genderSelect, continentSelect;
 
-    let chatInput, sendChatBtn, messagesDiv, statusText, infoDiv, emojiBtn, emojiPicker , mobileBox;
+    let chatInput, sendChatBtn, messagesDiv, statusText, infoDiv, emojiBtn, emojiPicker , mobileBox , switchCameraBtn;
 
     let leftPanel, verticalDivider, localBlock, remoteBlock, splitter, rightPanel;
 
@@ -50,6 +50,9 @@
     let isInitiator = false;
 
     let localStream = null;
+    
+    //for bck camera on mobile
+    let usingBackCamera = false;
 
     let pc = null;
 
@@ -200,13 +203,104 @@
 
     }
 
- 
+    //for mobile back camera 
+            //switchCameraBtn.addEventListener("click", async () => {
+            document.getElementById("switchCameraBtn").addEventListener("click", async () => {
+
+                usingBackCamera = !usingBackCamera;
+                startCamera();
+                /*
+            try {
+                usingBackCamera = !usingBackCamera;
+
+                // Stop existing tracks
+                if (localStream) {
+                    localStream.getTracks().forEach(t => t.stop());
+                }
+
+                // Pick camera
+                const constraints = {
+                    video: {
+                        facingMode: usingBackCamera ? { ideal: "environment" } : { ideal: "user" },
+                        width: { ideal: 1920, max: 3840 },
+                        height: { ideal: 1080, max: 2160 },
+                        frameRate: { ideal: 60, max: 60 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    }
+                };
+
+                // Get new stream
+                const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+                // Update local video
+                const localVideo = document.getElementById("localVideo");
+                //localVideo.srcObject = newStream;
+                
+                localStream = newStream;
+
+            if (localVideo) {
+
+                localVideo.srcObject = newStream;
+
+                localVideo.muted = true;
+
+                localVideo.style.display = "block";
+
+                if (localPlaceholder) localPlaceholder.style.display = "none";
+
+                // Attempt to play (some browsers require play() to be handled explicitly)
+
+                try { await localVideo.play(); } catch (e) { console.log("localVideo.play() prevented:", e); }
+
+            }
+
+                // Replace tracks in WebRTC connection
+                //if (peer) {
+                if (pc) {
+                    const senders = peer.getSenders();
+
+                    const videoTrack = newStream.getVideoTracks()[0];
+                    const audioTrack = newStream.getAudioTracks()[0];
+
+                    //localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+                    // Replace video
+                    const videoSender = senders.find(s => s.track && s.track.kind === "video");
+                    if (videoSender) 
+                        {
+                            videoSender.replaceTrack(videoTrack);
+                    }
+                    else {
+                        pc.addTrack(videoTrack, newStream);
+                    }
+
+                    // Replace audio
+                    const audioSender = senders.find(s => s.track && s.track.kind === "audio");
+                    if (audioSender) {
+                        audioSender.replaceTrack(audioTrack);
+                    }
+                    else {
+                        pc.addTrack(audioTrack, newStream);
+                    }
+                }
+
+                // Store stream globally
+                localStream = newStream;
+
+            } catch (err) {
+                console.error("Camera switch failed:", err);
+                //alert("Unable to switch camera on this device.");
+            }*/
+        });
 
     // --- Camera controls ---
 
     async function startCamera() {
 
-        if (localStream) { log("camera already running"); return localStream; }
+        //if (localStream) { console.log("camera already running"); return localStream; }
 
         try {
 
@@ -215,6 +309,7 @@
             const s = await navigator.mediaDevices.getUserMedia({
 
                 video: {
+                    facingMode: usingBackCamera ? { ideal: "environment" } : { ideal: "user" },
 
                     width: { min: 640, ideal: 7680, max: 7680 },
 
@@ -252,11 +347,11 @@
 
                 // Attempt to play (some browsers require play() to be handled explicitly)
 
-                try { await localVideo.play(); } catch (e) { log("localVideo.play() prevented:", e); }
+                try { await localVideo.play(); } catch (e) { console.log("localVideo.play() prevented:", e); }
 
             }
 
-            log("Local camera started", s.getTracks().map(t => t.kind));
+            console.log("Local camera started", s.getTracks().map(t => t.kind));
 
             return s;
 
@@ -1695,6 +1790,8 @@ function clearStatus() {
 
         //for mobile
         mobileBox = document.getElementById("mobileChatMessages");
+        //for mobile back camera
+        switchCameraBtn = document.getElementById("switchCameraBtn");
 
         // sanity check
 

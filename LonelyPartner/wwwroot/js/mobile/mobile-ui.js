@@ -37,15 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 50);
     });
 
-    /* ---------------------------------------------
-       TYPING PREVIEW
-    --------------------------------------------- */
-  /*  chatInput.addEventListener("input", () => {
-        const txt = chatInput.value.trim();
-        overlay.style.display = txt.length > 0 ? "block" : "none";
-        overlay.innerHTML = txt ? `<div>${txt}</div>` : "";
-    });
-*/
+
     /* ---------------------------------------------
        SEND ON ENTER / DONE / SEND
     --------------------------------------------- */
@@ -86,14 +78,14 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ---------------------------------------------
        AUTO-SCROLL MOBILE ON NEW MESSAGES
     --------------------------------------------- */
-    if (chatWindow) {
+  /*  if (chatWindow) {
         const observer = new MutationObserver(() => {
             chatWindow.scrollTop = chatWindow.scrollHeight;
         });
 
         observer.observe(chatWindow, { childList: true, subtree: true });
     }
-
+*/
     /* ---------------------------------------------
        CLICK OUTSIDE TO HIDE CHAT POPUP
     --------------------------------------------- */
