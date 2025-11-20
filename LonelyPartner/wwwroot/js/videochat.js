@@ -56,6 +56,9 @@
 
     let pc = null;
 
+    //from 447 line
+    //const peer = null;
+
     const pendingCandidates = {}; // partnerId -> [candidate,...]
 
  
@@ -203,98 +206,69 @@
 
     }
 
-    //for mobile back camera 
-            //switchCameraBtn.addEventListener("click", async () => {
-            document.getElementById("switchCameraBtn").addEventListener("click", async () => {
+    // --- CAMERA SWITCH ---
+    
+function enableCameraSwitch() {
+    const switchBtn = document.getElementById("switchCameraBtn");
 
-                usingBackCamera = !usingBackCamera;
-                startCamera();
-                /*
-            try {
-                usingBackCamera = !usingBackCamera;
-
-                // Stop existing tracks
-                if (localStream) {
-                    localStream.getTracks().forEach(t => t.stop());
+    switchBtn.onclick = async () => {
+        try {
+                if (!pc) {
+                    alert("Peer connection not ready yet!");
+                    return;
                 }
-
-                // Pick camera
-                const constraints = {
-                    video: {
-                        facingMode: usingBackCamera ? { ideal: "environment" } : { ideal: "user" },
-                        width: { ideal: 1920, max: 3840 },
-                        height: { ideal: 1080, max: 2160 },
-                        frameRate: { ideal: 60, max: 60 }
-                    },
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true
+                    usingBackCamera = !usingBackCamera;
+                    // Stop old stream
+                    if (localStream) {
+                        localStream.getTracks().forEach(t => t.stop());
                     }
-                };
+                    
+                    const constraints = {
+                        video: {
+                            facingMode: usingBackCamera 
+                                ? { ideal: "environment" } 
+                                : { ideal: "user" },
+                            width: { ideal: 1920, max: 3840 },
+                            height: { ideal: 1080, max: 2160 },
+                            frameRate: { ideal: 60, max: 60 }
+                        },
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true
+                        }
+                    };
+            
+                    const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+            
+                    // Update video preview
+                    const localVideo = document.getElementById("localVideo");
+                    localVideo.srcObject = newStream;
+            
+                    // Update RTCPeerConnection
+                    if ( pc) {
+            
+                        const senders = pc.getSenders();
 
-                // Get new stream
-                const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-
-                // Update local video
-                const localVideo = document.getElementById("localVideo");
-                //localVideo.srcObject = newStream;
-                
-                localStream = newStream;
-
-            if (localVideo) {
-
-                localVideo.srcObject = newStream;
-
-                localVideo.muted = true;
-
-                localVideo.style.display = "block";
-
-                if (localPlaceholder) localPlaceholder.style.display = "none";
-
-                // Attempt to play (some browsers require play() to be handled explicitly)
-
-                try { await localVideo.play(); } catch (e) { console.log("localVideo.play() prevented:", e); }
-
-            }
-
-                // Replace tracks in WebRTC connection
-                //if (peer) {
-                if (pc) {
-                    const senders = peer.getSenders();
-
-                    const videoTrack = newStream.getVideoTracks()[0];
-                    const audioTrack = newStream.getAudioTracks()[0];
-
-                    //localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-
-                    // Replace video
-                    const videoSender = senders.find(s => s.track && s.track.kind === "video");
-                    if (videoSender) 
-                        {
-                            videoSender.replaceTrack(videoTrack);
-                    }
-                    else {
-                        pc.addTrack(videoTrack, newStream);
+                        const videoTrack = newStream.getVideoTracks()[0];
+                        const audioTrack = newStream.getAudioTracks()[0];
+            
+                        const videoSender = senders.find(s => s.track?.kind === "video");
+                        if (videoSender) await videoSender.replaceTrack(videoTrack);
+            
+                        const audioSender = senders.find(s => s.track?.kind === "audio");
+                        if (audioSender) await audioSender.replaceTrack(audioTrack);
+                        
                     }
 
-                    // Replace audio
-                    const audioSender = senders.find(s => s.track && s.track.kind === "audio");
-                    if (audioSender) {
-                        audioSender.replaceTrack(audioTrack);
-                    }
-                    else {
-                        pc.addTrack(audioTrack, newStream);
-                    }
-                }
-
-                // Store stream globally
-                localStream = newStream;
-
+                    localStream = newStream;
+            
             } catch (err) {
-                console.error("Camera switch failed:", err);
-                //alert("Unable to switch camera on this device.");
-            }*/
-        });
+                    console.error(err);
+                }
+    }
+}
+
+
 
     // --- Camera controls ---
 
@@ -309,7 +283,6 @@
             const s = await navigator.mediaDevices.getUserMedia({
 
                 video: {
-                    facingMode: usingBackCamera ? { ideal: "environment" } : { ideal: "user" },
 
                     width: { min: 640, ideal: 7680, max: 7680 },
 
@@ -419,62 +392,62 @@
 
     }
 
-    // 🔹 Stop remote partner's video stream
-function stopRemoteVideo() {
-    const remoteVideo = document.getElementById("remoteVideo");
-    if (remoteVideo && remoteVideo.srcObject) {
-        const tracks = remoteVideo.srcObject.getTracks();
-        tracks.forEach(track => track.stop());
-        remoteVideo.srcObject = null;
-        console.log("🎥 Remote video stopped.");
+        // 🔹 Stop remote partner's video stream
+    function stopRemoteVideo() {
+        const remoteVideo = document.getElementById("remoteVideo");
+        if (remoteVideo && remoteVideo.srcObject) {
+            const tracks = remoteVideo.srcObject.getTracks();
+            tracks.forEach(track => track.stop());
+            remoteVideo.srcObject = null;
+            console.log("🎥 Remote video stopped.");
+        }
     }
-}
 
-// 🔹 Stop local chat input and hide typing area
-function stopTextChat() {
-    
-    //if (chatInput) chatInput.disabled = true;
-    //if (sendChatBtn) sendBtn.disabled = true;
+    // 🔹 Stop local chat input and hide typing area
+    function stopTextChat() {
+        
+        //if (chatInput) chatInput.disabled = true;
+        //if (sendChatBtn) sendBtn.disabled = true;
 
-    //setStatus("Chat ended.");
-    console.log("💬 Chat disabled.");
-}
+        //setStatus("Chat ended.");
+        console.log("💬 Chat disabled.");
+    }
 
-// 🔹 Enable local chat input 
-function starttextChat() {
-    
-    //if (chatInput) chatInput.enabled = true;
-    //if (sendChatBtn) sendBtn.enabled = true;
+    // 🔹 Enable local chat input 
+    function starttextChat() {
+        
+        //if (chatInput) chatInput.enabled = true;
+        //if (sendChatBtn) sendBtn.enabled = true;
 
-    //setStatus("Chat ended.");
-    console.log("💬 Chat enabled.");
-}
-
+        //setStatus("Chat ended.");
+        console.log("💬 Chat enabled.");
+    }
 
 
-// 🔹 Optional: show a subtle 'You left the chat' message
-function showStoppedMessage() {
-    setStatus("✅ You left the chat.", "info");
-    console.log("🛑 User stopped chat manually.");
-}
 
-// For status message
+    // 🔹 Optional: show a subtle 'You left the chat' message
+    function showStoppedMessage() {
+        setStatus("✅ You left the chat.", "info");
+        console.log("🛑 User stopped chat manually.");
+    }
 
-//function setStatus(message, type = "info") {
-// MAKE GLOBAL — used by mobile.js also
-window.setStatus = function (message, type = "info") {
-    
-    if (!statusText) return;
-    
-    statusText.className = `alert alert-${type} text-center mb-3`;
-    statusText.textContent = message;
-    statusText.style.display = "block";
-}
+    // For status message
 
-function clearStatus() {
-    const el = document.getElementById("statusText");
-    if (el) el.style.display = "none";
-}
+    //function setStatus(message, type = "info") {
+    // MAKE GLOBAL — used by mobile.js also
+    window.setStatus = function (message, type = "info") {
+        
+        if (!statusText) return;
+        
+        statusText.className = `alert alert-${type} text-center mb-3`;
+        statusText.textContent = message;
+        statusText.style.display = "block";
+    }
+
+    function clearStatus() {
+        const el = document.getElementById("statusText");
+        if (el) el.style.display = "none";
+    }
  
 
     // --- PeerConnection lifecycle ---
@@ -537,7 +510,7 @@ function clearStatus() {
 
                 // don't auto-close here; Next/Stop will manage
 
-                log("pc failed/disconnected");
+                console.log("pc failed/disconnected");
 
             }
 
@@ -607,6 +580,9 @@ function clearStatus() {
 
         log("Offer created & sent to", partnerId);
 
+        // Now it's safe: enable the camera switch button
+            enableCameraSwitch();
+
     }
 
  
@@ -621,15 +597,12 @@ function clearStatus() {
 
         currentPartnerId = fromId;
 
- 
 
         if (!localStream) {
 
             try { await startCamera(); } catch (e) { error("cannot start camera on offer", e); return; }
 
         }
-
- 
 
         pc = createPeerConnection(fromId);
 
