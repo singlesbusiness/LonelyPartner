@@ -20,6 +20,8 @@ function initAccessControl() {
 
     const upgradeModal = document.getElementById("upgradeModal");
 
+    //remote
+
  
     // ===============================
     // 🌍 Auto-detect continent (non-paid users)
@@ -58,7 +60,7 @@ function initAccessControl() {
         if (loginModal) {
 
             loginModal.style.display = "flex";
-
+            document.getElementById("remoteControls").style.display = "none";
         }       
 
     }

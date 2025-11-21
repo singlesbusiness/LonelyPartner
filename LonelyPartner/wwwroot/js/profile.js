@@ -342,7 +342,7 @@ profileBtn.addEventListener("click", async () => {
 
         //reloads the page after 1.5 secs
 
-        setTimeout(() => location.reload(), 1000);
+        //setTimeout(() => location.reload(), 1000);
 
     });
 

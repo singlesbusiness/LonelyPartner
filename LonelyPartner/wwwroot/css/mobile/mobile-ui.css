@@ -161,7 +161,7 @@
                 border-radius: 50%;
                 bottom: 2px !important;   /* was 1px — pushes block height visually */
                 right: 1px !important;
-                z-index: 99999;
+                z-index: 999;
                 display: flex;
                 gap: 10px;
                 pointer-events: auto;
@@ -410,9 +410,7 @@
             }
 
             /* ---- CONSENT MODAL ---- */
-        /* Background overlay */
-
-
+        
         /* Modal box */
         #consentModal {
             position: fixed;
@@ -442,7 +440,7 @@
             width: 100%;
             height: 100%;
             overflow-y: auto;
-
+            z-index: 999999 !important;
             pointer-events: auto !important;
         }
         
@@ -452,25 +450,19 @@
             pointer-events: auto !important;
         }
 
-    /* Disable everything behind modal 
-    body.modal-open {
-        pointer-events: none !important;
-    }
-    body.modal-open #consentModal,
-    body.modal-open #consentModal * {
-        pointer-events: auto !important;
-    }*/
+  
 
-    /* Enable modal itself */
-    #consentModal,
-    #consentModal * {
-        pointer-events: auto !important;
-        z-index: 9999999 !important;
-    }
+        /* Enable modal itself */
+        #consentModal,
+        #consentModal * {
+            pointer-events: auto !important;
+            z-index: 9999999 !important;
+        }
 
             /* ---- LOGIN MODAL ---- */
             #loginModal .cs-modal-content {
                 background: #26005a;
+               
             }
 
             /* ---- PROFILE MODAL ---- */
@@ -496,7 +488,9 @@
                 margin: 10px auto;
             }
 
-
+           .cs-modal-content[style*="display"] #remoteControls {
+                display: none !important;
+            }
 
 
         }
