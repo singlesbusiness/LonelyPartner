@@ -491,7 +491,10 @@ video {
 .h4 {
     color: #ffff00;
 }
-
+.warning{
+    color: rgb(148, 6, 11); 
+    font-size: 20px;
+}
 
 .modal-actions {
     margin-top: 20px;
@@ -1072,7 +1075,7 @@ nav {
 
 /* new consent Modal*/
 /* Modal Overlay */
-.consentmodal-overlay {
+.consentmodal {
     display: none;
     position: fixed;
     z-index: 1000;
@@ -1114,16 +1117,12 @@ nav {
             font-size: 16px;
             color: yellow;
         }
-        h4 {
-            margin-top: 0;
-            font-size: 14px;
-            color: yellow;
-        }
+        
 
         p {
             font-size: 16px;
             margin-bottom: 20px;
-            color: yellow;
+            color: rgb(5, 5, 4);
         }
 
         .terms-scroll {
@@ -1147,7 +1146,8 @@ nav {
 
         .modal-footer {
             display: flex;
-            justify-content: space-between;
+            gap: 40px;
+            justify-content: center;
         }
 
         .btn {

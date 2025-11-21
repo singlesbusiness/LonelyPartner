@@ -115,7 +115,7 @@
                         
                         @*<input id="remoteVolumeSlider" type="range" min="0" max="100" value="100" />*@
                     
-                        <button id="remoteToggleMic" class="circle-btn gray" title="Remote Mic">🎙️</button>
+                        <button id="remoteToggleMic" class="circle-btn gray" title="Remote Mic" style="display:none;">🎙️</button>
                     </div>
                 
                 </div>
@@ -227,23 +227,27 @@
 
     
         <!-- 🔞 Age Verification and consent Modal -->
-        <!-- <div id="consentModal" class="consentmodal"> -->
-       <div id="consentModal" class="consentmodal-overlay"> 
-            <div class="consentmodal-content">   
+        <!-- <div id="consentModal" class="consentmodal"> 
+       <div id="consentModal" class="consentmodal-overlay"></div>-->
+
+        <!-- Actual modal box -->
+        <div id="consentModal" class="consentmodal">
+            <div id="consentModalContent" class="consentmodal-content">   
             
                 <h2>🔞 Caution: It is  Adults Only website!</h2>
                 
                     <h3>You are entering an ADULT (18+) video chat.</h3> 
-                    <h4>You are responsible for your choices or any
+                    
+                <div class="terms-scroll">
+                <p>You are responsible for your choices or any
                     interactions that occur here. Visiting this Website if you are under 
                     18-years old and the age of majority may be prohibited by the law of 
-                    your jurisdiction.</h4>
+                    your jurisdiction.</p>
                     <p><strong>By clicking “Yes, I agree” below, you agree that the following statements below:</strong>
                 </p>
-                <div class="terms-scroll">
                     <ul>
-                    <li>I am an adult, at least 18-years old, I have the legal right to access 
-                        and access adult material of this website.</li>
+                    <li> <p>I am an adult, at least 18-years old, I have the legal right to access 
+                        and access adult material of this website.</p></li>
                     <li>I am aware that I will be participating by my camera, in this Website and it's adult and nude content.</li>
                     <li>By logging in, viewing contents and participating of/in this Website, I will not hold the 
                         Website’s owners or the developer of thid website, responsible for any materials located on the Website.</li>
@@ -255,10 +259,13 @@
                     </ul>
                 </div>
                 
-                <p style="color: rgb(148, 6, 11); font-size: 20px;"><strong>Click "No,Exit" button, If you do not agree, and leave the website, thanks.</strong></p>
+                
+                <p class="warning">
+                    <strong>Click "No, Exit" if you do not agree and close the website. </strong>
+                </p>
                 <div class="modal-footer">
-                    <button id="consentConfirmYes" class="btn">Yes, I agree</button>
-                    <button id="consentConfirmNo" class="btn">No, Exit</button>
+                    <button id="consentConfirmYes" class="btn btn-yes">Yes, I agree</button>
+                    <button id="consentConfirmNo" class="btn btn-no">No, Exit</button>
                 </div>
             </div>
         </div>

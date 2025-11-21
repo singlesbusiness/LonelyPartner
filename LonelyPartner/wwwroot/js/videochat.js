@@ -26,6 +26,7 @@
     let genderSelect, continentSelect;
 
     let chatInput, sendChatBtn, messagesDiv, statusText, infoDiv, emojiBtn, emojiPicker , mobileBox , switchCameraBtn;
+    let remoteToggleMic , toggleCamera, toggleMic;
 
     let leftPanel, verticalDivider, localBlock, remoteBlock, splitter, rightPanel;
 
@@ -158,15 +159,11 @@
 
         }
 
- 
-
         const modal = document.getElementById("consentModal");
 
         const yesBtn = document.getElementById("consentConfirmYes");
 
         const noBtn = document.getElementById("consentConfirmNo");
-
- 
 
         if (!modal || !yesBtn || !noBtn) {
 
@@ -175,8 +172,6 @@
             return false;
 
         }
-
- 
 
         return new Promise((resolve) => {
 
@@ -190,7 +185,6 @@
                 resolve(true);
 
             };
-
 
             noBtn.onclick = () => {
 
@@ -693,6 +687,10 @@ function enableCameraSwitch() {
         //set status empty set when app opened in two tabs.
         setStatus("", "info");
         statusText.style.display = "none";
+        //local and remote cam and  mic icon display off
+        remoteToggleMic.style.display = "none"
+        //toggleCamera.style.display = "none";
+        //toggleMic.style.display = "none";
         //clear chat
         if (infoDiv) {
             infoDiv.textContent = "";
@@ -924,6 +922,10 @@ function enableCameraSwitch() {
             // ✅ mark matched state so “Searching...” won't override later
             isMatched = true;
             setStatus("🎉 Partner found!", "success");
+            //remote mic and cam icon display on for both local and remote
+            remoteToggleMic.style.display = "inline-block";
+            //toggleCamera.style.display = "inline-block";
+            //toggleMic.style.display = "inline-block";
             // show partner’s location
             infoDiv.style.display = "inline-block";
             if (infoDiv) {
@@ -1765,6 +1767,11 @@ function enableCameraSwitch() {
         mobileBox = document.getElementById("mobileChatMessages");
         //for mobile back camera
         switchCameraBtn = document.getElementById("switchCameraBtn");
+        //remote mic control
+        remoteToggleMic = document.getElementById("remoteToggleMic");
+        //local cam and  mic control
+        //toggleCamera = document.getElementById("toggleCamera");
+        //toggleMic = document.getElementById("toggleMic");
 
         // sanity check
 
@@ -1775,8 +1782,6 @@ function enableCameraSwitch() {
             return;
 
         }
-
- 
 
         // age verify once (on page load)
 
@@ -1926,28 +1931,8 @@ function enableCameraSwitch() {
                 btn.classList.toggle("off", remoteVideo.muted);
             }); 
 
-/*
 
-    document.getElementById("remoteToggleMic").addEventListener("click", () => {
-
-        const btn = document.getElementById("remoteToggleMic");
-
-        if (!localStream) return;
-
-        const audioTrack = localStream.getAudioTracks()[0];
-
-        if (audioTrack) {
-
-            audioTrack.enabled = !audioTrack.enabled;
-
-            btn.classList.toggle("off", !audioTrack.enabled);
-
-        }
-
-    });
-
-    */
-
+       
   
 
 })();
