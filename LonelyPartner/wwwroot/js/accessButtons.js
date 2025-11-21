@@ -73,7 +73,7 @@ function initAccessControl() {
 
             upgradeModal.style.display = "flex";
 
-            if(typeof loadPlans === "function") loadPlans();
+            //if(typeof loadPlans === "function") loadPlans();
 
         }       
 

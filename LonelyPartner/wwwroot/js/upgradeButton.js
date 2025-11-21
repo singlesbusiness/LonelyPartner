@@ -55,7 +55,7 @@ function initUpgradeAccessControl() {
 
         upgradeModal.style.display = "flex";
 
-        if (typeof loadPlans === "function") loadPlans();
+        //if (typeof loadPlans === "function") loadPlans();
 
     }
     
@@ -815,7 +815,7 @@ function initUpgradeAccessControl() {
 
     }
 
- //////////////Load plans modal//////////////
+ //////////////Load plans modal- upgrade modal//////////////
 
 async function loadPlans() {
 
