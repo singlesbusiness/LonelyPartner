@@ -1,17 +1,353 @@
 ﻿@{
     ViewData["Title"] = "FAQ";
 }
+  <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>LonelyPartner - Video Chat</title>
+        <link rel="stylesheet" href="~/css/faq.css" />
+        
 
-<div class="container mt-5">
-    <h2>Frequently Asked Questions</h2>
-    <p>Here you can find answers to the most common questions about our platform.</p>
+    </head>
+    <body>
+        <div class="faqContainer">
+                <h2>Frequently Asked Questions</h2>
+            
+            @*General*@
+            <div class="itemType">
+                <h3>General</h3>
 
-    <ul>
-        <li><strong>Q:</strong> How do I create an account?</li>
-        <li><strong>A:</strong> Click “Join” and follow the simple steps.</li>
+                    <div class="faq-item">
+                        <div class="faq-header" onclick="toggleFaq(this)">
+                            <span class="faq-title">What is LonelyPartner?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-content">
+                            <p>
+                                LonelyPartner is an ADULT video cam roulette chat. To provide a platform 
+                                for like minded people to meet online through webcam and internet.
+                                 
+                            </p>
+                        </div>
+                    </div>
 
-        <li><strong>Q:</strong> Is my information private?</li>
-        <li><strong>A:</strong> Yes, we respect and protect your privacy at all times.</li>
-    </ul>
-</div>
+                    <div class="faq-item">
+                        <div class="faq-header" onclick="toggleFaq(this)">
+                            <span class="faq-title">Is LonelyPartner anonymous?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-content">
+                            <p>
+                                Yes, LonelyPartner is completely anonymous. LonelyPartner does not store 
+                                any personal data except the gmail Id for signin.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-header" onclick="toggleFaq(this)">
+                            <span class="faq-title">Is LonelyPartner free?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-content">
+                            <p>
+                                Yes, LonelyPartner's basic features are free to use, by just clicking "Start" button.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-header" onclick="toggleFaq(this)">
+                            <span class="faq-title">Who uses LonelyPartner?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-content">
+                            <p>
+                                LonelyPartner is an adult video chat roulette. As long as user/you are over 18 years
+                                old.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-header" onclick="toggleFaq(this)">
+                            <span class="faq-title">Should I have web camera?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-content">
+                            <p>
+                                Not, you need not have web camera. when you do not have web camera you will get connected
+                                to other users who have webcamera  and expect that you have web camera, and since LonelyPartner
+                                is roulette chat, the probability of getting connected is less.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-header" onclick="toggleFaq(this)">
+                            <span class="faq-title">How do I report a bug or provide feedback?</span>
+                            <span class="faq-arrow">▼</span>
+                        </div>
+                        <div class="faq-content">
+                            <p>
+                                You can use menu option at the top right corner and select "Contact Us", fill the form to send.
+                            </p>
+                        </div>
+                    </div>
+
+
+            </div>
+            @*How to use*@
+            <div class="itemType">
+                <h3>How to use</h3>
+                    
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Why does it say “Allow” on my screen?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    When you first connect to the LonelyPartner platform, you are asked to allow the service
+                                    to access your webcamera. Allowing your webcamera, lets other people on the chat see your
+                                    live broadcast.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">What is "Start" button?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    To start webcamera chat roulette, you need to click "Start" button. to meet like minded user.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">What is "Start" button?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    To start webcamera chat roulette, you need to click "Start" button. to meet like minded user.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Why should I select "I Am" drop down?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    You need to select "I Am", so other users know which gender you automatically, 
+                                    to increase the probability of finding a like minded user.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">What is "Next" button?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    Say, you are in chat with other user, later you do not find other user like minded,
+                                    just click "Next", to find another like minded user.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">What is "Looking For" button?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    If you want to find a user with specifc gender you can click "Looking For" button,
+                                    It is a premium service.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">What is "All Continents" button?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    If you want to find a user from a specifc continent you can click "All Continents" button,
+                                    It is a premium service.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">What is "Login" button?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    LonelyPartner is an anonymous video chat roulette platform, which does not
+                                    have sign-up, only sign-in using gmail account.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Do I need to have Gmail account?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    Yes, LonelyPartner, as of today uses only Gmail sign-in.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Can I share personal information?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    LonelyPartner recommends not to share personal information. You can choose
+                                    to share your personal information during the chat.
+                                </p>
+                            </div>
+                        </div>
+            </div>
+
+             @*Device*@
+            <div class="itemType">
+                <h3>Device</h3>
+                    
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Which device can I use?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    You can use desktop , loptop or mobile, to use LonelyPartner platform.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Which browser do I use?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    LonelyPartner recommends you to use chrome browser, to have hassle free
+                                    user experience.
+                                </p>
+                            </div>
+                        </div>
+            </div>
+
+             @*Payment*@
+            <div class="itemType">
+                <h3>Payment</h3>
+                    
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Can I use only Crypto Payment?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    Yes,LonelyPartner is an anonymous video chat roullete, to keep user
+                                    anonymous, LonelyPartner chose crypto payment. Crypto is complete anonymous,
+                                    when decentralized exchange is used.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Why only Phantom Wallet?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    Phantom Wallet is easy to use, user friendly, Solana crypto's native wallet.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Why only Solana crypto?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    Solana has the lowest fees and fastest trasaction per second. Easy to use when 
+                                    transaction is using Phantom Wallet.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">I used QR code while payment, but I do not see premium service enabled?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    When you use QR code and make the payment for premium service, you need to get the 
+                                    signature from Solscan.com. You can go to Phantom wallet > select "Solana" under Tokens >
+                                    scroll to the bottom, you will see the transacion under "Activity", Click the transaction >
+                                    click "View on Orb" > browser opens, showing you transaction details , copy "Signature".
+                                    Come to LonelyPartner > Profile > paste the signature in "Payment Verification" and click "Verify Payment".
+                                    LonelyPartner will verify the payment and activate premium service.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">I clicked "Pay x.xxxxSOL" button for payment?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    You will be asked to install Phantom wallet if not not installed already.
+                                    Then will be asked to give access to LonelyPartner website, once you give permisson,
+                                    you will be asked to sign the transaction, meaning you are making the payment. LonelyPartner
+                                    will verify the payment and enable premium services immediately.
+                                </p>
+                            </div>
+                        </div>
+            </div>
+
+        </div>
+
+             @*=============Script==========*@
+                <script>
+                    function toggleFaq(header) {
+                        const item = header.parentElement;
+                        item.classList.toggle("open");
+                    }
+                </script>
+
+    </body>
+</html>
 
