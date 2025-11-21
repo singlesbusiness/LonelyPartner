@@ -27,7 +27,7 @@ public class OrderCleanupService : BackgroundService
     {   
         //default intervalhours = 24 , retentionDays = 7, if values not coming from appsetting
         var intervalHours = _config.GetValue<int>("OrderCleanupSettings:IntervalHours", 24);
-        var retentionDays = _config.GetValue<int>("OrderCleanupSettings:RetentionDays", 7);
+        var retentionDays = _config.GetValue<int>("OrderCleanupSettings:RetentionDays", 1);
 
         _logger.LogInformation($"🧹 OrderCleanupService started. Runs every {intervalHours} hours, deleting orders older than {retentionDays} days.");
 
@@ -62,7 +62,7 @@ public class OrderCleanupService : BackgroundService
 
             var cutoffDate = DateTime.UtcNow.AddDays(-retentionDays);
             var oldOrders = await db.OrderEntity
-                .Where(o => o.CreatedAt < cutoffDate && o.Status == "created" )
+                .Where(o => o.CreatedAt < cutoffDate && o.Status.ToLower() == "created" )
                 .ToListAsync(token);
 
             if (oldOrders.Any())
