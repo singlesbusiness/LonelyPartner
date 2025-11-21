@@ -866,6 +866,8 @@ async function loadPlans() {
                     //console.log("INR Amount:", inrAmount);
 
                 ///end////
+                //was after feature
+                //<p style="text-align:center;">Save ${plan.savePercent}%</p>
 
                 div.innerHTML = `
 
@@ -873,8 +875,7 @@ async function loadPlans() {
 
                     <div class="features">${plan.features}</div>
 
-                    <p style="text-align:center;">Save ${plan.savePercent}%</p>
-
+   
                     <p class="price">$${plan.price.toFixed(2)}/₹${inrAmount ? inrAmount.toFixed(2) : plan.priceINR}</p>
 
                     <button class="buyBtn">Buy</button>

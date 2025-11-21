@@ -433,6 +433,10 @@
             align-items: center;
 
             pointer-events: auto; /* important */
+            
+            /* for testing
+            display: none !important;
+            */
         }
 
         /* Scrollable modal content */
@@ -466,7 +470,14 @@
             }
 
             /* ---- PROFILE MODAL ---- */
-            #profileModal .cs-modal-content {
+            #profileModal {
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                width: 92vw;
+                max-width: 500px;
+                max-height: 85vh;
+                
                 background: #1a0038;
             }
 

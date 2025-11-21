@@ -145,7 +145,7 @@
 
  
 
-    // --- Age verification (one-time via localStorage) ---
+    // --- consent/Age verification (one-time via localStorage) ---
 
     function ensureAgeVerified() {
 
@@ -1783,8 +1783,8 @@ function enableCameraSwitch() {
 
         }
 
-        // age verify once (on page load)
-
+        // consent and  age verify once (on page load)
+        /*
         if (!ensureAgeVerified()) {
 
             // if not OK, redirect or stop further initialization
@@ -1793,7 +1793,7 @@ function enableCameraSwitch() {
 
             return;
 
-        }
+        } */
 
         //Disable stop button on page load
         stopBtn.disabled = true;
