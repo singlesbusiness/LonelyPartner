@@ -20,6 +20,7 @@ public class SolanaPaymentsController : ControllerBase
     private readonly IHubContext<ChatHub> _hub; // your signalr hub
     private readonly IINRExchangeRateService _exchangeRateService; //INR rate
     private readonly EmailService _emailService;//Email
+    
 
     public SolanaPaymentsController(UserDBContext db,
                                     IConfiguration cfg,
@@ -384,8 +385,8 @@ public class SolanaPaymentsController : ControllerBase
                         await _emailService.SendInvoiceEmailAsync(simpleOrderInfo)
                     );
                 }
-                Console.WriteLine("✅ Payment successful — email queued for sending.");
-
+                //Console.WriteLine("✅ Payment successful — email queued for sending.");
+                _logger.LogInformation("✅ Payment successful — email queued for sending.");
 
             /*
             // Notify user via SignalR (User identifier must be configured — we send to user's email)
@@ -406,8 +407,9 @@ public class SolanaPaymentsController : ControllerBase
             return Ok(new { ok = true });
         }
         catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error verifying tx");
+        {   
+            _logger.LogError(ex, "Unexpected error in SolanaPaymentsController.verify");
+            
             return StatusCode(500, "Error parsing transaction");
         }
     }
@@ -418,23 +420,32 @@ public class SolanaPaymentsController : ControllerBase
     [Authorize]
     public async Task<IActionResult> GetLastOrder()
     {
-        var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
-        if (email == null)
-            return Unauthorized();
+        try
+        {
+            var email = User.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value;
+            if (email == null)
+                return Unauthorized();
 
-        var user = await _db.UserEntity.FirstOrDefaultAsync(u => u.CustomerEmail == email);
-        if (user == null)
-            return Unauthorized();
+            var user = await _db.UserEntity.FirstOrDefaultAsync(u => u.CustomerEmail == email);
+            if (user == null)
+                return Unauthorized();
 
-        var lastOrder = await _db.OrderEntity
-            .Where(o => o.UserId == user.Id)
-            .OrderByDescending(o => o.CreatedAt)
-            .FirstOrDefaultAsync();
+            var lastOrder = await _db.OrderEntity
+                .Where(o => o.UserId == user.Id)
+                .OrderByDescending(o => o.CreatedAt)
+                .FirstOrDefaultAsync();
 
-        if (lastOrder == null)
-            return NotFound();
+            if (lastOrder == null)
+                return NotFound();
 
-        return Ok(new { orderId = lastOrder.OrderId });
+            return Ok(new { orderId = lastOrder.OrderId });
+        }
+        catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error in SolanaPaymentsController.get-last-order");
+                // Avoid exposing error details to user
+                return RedirectToAction("Error");
+            }
     }
 
 }

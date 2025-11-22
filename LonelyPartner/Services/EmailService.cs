@@ -13,10 +13,12 @@ namespace LonelyPartner.Services
     public class EmailService
     {
         private readonly IConfiguration _config;
+        private readonly ILogger<EmailService> _logger;
 
-        public EmailService( IConfiguration config)
+        public EmailService( IConfiguration config , ILogger<EmailService> logger)
         {   
             _config = config;
+            _logger = logger;
         }
 
         public async Task<bool> SendInvoiceEmailAsync(dynamic orderInfo)
@@ -125,14 +127,16 @@ namespace LonelyPartner.Services
 
                 await client.SendMailAsync(message);
                     */
-                    Console.WriteLine($"✅ Invoice email sent to {orderInfo.Email}");
+                    _logger.LogInformation($"✅ Invoice email sent to {orderInfo.Email}");
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"❌ Failed to send email: {ex.Message}");
+                    //Console.WriteLine($"❌ Failed to send email: {ex.Message}");
+                    _logger.LogError(ex, "Unexpected error in EmailService.SendInvoiceEmailAsync");
                     return false;
                 }
+                
             }
     }
 }

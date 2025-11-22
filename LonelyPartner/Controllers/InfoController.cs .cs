@@ -7,10 +7,12 @@ namespace LonelyPartner.Controllers
     public class InfoController : Controller
     {
          private readonly IConfiguration _config;
+         private readonly ILogger<InfoController> _logger;
 
-        public InfoController(IConfiguration config)
+        public InfoController(IConfiguration config, ILogger<InfoController> logger)
         {
             _config = config;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -95,7 +97,8 @@ namespace LonelyPartner.Controllers
                 //Console.WriteLine("sent contact email.");
             }
             catch (Exception ex)
-            {
+            {   
+                _logger.LogError(ex, "Unexpected error in InfoController.ContactUs");
                 ViewBag.Status = $"❌ Failed to send email: {ex.Message}";
             }
             return View();

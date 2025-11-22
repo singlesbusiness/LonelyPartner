@@ -10,10 +10,14 @@ namespace LonelyPartner.Controllers
     public class WalletController : ControllerBase
     {
         private readonly WalletService _settings;
+        private readonly ILogger<WalletController> _logger;
 
-        public WalletController(WalletService settings)
+        public WalletController(WalletService settings ,
+                                ILogger<WalletController> logger)
         {
             _settings = settings;
+            _logger = logger;
+            
         }
 
         [HttpGet("solkey")]
@@ -27,7 +31,8 @@ namespace LonelyPartner.Controllers
             }
             catch (Exception ex)
                 {
-                    Console.WriteLine($"❌ GetSolKey() Error: {ex.Message}");
+                    //Console.WriteLine($"❌ GetSolKey() Error: {ex.Message}");
+                    _logger.LogError(ex, "Unexpected error in WalletController.solkey");
                     return StatusCode(500, new { message = "Error retrieving Solana key." });
                 }
         }
@@ -42,14 +47,15 @@ namespace LonelyPartner.Controllers
             {
                 var updatedBy = User.Identity?.Name ?? "Admin";
                 await _settings.UpdateSolanaPublicKeyAsync(request.NewKey, updatedBy);
-                Console.WriteLine("🟢  Updated Solana public key by admin");
+                //Console.WriteLine("🟢  Updated Solana public key by admin");
                 // ✅ show in admin portal at right bottom success message
-                
+                _logger.LogInformation("🟢  Updated Solana public key by admin");
                 return Ok(new { Message = "Solana key updated successfully." });
             }
             catch (Exception ex)
                 {
-                    Console.WriteLine($"❌ GetSolKey() Error: {ex.Message}");
+                    //Console.WriteLine($"❌ GetSolKey() Error: {ex.Message}");
+                    _logger.LogError(ex, "Unexpected error in WalletController.solkey/update");
                     return StatusCode(500, new { message = "Error updating Solana key." });
                 }
         }
@@ -66,7 +72,8 @@ namespace LonelyPartner.Controllers
             }
             catch (Exception ex)
                 {
-                    Console.WriteLine($"❌ GetHeliusURL() Error: {ex.Message}");
+                    //Console.WriteLine($"❌ GetHeliusURL() Error: {ex.Message}");
+                    _logger.LogError(ex, "Unexpected error in WalletController.heliusurl");
                     return StatusCode(500, new { message = "Error retrieving Helius URL." });
                 }
         }
@@ -81,14 +88,16 @@ namespace LonelyPartner.Controllers
             {
                 var updatedBy = User.Identity?.Name ?? "Admin";
                 await _settings.UpdateHeliusUrlServiceAsync(request.NewKey, updatedBy);
-                Console.WriteLine("🟢  Updated Helius URL by admin");
+                //Console.WriteLine("🟢  Updated Helius URL by admin");
+                _logger.LogInformation("🟢  Updated Helius URL by admin");
                 // ✅ show in admin portal at right bottom success message
                 
                 return Ok(new { Message = "Helius URL updated successfully." });
             }
             catch (Exception ex)
                 {
-                    Console.WriteLine($"❌ GetHeliusURL() Error: {ex.Message}");
+                    //Console.WriteLine($"❌ GetHeliusURL() Error: {ex.Message}");
+                    _logger.LogError(ex, "Unexpected error in WalletController.heliusurl/update");
                     return StatusCode(500, new { message = "Error updating Heius URL." });
                 }
         }

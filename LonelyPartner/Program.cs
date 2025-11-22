@@ -95,11 +95,16 @@ builder.Services.AddHttpClient<CryptoPriceService>();
 //INR exchange
 builder.Services.AddHttpClient<IINRExchangeRateService, INRExchangeRateService>();
 
+//cache INR value
+builder.Services.AddMemoryCache();
+
 //Cleanup Orderentity
 builder.Services.AddHostedService<OrderCleanupService>();
 
 //Email Service
 builder.Services.AddScoped<LonelyPartner.Services.EmailService>();
+
+
 
 
 //for one session of the user

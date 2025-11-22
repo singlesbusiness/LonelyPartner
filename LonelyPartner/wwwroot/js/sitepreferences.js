@@ -16,13 +16,13 @@ function applyConsent() {
 // Blocked scripts until consent is granted
 function loadAnalytics() {
     let ga = document.createElement('script');
-    ga.src = "https://www.googletagmanager.com/gtag/js?id=G-RCRG6378GH";
+    ga.src = "https://www.googletagmanager.com/gtag/js?id=" + "G-RCRG6378GH";
     document.head.appendChild(ga);
 }
 
 function loadMarketing() {
     let fb = document.createElement('script');
-    fb.innerHTML = `/* Facebook Pixel */`;
+    fb.innerHTML = `/* marketing loader */`;
     document.head.appendChild(fb);
 }
 
