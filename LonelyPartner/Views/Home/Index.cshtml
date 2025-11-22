@@ -11,6 +11,7 @@
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <title>LonelyPartner - Video Chat</title>
         <link rel="stylesheet" href="~/css/videochat.css" />
+        <link rel="stylesheet" href="~/css/cookie.css" />
         
 
         <!-- MediaPipe for Face masks
@@ -387,6 +388,53 @@
             </div>
         </div>
 
+        <!-- EU Cookie   -->
+        <!-- COOKIE BANNER -->
+        <div id="cookie-banner" class="cookie-banner">
+            <div class="cookie-content">
+                <h4>Cookies on this website</h4>
+                <p>
+                    We use cookies to improve your browsing experience, provide analytics,
+                    and show personalised ads. You can choose which cookies you accept.
+                </p>
+
+                <div class="cookie-actions">
+                    <button class="btn cookie-btn-primary" id="accept-all">Accept all</button>
+                    <button class="btn cookie-btn-secondary" id="reject-all">Reject all</button>
+                    <button class="btn cookie-btn-link" id="customize">Customize</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS MODAL -->
+        <div id="cookie-settings" class="cookie-modal">
+            <div class="cookie-modal-content">
+                <h3>Cookie Settings</h3>
+
+                <label class="cookie-option">
+                    <input type="checkbox" disabled checked>
+                    <span>Essential Cookies</span>
+                </label>
+
+                <label class="cookie-option">
+                    <input type="checkbox" id="analytics">
+                    <span>Analytics Cookies</span>
+                </label>
+
+                <label class="cookie-option">
+                    <input type="checkbox" id="marketing">
+                    <span>Marketing Cookies</span>
+                </label>
+
+                <div class="cookie-actions">
+                    <button class="btn cookie-btn-primary" id="save-settings">Save Settings</button>
+                    <button class="btn cookie-btn-secondary" id="close-settings">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+             
+
         @*=========================Mobile Wrapper=============================*@
     <!-- MOBILE UI WRAPPER (do not remove) -->
             <div id="mobileAppWrapper"></div>
@@ -500,6 +548,8 @@
                 <script src ="~/js/verifyPayment.js"></script>
                 <script src="~/js/profile.js"></script>
                 <script src="~/js/multiTabAccessBlock.js"></script>
+                @*EU Cookie*@
+                <script src="~/js/cookie-consent.js"></script>
                 
                 @* 
                     <script src="~/js/maskCarousel.js"></script>
