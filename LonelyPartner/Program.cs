@@ -111,23 +111,13 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-
-//to make local testing browser SSL
-// 👇 Add this before builder.Build()
-
-/*
-if (builder.Environment.IsDevelopment())
+//cookie EU
+builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-    builder.WebHost.ConfigureKestrel(options =>
-    {
-        options.ListenAnyIP(7051, listenOptions =>
-        {
-            listenOptions.UseHttps("lonelypartner.com.pfx", "password123");
-        });
-    });
-}
+    options.CheckConsentNeeded = context => true; // GDPR requirement
+    options.MinimumSameSitePolicy = SameSiteMode.Lax;
+});
 
-*/
 
 var app = builder.Build();
 
@@ -139,7 +129,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-
+//EU Cookie
+app.UseCookiePolicy();
 
 //to get ip
 app.UseForwardedHeaders();

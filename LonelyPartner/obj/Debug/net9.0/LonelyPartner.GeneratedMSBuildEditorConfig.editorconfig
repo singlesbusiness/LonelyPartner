@@ -40,6 +40,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWRtaW5ub3R1c2VkL0Rhc2hib2FyZG5vdHVzZWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/Views/Home/CookiePolicy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Db29raWVQb2xpY3kuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

@@ -22,6 +22,8 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/cookie.css" />
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
     <!--
@@ -156,7 +158,56 @@
         @RenderBody()
     </main>
 
+    <!-- COOKIE BANNER -->
+<div id="cookie-banner" class="cookie-banner">
+    <div class="cookie-content">
+        <h4>Cookies on this website</h4>
+        <p>
+            We use cookies to improve your browsing experience, provide analytics, 
+            and show personalised ads. You can choose which cookies you accept.
+        </p>
+
+        <div class="cookie-actions">
+            <button class="btn cookie-btn-primary" id="accept-all">Accept all</button>
+            <button class="btn cookie-btn-secondary" id="reject-all">Reject all</button>
+            <button class="btn cookie-btn-link" id="customize">Customize</button>
+        </div>
+    </div>
+</div>
+
+<!-- SETTINGS MODAL for EU Cookie-->
+<div id="cookie-settings" class="cookie-modal">
+    <div class="cookie-modal-content">
+        <h3>Cookie Settings</h3>
+
+        <label class="cookie-option">
+            <input type="checkbox" disabled checked>
+            <span>Essential Cookies</span>
+        </label>
+
+        <label class="cookie-option">
+            <input type="checkbox" id="analytics">
+            <span>Analytics Cookies</span>
+        </label>
+
+        <label class="cookie-option">
+            <input type="checkbox" id="marketing">
+            <span>Marketing Cookies</span>
+        </label>
+
+        <div class="cookie-actions">
+            <button class="btn cookie-btn-primary" id="save-settings">Save Settings</button>
+            <button class="btn cookie-btn-secondary" id="close-settings">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
     <footer class="text-center text-muted">
+            <a href="#" onclick="document.getElementById('cookie-settings').style.display='block'">
+            Cookie Settings
+        </a>
+
         &copy; @DateTime.Now.Year - LonelyPartner
     </footer>
     <script src="https://unpkg.com/@@solana/web3.js@1.65.1/lib/index.iife.min.js"></script>
@@ -165,6 +216,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    
 
     @RenderSection("Scripts", required: false)
 
@@ -194,5 +246,6 @@
             }
         });
     </script>
+    <script src="~/js/cookie-consent.js"></script>
 </body>
 </html>
