@@ -11,6 +11,7 @@ namespace LonelyPartner.Hubs
     public class ChatHub : Hub
     {
         private readonly UserDBContext _db;
+        private readonly ILogger<ChatHub> _logger;
 
         
         //FIFO
@@ -23,9 +24,10 @@ namespace LonelyPartner.Hubs
         
         //user preference
         public static ConcurrentDictionary<string, (string Gender, string DesiredGender, string Continent, string Country, string City, bool IsPaidUser, bool IsAdmin)> UserPreferences = new();
-        public ChatHub(UserDBContext db)
+        public ChatHub(UserDBContext db , ILogger<ChatHub> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
         // 🔹 Get current user (from DB if logged in)
@@ -98,14 +100,14 @@ namespace LonelyPartner.Hubs
 
                     if (genderMatch && continentMatch)
                     {
-                        Console.WriteLine($"✅ Strict match: {currentId} ↔ {candidateId} ({desiredGender}/{desiredContinent})");
+                        _logger.LogInformation($"✅ Strict match: {currentId} ↔ {candidateId} ({desiredGender}/{desiredContinent})");
                         return candidateId;
                     }
 
                     // 2️⃣ RELAXED: Match desired gender (any continent)
                     if (genderMatch)
                     {
-                        Console.WriteLine($"🌍 Relaxed match: {currentId} ↔ {candidateId} ({desiredGender}/All continents)");
+                        _logger.LogInformation($"🌍 Relaxed match: {currentId} ↔ {candidateId} ({desiredGender}/All continents)");
                         return candidateId;
                     }
 
@@ -130,7 +132,7 @@ namespace LonelyPartner.Hubs
 
                     if (matchAllowed)
                     {
-                        Console.WriteLine($"🎲 Free/random match: {currentId} ↔ {candidateId}");
+                        _logger.LogInformation($"🎲 Free/random match: {currentId} ↔ {candidateId}");
                         return candidateId;
                     }
                 }
@@ -143,7 +145,7 @@ namespace LonelyPartner.Hubs
         //  helper: FIFO stays correct even after removals
         //================================
 
-        private static void RebuildQueueWithout(IEnumerable<string> removedIds)
+        private void RebuildQueueWithout(IEnumerable<string> removedIds)
                 {   
                     try
                      {
@@ -159,7 +161,7 @@ namespace LonelyPartner.Hubs
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"❌ RebuildQueueWithout Error: {ex}");
+                        _logger.LogInformation($"❌ RebuildQueueWithout Error: {ex}");
                     }
                 }
 
@@ -184,15 +186,16 @@ namespace LonelyPartner.Hubs
             {
                 var httpContext = Context.GetHttpContext();
                 string ip = httpContext?.Connection?.RemoteIpAddress?.ToString();
-                //Console.WriteLine($"ip=> {ip}");
+                //_logger.LogInformation($"ip=> {ip}");
+
                 if (string.IsNullOrEmpty(ip) || ip == "::1" || ip == "127.0.0.1" || ip.StartsWith("127.")|| ip.StartsWith("::ffff:127."))
-                {   //Console.WriteLine(" in 1st if");
+                {   
                     ip = httpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault();
                 } 
 
                 // Normalize IPv6-mapped IPv4 (e.g., ::ffff:192.168.1.5 → 192.168.1.5)
                 if (!string.IsNullOrWhiteSpace(ip) && ip.Contains("::ffff:"))
-                {       //Console.WriteLine(" in 2nd if");
+                {       
                     ip = ip.Replace("::ffff:", "");
                 }
 
@@ -267,7 +270,7 @@ namespace LonelyPartner.Hubs
             var connectionId = Context.ConnectionId;
             try
             {
-                Console.WriteLine($"⛔ Stop() called by {connectionId}");
+                _logger.LogInformation("⛔ Stop() called by {ConnId}", connectionId);
 
                 // Remove from waiting list (if user wasn't matched yet)
                 WaitingUsers.TryRemove(connectionId, out _);
@@ -281,7 +284,7 @@ namespace LonelyPartner.Hubs
                     // Also remove the reverse mapping
                     ActivePairs.TryRemove(partnerId, out _);
 
-                    Console.WriteLine($"🔚 Pair ended between {connectionId} and {partnerId}");
+                    _logger.LogInformation($"🔚 Pair ended between {connectionId} and {partnerId}");
 
                     // Notify the partner that the user left
                     await Clients.Client(partnerId).SendAsync("PartnerLeft");
@@ -293,18 +296,18 @@ namespace LonelyPartner.Hubs
                         WaitingQueue.Enqueue(partnerId);
 
                         await Clients.Client(partnerId).SendAsync("Waiting", "stop");
-                        Console.WriteLine($"🔄 Requeued partner {partnerId}");
+                        _logger.LogInformation($"🔄 Requeued partner {partnerId}");
                     }
                 }
 
                 // Tell the caller that chat has stopped
                 await Clients.Caller.SendAsync("ChatStopped");
 
-                Console.WriteLine($"✅ {connectionId} cleanly stopped and left chat.");
+                _logger.LogInformation($"✅ {connectionId} cleanly stopped and left chat.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Stop() Error: {ex.Message}");
+                _logger.LogError(ex, "Stop() failed for {ConnectionId}=", connectionId);
                 await Clients.Caller.SendAsync("Error", "Stop failed on server.");
             }
         }
@@ -318,7 +321,7 @@ namespace LonelyPartner.Hubs
             
             try
                 {
-                    Console.WriteLine($"➡️ myself Next() called by {connectionId}");
+                    _logger.LogInformation($"➡️ myself Next() called by {connectionId}");
 
                     // 1️⃣ Remove from waiting list
                     WaitingUsers.TryRemove(connectionId, out _);
@@ -331,7 +334,7 @@ namespace LonelyPartner.Hubs
                 {
                     ActivePairs.TryRemove(partnerId, out _);
 
-                    Console.WriteLine($"🔄 myself {connectionId} clicked Next — ending pair with {partnerId}");
+                    _logger.LogInformation($"🔄 myself {connectionId} clicked Next — ending pair with {partnerId}");
 
                     // Notify partner so partner will start search again from js/partnerleft
                     await Clients.Client(partnerId).SendAsync("PartnerLeft");
@@ -341,12 +344,12 @@ namespace LonelyPartner.Hubs
                     {
                         WaitingUsers[partnerId] = pref;
                         WaitingQueue.Enqueue(partnerId);
-                        Console.WriteLine($"🔁 Partner {partnerId} requeued");
+                        _logger.LogInformation($"🔁 Partner {partnerId} requeued");
                     }
                 }
                         // 3️⃣ Notify caller that chat ended
                     await Clients.Caller.SendAsync("ChatStopped");
-                    Console.WriteLine($"✅ myself {connectionId} ended chat, ready to start searching again.");
+                    _logger.LogInformation($"✅ myself {connectionId} ended chat, ready to start searching again.");
 
                         // Requeue myself if they are still online and valid
                         if (UserPreferences.TryGetValue(connectionId, out var selfprefs))
@@ -355,7 +358,7 @@ namespace LonelyPartner.Hubs
                             WaitingQueue.Enqueue(connectionId);
 
                             await Clients.Client(connectionId).SendAsync("Waiting","next");
-                            Console.WriteLine($"🔁 myself {connectionId} re-queued.");
+                            _logger.LogInformation($"🔁 myself {connectionId} re-queued.");
                         }
                     
 
@@ -363,7 +366,7 @@ namespace LonelyPartner.Hubs
                 }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Next() Error=> {ex.Message}");
+                        _logger.LogError($"Next() Error=> {ex.Message}");
                         await Clients.Caller.SendAsync("Error", "Failed to find next partner, please try again.");
                     }
                         
@@ -374,7 +377,7 @@ namespace LonelyPartner.Hubs
         {
             if (string.IsNullOrWhiteSpace(message)) return;
 
-            Console.WriteLine($"[CHAT] {Context.ConnectionId} → {partnerId}: {message}");
+            _logger.LogInformation($"[CHAT] {Context.ConnectionId} → {partnerId}: {message}");
             await Clients.Client(partnerId).SendAsync("ReceiveChatMessage", Context.ConnectionId, message);
         }
 
@@ -386,7 +389,7 @@ namespace LonelyPartner.Hubs
             // ✅ Check if sender and target are in the same active pair
                 if (!ActivePairs.TryGetValue(senderId, out var partnerId) || partnerId != targetId)
                 {
-                    Console.WriteLine($"🚫 Invalid signal: {senderId} attempted to send to {targetId}, not a valid pair.");
+                    _logger.LogInformation($"🚫 Invalid signal: {senderId} attempted to send to {targetId}, not a valid pair.");
                     return;
                 }
             await Clients.Client(targetId).SendAsync("ReceiveSignal", senderId, type, data);
@@ -400,7 +403,7 @@ namespace LonelyPartner.Hubs
 
             try
             {   
-                Console.WriteLine($"❌ Disconnected: {connectionId}");
+                _logger.LogInformation($"❌ Disconnected: {connectionId}");
 
                 WaitingUsers.TryRemove(connectionId, out _);
                 RemoveFromQueue(connectionId);
@@ -408,7 +411,7 @@ namespace LonelyPartner.Hubs
                 if (ActivePairs.TryRemove(connectionId, out var partnerId))
                     {
                         ActivePairs.TryRemove(partnerId, out _);
-                        Console.WriteLine($"💔 Disconnected: notified partner {partnerId}");
+                        _logger.LogInformation($"💔 Disconnected: notified partner {partnerId}");
 
                         await Clients.Client(partnerId).SendAsync("PartnerLeft");
 
@@ -423,14 +426,14 @@ namespace LonelyPartner.Hubs
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Disconnect Error for {connectionId}: {ex}");
+                _logger.LogError($"❌ Disconnect Error for {connectionId}: {ex}");
             }
   
             await base.OnDisconnectedAsync(exception);
         }
 
         //Helper
-        private static void RemoveFromQueue(string id)
+        private void RemoveFromQueue(string id)
             {
                 try
                 {
@@ -446,8 +449,8 @@ namespace LonelyPartner.Hubs
                         WaitingQueue.Enqueue(uid);
                 }
                 catch (Exception ex)
-                {
-                    Console.WriteLine($"❌ RemoveFromQueue Error: {ex}");
+                {   
+                    _logger.LogInformation($"❌ RemoveFromQueue Error: {ex}"); 
                 }
             }
 
@@ -455,7 +458,7 @@ namespace LonelyPartner.Hubs
         // 🔹 On connected
         public override Task OnConnectedAsync()
         {
-            Console.WriteLine($"✅ Connected: {Context.ConnectionId}");
+            _logger.LogInformation($"✅ Connected: {Context.ConnectionId}");
             return base.OnConnectedAsync();
         }
 
@@ -470,14 +473,14 @@ namespace LonelyPartner.Hubs
                 http.Timeout = TimeSpan.FromSeconds(3);
                 //a16664ac16ea19 is the token from ininfo.io
                 var json = await http.GetStringAsync($"https://ipinfo.io/{ip}/json?token=a16664ac16ea19");
-                //Console.WriteLine("json=>" , json);
+                //_logger.LogInformation("json=>" , json);
                 using var doc = JsonDocument.Parse(json);
-                //Console.WriteLine("doc=>" ,doc);
+                //_logger.LogInformation("doc=>" ,doc);
                 var root = doc.RootElement;
-                //Console.WriteLine("root=>" ,root);
+                //_logger.LogInformation("root=>" ,root);
                 var country = root.TryGetProperty("country", out var c) ? c.GetString() : "Unknown";
                 var city = root.TryGetProperty("city", out var ci) ? ci.GetString() : "Unknown";
-                //Console.WriteLine($" country=> {country}, city=>{city}");
+                //_logger.LogInformation($" country=> {country}, city=>{city}");
                 return (country ?? "Unknown", city ?? "Unknown");
             }
             catch

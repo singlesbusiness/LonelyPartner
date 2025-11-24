@@ -199,7 +199,7 @@ function initUpgradeAccessControl() {
                                     font-family: 'Segoe UI', Arial, sans-serif;
                                 ">
                                     <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Create Order</h3>
-                                    <p style="line-height:1.6;">
+                                    <p style="line-height:1.6;color:#ffcc00">
                                         Create Order failed: Please try again.
                                     </p>
                                     <button id="createOrderfailBtn" style="
@@ -290,7 +290,7 @@ function initUpgradeAccessControl() {
                                     font-family: 'Segoe UI', Arial, sans-serif;
                                 ">
                                     <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Create Order</h3>
-                                    <p style="line-height:1.6;">
+                                    <p style="line-height:1.6;color:#ffcc00">
                                         Create Order failed: Please try again.
                                     </p>
                                     <button id="createOrderfailBtn1" style="
@@ -487,7 +487,7 @@ function initUpgradeAccessControl() {
                                     font-family: 'Segoe UI', Arial, sans-serif;
                                 ">
                                     <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Phantom Wallet</h3>
-                                    <p style="line-height:1.6;">
+                                    <p style="line-height:1.6;color:#ffcc00">
                                         Redirecting to Phantom Wallet.
                                     </p>
                                     <button id="redirectToWalletBtn" style="
@@ -573,7 +573,7 @@ function initUpgradeAccessControl() {
                                     font-family: 'Segoe UI', Arial, sans-serif;
                                 ">
                                     <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Phantom Wallet</h3>
-                                    <p style="line-height:1.6;">
+                                    <p style="line-height:1.6;color:#ffcc00">
                                         Phantom Wallet not detected. Please install it to continue..
                                     </p>
                                     <button id="noWalletBtn" style="
@@ -838,6 +838,40 @@ async function loadPlans() {
             //plans.forEach(async plan => {
                 // Loop through each plan to create a plan card
             for (const plan of plans) {
+                
+                ////////////////
+                let tagline = "";
+                let badge = "";
+                
+                switch (plan.name.toLowerCase()) {
+                    
+                    case "hourplan":
+                        tagline = "⭐ Cheapest premium access";
+                        badge = `<span class="badge cheap">Cheapest</span>`;
+                        console.log("inside tag");
+                        break;
+
+                    case "dayplan":
+                        tagline = "📈 For short premium sessions";
+                        badge = `<span class="badge quick">Quick Upgrade</span>`;
+                        break;
+
+                    case "weekplan":
+                        tagline = "🔥 Most purchased";
+                        badge = `<span class="badge popular">Most Popular</span>`;
+                        break;
+
+                    case "monthplan":
+                        tagline = "💰 Best value";
+                        badge = `<span class="badge value">Best Value</span>`;
+                        break;
+                        case "yearplan":
+                        tagline = "💎 Unlock all features for the entire year";
+                        badge = `<span class="badge best">Top Tier</span>`;
+                        break;
+                }
+                /////////////////
+
                 const div = document.createElement("div");
 
                 div.className = "plan-card";
@@ -875,7 +909,8 @@ async function loadPlans() {
 
                     <div class="features">${plan.features}</div>
 
-   
+                    <p class="tagline">${tagline}</p>
+
                     <p class="price">$${plan.price.toFixed(2)}/₹${inrAmount ? inrAmount.toFixed(2) : plan.priceINR}</p>
 
                     <button class="buyBtn">Buy</button>

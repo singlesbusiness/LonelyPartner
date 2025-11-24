@@ -66,11 +66,14 @@ h4{
     margin: 10% auto;
     padding: 30px;
     border-radius: 8px;
+    color: black;
     
 }
+/*
 h3{
-    color: black;
+    color: rgb(0, 0, 0);
 }
+    */
 
 .cookie-option {
     display: block;

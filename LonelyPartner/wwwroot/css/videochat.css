@@ -597,6 +597,9 @@ video {
     scroll-snap-type: x mandatory;
     padding-bottom: 1rem;
 }
+.upgrademodal p{
+    color: #ffff00;
+}
 
 .plan-card {
     background: #1f096b;
@@ -613,6 +616,8 @@ video {
     justify-content: space-between;
     height: 280px; /* ✅ Fixed height to keep all cards equal */
     text-align: left;
+    position: relative;
+    overflow: visible;
 }
 
 .plan-card:hover {
@@ -646,6 +651,30 @@ video {
         margin: 4px 0;
     }
 
+.badge {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    background: #ffcc00;
+    color: #000;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+.badge.popular { background: #ff5733; color: white; }
+.badge.value { background: #28a745; color: white; }
+.badge.best { background: #007bff; color: white; }
+.badge.cheap { background: #ffc107; color: black; }
+.badge.quick { background: #17a2b8; color: white; }
+
+.tagline {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #ffde59;
+    font-weight: 600;
+}
 .plan-card button {
         background: #007bff;
         color: white;

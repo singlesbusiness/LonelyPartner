@@ -76,7 +76,7 @@
                     font-family: 'Segoe UI', Arial, sans-serif;
                 ">
                     <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Session Moved</h3>
-                    <p style="line-height:1.6;">
+                    <p style="line-height:1.6;color:#ffcc00">
                         Your session has started in another tab.<br/>
                         This tab will now disconnect.
                     </p>
