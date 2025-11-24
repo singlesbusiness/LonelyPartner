@@ -913,6 +913,8 @@ function enableCameraSwitch() {
             
                 if (isMatched) return; // 🚫 Don’t show searching if already matched
                 //setStatus("🔎 Searching for a partner...", "info");
+
+                //from = stop, means user will be in waiting.
             });
  
 

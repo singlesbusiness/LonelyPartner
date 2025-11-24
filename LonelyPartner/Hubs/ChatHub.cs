@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Security.Claims;
 using System.Text.Json;
 using LonelyPartner.Data;
@@ -13,6 +13,8 @@ namespace LonelyPartner.Hubs
         private readonly UserDBContext _db;
 
         
+        //FIFO
+        private static readonly ConcurrentQueue<string> WaitingQueue = new();
         // 🔹 Users waiting for a partner
         private static readonly ConcurrentDictionary<string, (string Gender, string DesiredGender, string Continent, string Country, string City, bool IsPaidUser, bool IsAdmin)> WaitingUsers = new();
 
@@ -56,20 +58,28 @@ namespace LonelyPartner.Hubs
                 return null;
 
             var selfGender = currentUser.Gender;
+            string selfDesiredGender = currentUser.DesiredGender;
             var selfContinent = currentUser.Continent;
+            bool iAmPaid = currentUser.IsPaidUser;
+            bool iAmAdmin = currentUser.IsAdmin;
 
-            foreach (var kvp in WaitingUsers)
+
+            //iterate users from Queue, to find a match
+            foreach (var candidateId in WaitingQueue)
             {   
                 
-                var candidateId = kvp.Key;
                 if (candidateId == currentId) continue;
+               
+                if (!WaitingUsers.ContainsKey(candidateId)) 
+                     continue; // removed by someone else
 
                 if (!UserPreferences.TryGetValue(candidateId, out var candidate))
                     continue;
 
                     // Get candidate details
                     string candidateGender = candidate.Gender;        // candidate’s self gender
-                    string candidateContinent = candidate.Continent;  // candidate’s continent
+                    string otherDesiredGender = candidate.DesiredGender; // candidate’s desired gender, free user will have All
+                    string candidateContinent = candidate.Continent;  // candidate’s continent,free user will have All
                     bool candidateIsPaid = candidate.IsPaidUser;          // assuming stored in prefs
                     bool candidateIsAdmin = candidate.IsAdmin;        // same
                     // strict = true meaning paid candidate
@@ -129,6 +139,31 @@ namespace LonelyPartner.Hubs
             return null;
         }
 
+        //================================
+        //  helper: FIFO stays correct even after removals
+        //================================
+
+        private static void RebuildQueueWithout(IEnumerable<string> removedIds)
+                {   
+                    try
+                     {
+                    var newQ = new ConcurrentQueue<string>();
+
+                    foreach (var id in WaitingQueue)
+                        if (!removedIds.Contains(id))
+                            newQ.Enqueue(id);
+
+                    WaitingQueue.Clear();
+                    foreach (var id in newQ)
+                        WaitingQueue.Enqueue(id);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"❌ RebuildQueueWithout Error: {ex}");
+                    }
+                }
+
+
         // ===============================
         // 🔹 Core: Start Searching Shared
         // ===============================
@@ -168,16 +203,20 @@ namespace LonelyPartner.Hubs
             // Store preferences
             UserPreferences[connectionId] = (gender, desiredGender, continent, country, city, isPaidUser, isAdmin);
             WaitingUsers[connectionId] = (gender, desiredGender, continent, country, city, isPaidUser, isAdmin);
-
+            WaitingQueue.Enqueue(connectionId);
             //await Clients.Caller.SendAsync("StatusUpdate", $"Searching for {desiredGender} in {continent}...", "info");
 
             // Try to find partner
             var matchId = FindCompatiblePartner(connectionId, desiredGender, continent, strict);
+            
 
             if (matchId != null && WaitingUsers.TryRemove(matchId, out var partnerInfo))
             {
                 // Remove self too
                 WaitingUsers.TryRemove(connectionId, out _);
+                //WaitingUsers.TryRemove(matchId, out _);
+
+                RebuildQueueWithout(new [] { matchId, connectionId });
 
                 ActivePairs[connectionId] = matchId;
                 ActivePairs[matchId] = connectionId;
@@ -233,6 +272,9 @@ namespace LonelyPartner.Hubs
                 // Remove from waiting list (if user wasn't matched yet)
                 WaitingUsers.TryRemove(connectionId, out _);
 
+                // 2️⃣ Remove from FIFO queue
+                RemoveFromQueue(connectionId);
+
                 // If the user was in an active pair
                 if (ActivePairs.TryRemove(connectionId, out var partnerId))
                 {
@@ -248,6 +290,8 @@ namespace LonelyPartner.Hubs
                     if (UserPreferences.TryGetValue(partnerId, out var prefs))
                     {
                         WaitingUsers[partnerId] = prefs;
+                        WaitingQueue.Enqueue(partnerId);
+
                         await Clients.Client(partnerId).SendAsync("Waiting", "stop");
                         Console.WriteLine($"🔄 Requeued partner {partnerId}");
                     }
@@ -267,9 +311,6 @@ namespace LonelyPartner.Hubs
 
     
 
-
-         
-
         // 🔹 Next partner
         public async Task Next()
         {
@@ -282,6 +323,9 @@ namespace LonelyPartner.Hubs
                     // 1️⃣ Remove from waiting list
                     WaitingUsers.TryRemove(connectionId, out _);
 
+                    // Remove from FIFO queue
+                    RemoveFromQueue(connectionId);
+
                 // 2️⃣ If this user was matched with someone, end that pairing
                 if (ActivePairs.TryRemove(connectionId, out var partnerId))
                 {
@@ -291,15 +335,25 @@ namespace LonelyPartner.Hubs
 
                     // Notify partner so partner will start search again from js/partnerleft
                     await Clients.Client(partnerId).SendAsync("PartnerLeft");
+
+                     // requeue partner
+                    if (UserPreferences.TryGetValue(partnerId, out var pref))
+                    {
+                        WaitingUsers[partnerId] = pref;
+                        WaitingQueue.Enqueue(partnerId);
+                        Console.WriteLine($"🔁 Partner {partnerId} requeued");
+                    }
                 }
                         // 3️⃣ Notify caller that chat ended
                     await Clients.Caller.SendAsync("ChatStopped");
                     Console.WriteLine($"✅ myself {connectionId} ended chat, ready to start searching again.");
 
                         // Requeue myself if they are still online and valid
-                        if (UserPreferences.TryGetValue(connectionId, out var prefs))
+                        if (UserPreferences.TryGetValue(connectionId, out var selfprefs))
                         {
-                            WaitingUsers[connectionId] = prefs;
+                            WaitingUsers[connectionId] = selfprefs;
+                            WaitingQueue.Enqueue(connectionId);
+
                             await Clients.Client(connectionId).SendAsync("Waiting","next");
                             Console.WriteLine($"🔁 myself {connectionId} re-queued.");
                         }
@@ -344,17 +398,59 @@ namespace LonelyPartner.Hubs
         {
             var connectionId = Context.ConnectionId;
 
-            WaitingUsers.TryRemove(connectionId, out _);
-            if (ActivePairs.TryRemove(connectionId, out var partnerId))
-                {
-                    ActivePairs.TryRemove(partnerId, out _);
-                    await Clients.Client(partnerId).SendAsync("PartnerLeft");
-                    Console.WriteLine($"💔 Disconnected: notified partner {partnerId}");
-                }
-            Console.WriteLine($"❌ Disconnected: {connectionId}");
-            
+            try
+            {   
+                Console.WriteLine($"❌ Disconnected: {connectionId}");
+
+                WaitingUsers.TryRemove(connectionId, out _);
+                RemoveFromQueue(connectionId);
+
+                if (ActivePairs.TryRemove(connectionId, out var partnerId))
+                    {
+                        ActivePairs.TryRemove(partnerId, out _);
+                        Console.WriteLine($"💔 Disconnected: notified partner {partnerId}");
+
+                        await Clients.Client(partnerId).SendAsync("PartnerLeft");
+
+                        if (UserPreferences.TryGetValue(partnerId, out var pref))
+                            {
+                                WaitingUsers[partnerId] = pref;
+                                WaitingQueue.Enqueue(partnerId);
+                            }
+                        
+                    }
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Disconnect Error for {connectionId}: {ex}");
+            }
+  
             await base.OnDisconnectedAsync(exception);
         }
+
+        //Helper
+        private static void RemoveFromQueue(string id)
+            {
+                try
+                {
+                    var newQ = new ConcurrentQueue<string>();
+
+                    foreach (var uid in WaitingQueue)
+                        if (uid != id)
+                            newQ.Enqueue(uid);
+
+                    // Replace queue
+                    while (WaitingQueue.TryDequeue(out _)) { }
+                    foreach (var uid in newQ)
+                        WaitingQueue.Enqueue(uid);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ RemoveFromQueue Error: {ex}");
+                }
+            }
+
 
         // 🔹 On connected
         public override Task OnConnectedAsync()
