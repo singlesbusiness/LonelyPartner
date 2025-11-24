@@ -114,10 +114,10 @@
         <div class="container">
             <div class="left-panel" id="leftPanel">
                 <div id="remoteVideoBlock" class="video-block">
-                    <div class="label">Partner</div>
+                    <div class="label" id="remotelable">Partner</div>
                     <video id="remoteVideo" autoplay playsinline></video>
                     <div class="placeholder" id="remotePlaceholder">
-                        <div class="avatar">👤</div>
+                        <div class="avatar" id="remoteavatar">👤</div>
                         <h3>Partner</h3>
                         @*<p class="sub">Searching..</p>*@
                     </div>
@@ -138,9 +138,9 @@
                     <div class="label">You</div>
                     <video id="localVideo" autoplay muted playsinline></video>
                     <div class="placeholder" id="localPlaceholder">
-                        <div class="avatar">🎥</div>
+                        <div class="avatar" id="localavatar">🎥</div>
                         <h3>You</h3>
-                        <p class="sub">Camera is Off</p>
+                        <p class="sub" id ="sub">Camera is Off</p>
                     </div>
                     <!-- CAMERA & MIC CONTROLS -->
                     <div class="video-controls" id="localControls">

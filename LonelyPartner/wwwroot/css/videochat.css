@@ -147,6 +147,11 @@ video {
 .placeholder {
     text-align: center;
     opacity: 0.9
+    
+}
+.placeholder h3{
+    justify-content: center;
+    color:#d8e5f3
 }
 
 .avatar {
