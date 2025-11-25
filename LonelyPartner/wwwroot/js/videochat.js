@@ -68,7 +68,24 @@
 
     const RTC_CONFIG = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
- 
+    /* 
+    //Use both STUN + TURN:
+    const RTC_CONFIG = {
+            iceServers: [
+                {
+                    urls: "stun:stun.l.google.com:19302"
+                },
+                {
+                    urls: [
+                        "turn:yourdomain.com:3478?transport=udp",
+                        "turn:yourdomain.com:3478?transport=tcp"
+                    ],
+                    username: "myuser",
+                    credential: "mypassword"
+                }
+            ]
+        };
+    */
 
     // --- Utilities ---
 

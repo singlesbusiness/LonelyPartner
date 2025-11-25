@@ -95,6 +95,7 @@ namespace LonelyPartner.Controllers
 
                 ViewBag.Status = "✅ Your message has been sent successfully.";
                 //Console.WriteLine("sent contact email.");
+                _logger.LogInformation("Sent contact email.");
             }
             catch (Exception ex)
             {   
