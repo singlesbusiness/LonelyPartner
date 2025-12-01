@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using Serilog;
+using Serilog.Events;
 using LonelyPartner.Data;
 using LonelyPartner.Models;
 using LonelyPartner.Services;
@@ -14,6 +16,8 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MySqlX.XDevAPI;
+using Microsoft.Extensions.Hosting;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +27,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .AddJsonFile("Properties/launchSettings.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
+
+//logging
+// Set up Serilog to read from appsettings.json
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
     
 //for getting ip
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -126,13 +135,22 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 
 var app = builder.Build();
 
+/*
+// Add CSP Header in the HTTP Response
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Add("Content-Security-Policy", "script-src 'self';");
+    await next.Invoke();
+});
+*/
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(); // This ensures static files are served from wwwroot
 
 //EU Cookie
 app.UseCookiePolicy();

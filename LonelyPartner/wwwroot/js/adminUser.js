@@ -5,6 +5,8 @@
 // ===============================
 
 //=======Wallet details==================
+
+
                 async function updateSolKey(newKey) {
                     console.log("update address");
                     try{
@@ -100,7 +102,7 @@
     
  
 document.addEventListener("DOMContentLoaded", async () => {
-    console.log("Admin dashboard script loaded ✅");
+    console.log("adminUser.js script loaded ✅");
 
     // Wait until DOM has the wallet buttons
     const refreshKeyBtn = document.getElementById("refreshKey");

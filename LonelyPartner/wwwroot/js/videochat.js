@@ -65,27 +65,28 @@
  
 
     // STUN config
-
+    /*    //STUN ONLY
     const RTC_CONFIG = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
-    /* 
+    */
+     
     //Use both STUN + TURN:
     const RTC_CONFIG = {
             iceServers: [
                 {
-                    urls: "stun:stun.l.google.com:19302"
-                },
+                    urls: "stun:stun.l.google.com:19302"   // This is the public Google STUN server
+                },  
                 {
                     urls: [
-                        "turn:yourdomain.com:3478?transport=udp",
-                        "turn:yourdomain.com:3478?transport=tcp"
+                        "turn:lonelypartner.com:3478?transport=udp", // TURN server using UDP
+                        "turn:lonelypartner.com:3478?transport=tcp"  // TURN server using TCP
                     ],
-                    username: "myuser",
-                    credential: "mypassword"
+                    username: "lpturnserver",         // Replace with the username you set in your TURN server
+                    credential: "password1234"    // Replace with the password you set in your TURN server
                 }
             ]
         };
-    */
+    
 
     // --- Utilities ---
 
@@ -225,7 +226,7 @@ function enableCameraSwitch() {
     switchBtn.onclick = async () => {
         try {
                 if (!pc) {
-                    alert("Peer connection not ready yet!");
+                    //alert("Peer connection not ready yet!");
                     return;
                 }
                     usingBackCamera = !usingBackCamera;
@@ -1283,8 +1284,86 @@ function enableCameraSwitch() {
 
         } catch (e) {
 
-            alert("Camera is required to start. Please allow camera access.");
+            //alert("Camera is required to start. Please reset-settings in browser-settings, and refresh the page.");
+            showTabAlert();
+                ////////////////////////////////
+                // Display alert modal
+                function showTabAlert() {
+                        let modal = document.getElementById("tabAlertModal");
+                        if (!modal) {
+                            modal = document.createElement("div");
+                            modal.id = "tabAlertModal";
+                            modal.style.position = "fixed";
+                            modal.style.top = 0;
+                            modal.style.left = 0;
+                            modal.style.width = "100%";
+                            modal.style.height = "100%";
+                            modal.style.background = "rgba(0, 0, 0, 0.6)";
+                            modal.style.display = "flex";
+                            modal.style.justifyContent = "center";
+                            modal.style.alignItems = "center";
+                            modal.style.zIndex = "9999";
+                            modal.style.backdropFilter = "blur(3px)";
 
+                            modal.innerHTML = `
+                                <div style="
+                                    background:#2e1065;
+                                    color:#fff;
+                                    padding:30px 35px;
+                                    border-radius:14px;
+                                    text-align:center;
+                                    max-width:400px;
+                                    width:90%;
+                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
+                                    animation: fadeIn 0.3s ease;
+                                    font-family: 'Segoe UI', Arial, sans-serif;
+                                ">
+                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Camera Setting</h3>
+                                    <p style="line-height:1.6;color:#ffcc00">
+                                        Camera is required to start. Please go to  browser-settings >  click reset-settings, and refresh the page.
+                                    </p>
+                                    <button id="cameraSettingBtn" style="
+                                        margin-top:18px;
+                                        background-color:#ffcc00;
+                                        color:#2e1065;
+                                        border:none;
+                                        border-radius:6px;
+                                        padding:10px 24px;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                        transition: background-color 0.2s ease, transform 0.1s ease;
+                                    ">
+                                        Ok
+                                    </button>
+                                </div>
+                            `;
+
+                            document.body.appendChild(modal);
+
+                            // Add fade-in animation dynamically
+                            const style = document.createElement("style");
+                            style.textContent = `
+                            @keyframes fadeIn {
+                                from { opacity: 0; transform: scale(0.95); }
+                                to { opacity: 1; transform: scale(1); }
+                            }
+                            #cameraSettingBtn:hover {
+                                background-color: #ffd633 !important;
+                                transform: scale(1.05);
+                            }
+                        `;
+                        document.head.appendChild(style);
+                        } else {
+                        modal.style.display = "flex";
+                        }
+
+                    document.getElementById("cameraSettingBtn")?.addEventListener("click", () => {
+                        modal.style.display = "none";
+                        //reloads the page after 1.5 secs
+                        //setTimeout(() => location.reload(), 200);
+                    });
+
+            }
             return;
 
         }
@@ -1314,7 +1393,87 @@ function enableCameraSwitch() {
 
              catch (e) {
                     console.error("Start error:", e);
-                    alert("Server Error. please wait");
+                    //alert("Server Error, please referesh the page");
+                     showTabAlert();
+                ////////////////////////////////
+                // Display alert modal
+                function showTabAlert() {
+                        let modal = document.getElementById("tabAlertModal");
+                        if (!modal) {
+                            modal = document.createElement("div");
+                            modal.id = "tabAlertModal";
+                            modal.style.position = "fixed";
+                            modal.style.top = 0;
+                            modal.style.left = 0;
+                            modal.style.width = "100%";
+                            modal.style.height = "100%";
+                            modal.style.background = "rgba(0, 0, 0, 0.6)";
+                            modal.style.display = "flex";
+                            modal.style.justifyContent = "center";
+                            modal.style.alignItems = "center";
+                            modal.style.zIndex = "9999";
+                            modal.style.backdropFilter = "blur(3px)";
+
+                            modal.innerHTML = `
+                                <div style="
+                                    background:#2e1065;
+                                    color:#fff;
+                                    padding:30px 35px;
+                                    border-radius:14px;
+                                    text-align:center;
+                                    max-width:400px;
+                                    width:90%;
+                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
+                                    animation: fadeIn 0.3s ease;
+                                    font-family: 'Segoe UI', Arial, sans-serif;
+                                ">
+                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Connection Error</h3>
+                                    <p style="line-height:1.6;color:#ffcc00">
+                                        Connection Error, please referesh the page.
+                                    </p>
+                                    <button id="connectErrBtn" style="
+                                        margin-top:18px;
+                                        background-color:#ffcc00;
+                                        color:#2e1065;
+                                        border:none;
+                                        border-radius:6px;
+                                        padding:10px 24px;
+                                        font-weight:bold;
+                                        cursor:pointer;
+                                        transition: background-color 0.2s ease, transform 0.1s ease;
+                                    ">
+                                        Ok
+                                    </button>
+                                </div>
+                            `;
+
+                            document.body.appendChild(modal);
+
+                            // Add fade-in animation dynamically
+                            const style = document.createElement("style");
+                            style.textContent = `
+                            @keyframes fadeIn {
+                                from { opacity: 0; transform: scale(0.95); }
+                                to { opacity: 1; transform: scale(1); }
+                            }
+                            #connectErrBtn:hover {
+                                background-color: #ffd633 !important;
+                                transform: scale(1.05);
+                            }
+                        `;
+                        document.head.appendChild(style);
+                        } else {
+                        modal.style.display = "flex";
+                        }
+
+                    document.getElementById("connectErrBtn")?.addEventListener("click", () => {
+                        modal.style.display = "none";
+                        //reloads the page after 1.5 secs
+                        //setTimeout(() => location.reload(), 200);
+                    });
+
+            }
+
 
                     //return;
 

@@ -21,6 +21,10 @@
     </PackageReference>
     <PackageReference Include="MySql.Data" Version="9.5.0" />
     <PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.9" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +32,7 @@
     <Folder Include="Migrations\" />
     <Folder Include="Pages\" />
     <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
 </Project>

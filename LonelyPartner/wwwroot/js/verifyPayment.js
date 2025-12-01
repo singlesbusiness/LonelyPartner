@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
          //reloads the page after 1.5 secs
 
         setTimeout(() => location.reload(), 1500);
+        //location.reload();
 
     });
 

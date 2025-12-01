@@ -7,6 +7,14 @@
     var currentPage = (int)(ViewBag.CurrentPage ?? 1);
     var totalPages = (int)(ViewBag.TotalPages ?? 1);
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Admin Dashboard</title>
+</head>
+
+<body>
 
 <div class="container py-4">
     <h2 class="mb-4">👩‍💼 Admin Dashboard</h2>
@@ -210,6 +218,9 @@
         }
     </script>
 
-@section Scripts {
-    <script src="~/js/adminuser.js"></script>
-}
+
+   @*<script asp-src="~/js/adminUser.js"></script>*@ 
+    <script src="@Url.Content("~/js/adminUser.js")"></script>
+
+</body>
+</html>

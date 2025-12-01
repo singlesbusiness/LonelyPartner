@@ -21,7 +21,10 @@
              "browser": "brave",
              //"browser": "custom",
              //"browserLaunchLocation": "Brave Browser"
-         }
+         },
+         "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+        }
     }
   ]
 }
