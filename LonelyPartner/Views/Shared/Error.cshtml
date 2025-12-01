@@ -2,23 +2,34 @@
 @{
     ViewData["Title"] = "Error";
 }
+ <!doctype html>
+    <html lang="en">
+        <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width,initial-scale=1" />
+            <title>LonelyPartner - Video Chat</title>
+                <!-- Favicon for solana wallet-->
+            <link rel="icon" type="image/png" href="~/images/lpcamera.png">
+        </head>
+    <body>
+            <div class="container mt-5 text-center">
+                <h1 class="text-danger">Something went wrong</h1>
+                <p class="lead">
+                    We’re sorry — an unexpected error occurred.
+                </p>
 
-<div class="container mt-5 text-center">
-    <h1 class="text-danger">Something went wrong</h1>
-    <p class="lead">
-        We’re sorry — an unexpected error occurred.
-    </p>
+                @if (Model.ShowRequestId)
+                {
+                    <p class="text-muted">
+                        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                    </p>
+                }
 
-    @if (Model.ShowRequestId)
-    {
-        <p class="text-muted">
-            <strong>Request ID:</strong> <code>@Model.RequestId</code>
-        </p>
-    }
+                <p class="mt-4">
+                    Please try again later. If the problem persists, contact support.
+                </p>
 
-    <p class="mt-4">
-        Please try again later. If the problem persists, contact support.
-    </p>
-
-    <a href="/" class="btn btn-primary mt-3">Return to Home</a>
-</div>
+                <a href="/" class="btn btn-primary mt-3">Return to Home</a>
+            </div>
+</body>
+</html>

@@ -32,7 +32,7 @@ namespace LonelyPartner.Controllers
         public async Task<IActionResult> ContactUs(string fromemail, string reason, string message )
         {
             
-
+            // Perform CAPTCHA validation here
             string captchaResponse = Request.Form["g-recaptcha-response"];
             if (string.IsNullOrEmpty(captchaResponse))
             {
