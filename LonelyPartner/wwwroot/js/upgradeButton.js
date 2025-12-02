@@ -36,6 +36,82 @@ function initUpgradeAccessControl() {
                 return (window.appUser.productId != 0) && (endDateLocal > nowLocal);
             }
  
+    //check if user is on mobile        
+    function isMobile() {
+    return /Mobi|Android/i.test(navigator.userAgent);
+    }
+
+    //reusing the alert modal
+    function createModal({ message, buttonText, modalHeader, onClick }) {
+    let modal = document.getElementById("tabAlertModal");
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "tabAlertModal";
+        modal.style.position = "fixed";
+        modal.style.top = 0;
+        modal.style.left = 0;
+        modal.style.width = "100%";
+        modal.style.height = "100%";
+        modal.style.background = "rgba(0, 0, 0, 0.6)";
+        modal.style.display = "flex";
+        modal.style.justifyContent = "center";
+        modal.style.alignItems = "center";
+        modal.style.zIndex = "9999";
+        modal.style.backdropFilter = "blur(3px)";
+        modal.innerHTML = `
+            <div style="
+                background:#2e1065;
+                color:#fff;
+                padding:30px 35px;
+                border-radius:14px;
+                text-align:center;
+                max-width:400px;
+                width:90%;
+                box-shadow:0 0 20px rgba(0,0,0,0.5);
+                animation: fadeIn 0.3s ease;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            ">
+                <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ ${modalHeader}</h3>
+                <p style="line-height:1.6;color:#ffcc00">${message}</p>
+                <button id="modalButton" style="
+                    margin-top:18px;
+                    background-color:#ffcc00;
+                    color:#2e1065;
+                    border:none;
+                    border-radius:6px;
+                    padding:10px 24px;
+                    font-weight:bold;
+                    cursor:pointer;
+                    transition: background-color 0.2s ease, transform 0.1s ease;
+                ">
+                    ${buttonText}
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const style = document.createElement("style");
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            #modalButton:hover {
+                background-color: #ffd633 !important;
+                transform: scale(1.05);
+            }
+        `;
+        document.head.appendChild(style);
+    } else {
+        modal.style.display = "flex";
+    }
+
+    document.getElementById("modalButton")?.addEventListener("click", () => {
+        modal.style.display = "none";
+        if (onClick) onClick();
+    });
+}
+
 
     //load upgrade modal in backgroud
 
@@ -164,86 +240,14 @@ function initUpgradeAccessControl() {
 
             const txt = await res.text();
             console.log("Create order failed: " + txt);
-            //alert("Create order failed: Please try again.");
-            showTabAlert();
-                ////////////////////////////////
-                // Display alert modal
-                function showTabAlert() {
-                        let modal = document.getElementById("tabAlertModal");
-                        if (!modal) {
-                            modal = document.createElement("div");
-                            modal.id = "tabAlertModal";
-                            modal.style.position = "fixed";
-                            modal.style.top = 0;
-                            modal.style.left = 0;
-                            modal.style.width = "100%";
-                            modal.style.height = "100%";
-                            modal.style.background = "rgba(0, 0, 0, 0.6)";
-                            modal.style.display = "flex";
-                            modal.style.justifyContent = "center";
-                            modal.style.alignItems = "center";
-                            modal.style.zIndex = "9999";
-                            modal.style.backdropFilter = "blur(3px)";
+            //alert("Create order failed: Please try again."); 
 
-                            modal.innerHTML = `
-                                <div style="
-                                    background:#2e1065;
-                                    color:#fff;
-                                    padding:30px 35px;
-                                    border-radius:14px;
-                                    text-align:center;
-                                    max-width:400px;
-                                    width:90%;
-                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
-                                    animation: fadeIn 0.3s ease;
-                                    font-family: 'Segoe UI', Arial, sans-serif;
-                                ">
-                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Create Order</h3>
-                                    <p style="line-height:1.6;color:#ffcc00">
-                                        Create Order failed: Please try again.
-                                    </p>
-                                    <button id="createOrderfailBtn" style="
-                                        margin-top:18px;
-                                        background-color:#ffcc00;
-                                        color:#2e1065;
-                                        border:none;
-                                        border-radius:6px;
-                                        padding:10px 24px;
-                                        font-weight:bold;
-                                        cursor:pointer;
-                                        transition: background-color 0.2s ease, transform 0.1s ease;
-                                    ">
-                                        Ok
-                                    </button>
-                                </div>
-                            `;
-
-                            document.body.appendChild(modal);
-
-                            // Add fade-in animation dynamically
-                            const style = document.createElement("style");
-                            style.textContent = `
-                            @keyframes fadeIn {
-                                from { opacity: 0; transform: scale(0.95); }
-                                to { opacity: 1; transform: scale(1); }
-                            }
-                            #createOrderfailBtn:hover {
-                                background-color: #ffd633 !important;
-                                transform: scale(1.05);
-                            }
-                        `;
-                        document.head.appendChild(style);
-                        } else {
-                        modal.style.display = "flex";
-                        }
-
-                    document.getElementById("createOrderfailBtn")?.addEventListener("click", () => {
-                        modal.style.display = "none";
-                        //reloads the page after 1.5 secs
-                        //setTimeout(() => location.reload(), 200);
-                    });
-
-            }
+             createModal({
+                            message: "Create Order failed: Please try again.",
+                            buttonText: "Ok",
+                            modalHeader: "Create Order",
+                            onClick: () => modal.style.display = "none",
+                        });
 
             return;
 
@@ -256,85 +260,12 @@ function initUpgradeAccessControl() {
         if (data.checkout.success != true) {
             console.log("Create order failed: " ,data.checkout.success );
             //alert("Create order failed: Please try again");
-            showTabAlert();
-                ////////////////////////////////
-                // Display alert modal
-                function showTabAlert() {
-                        let modal = document.getElementById("tabAlertModal");
-                        if (!modal) {
-                            modal = document.createElement("div");
-                            modal.id = "tabAlertModal";
-                            modal.style.position = "fixed";
-                            modal.style.top = 0;
-                            modal.style.left = 0;
-                            modal.style.width = "100%";
-                            modal.style.height = "100%";
-                            modal.style.background = "rgba(0, 0, 0, 0.6)";
-                            modal.style.display = "flex";
-                            modal.style.justifyContent = "center";
-                            modal.style.alignItems = "center";
-                            modal.style.zIndex = "9999";
-                            modal.style.backdropFilter = "blur(3px)";
-
-                            modal.innerHTML = `
-                                <div style="
-                                    background:#2e1065;
-                                    color:#fff;
-                                    padding:30px 35px;
-                                    border-radius:14px;
-                                    text-align:center;
-                                    max-width:400px;
-                                    width:90%;
-                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
-                                    animation: fadeIn 0.3s ease;
-                                    font-family: 'Segoe UI', Arial, sans-serif;
-                                ">
-                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Create Order</h3>
-                                    <p style="line-height:1.6;color:#ffcc00">
-                                        Create Order failed: Please try again.
-                                    </p>
-                                    <button id="createOrderfailBtn1" style="
-                                        margin-top:18px;
-                                        background-color:#ffcc00;
-                                        color:#2e1065;
-                                        border:none;
-                                        border-radius:6px;
-                                        padding:10px 24px;
-                                        font-weight:bold;
-                                        cursor:pointer;
-                                        transition: background-color 0.2s ease, transform 0.1s ease;
-                                    ">
-                                        Ok
-                                    </button>
-                                </div>
-                            `;
-
-                            document.body.appendChild(modal);
-
-                            // Add fade-in animation dynamically
-                            const style = document.createElement("style");
-                            style.textContent = `
-                            @keyframes fadeIn {
-                                from { opacity: 0; transform: scale(0.95); }
-                                to { opacity: 1; transform: scale(1); }
-                            }
-                            #createOrderfailBtn1:hover {
-                                background-color: #ffd633 !important;
-                                transform: scale(1.05);
-                            }
-                        `;
-                        document.head.appendChild(style);
-                        } else {
-                        modal.style.display = "flex";
-                        }
-
-                    document.getElementById("createOrderfailBtn1")?.addEventListener("click", () => {
-                        modal.style.display = "none";
-                        //reloads the page after 1.5 secs
-                        //setTimeout(() => location.reload(), 200);
-                    });
-
-            }
+            createModal({
+                            message: "Create Order failed: Please try again.",
+                            buttonText: "Ok",
+                            modalHeader: "Create Order",
+                            onClick: () => modal.style.display = "none",
+                        });
         }
 
         //document.getElementById("solAmount").innerText = `${data.checkout.amountSol} SOL (~$${data.checkout.usd})`;
@@ -449,177 +380,81 @@ function initUpgradeAccessControl() {
                 if (!provider) {
                     // 📱 On mobile, try deep linking to Phantom app
                     if (/Mobi|Android/i.test(navigator.userAgent)) {
+                        /*
+                        const transactionDeatils = {
+                            solAmount : solAmount,
+                            receiveAddress : receiveAddress,
+                            memo : memo || "",
+                            orderId : orderId,
+                        }
+                        */
                         const dappUrl = encodeURIComponent(window.location.href);
-                        const deepLink = `https://phantom.app/ul/browse/${dappUrl}`;
+                        //const transactionParams = encodeURIComponent(JSON.stringify(transactionDeatils));
+                        //const deepLink = `https://phantom.app/ul/browse/${dappUrl}`;
+                        //const deepLink = `https://phantom.app/ul/browse/${dappUrl}?transaction=${transactionParams}`;
+                       //const deepLink = `phantom://connect/${dappUrl}`;
+                        //const deepLink = `phantom://pay?transaction=${transactionParams}`;
+
+                         // Phantom Wallet deep link
+                        const phantomDeepLink = `phantom://connect/${dappUrl}`; // This is the deep link to try opening Phantom app
+                        const playStoreLink = "https://play.google.com/store/apps/details?id=com.phantom.app"; // Google Play Store link
+                        const appStoreLink = "https://apps.apple.com/us/app/phantom-wallet/id1602050444"; // iOS App Store link
+
+                        let isAppOpened = false;
+
+                        // Try to open Phantom wallet with a timeout to check if the app is installed
+                        const timeoutDuration = 1000; // Timeout duration (1 second)
+
+                        // Set a timeout to redirect to the app store if Phantom isn't installed
+                        setTimeout(() => {
+                                    if (!isAppOpened) {
+                                        // Redirect to the respective app store if Phantom Wallet isn't installed
+                                        const isAndroid = /Android/i.test(navigator.userAgent);
+                                        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+                                        if (isAndroid) {
+                                            console.log("Phantom Wallet not found. Redirecting to Google Play Store...");
+                                            window.location.href = playStoreLink;
+                                        } else if (isIOS) {
+                                            console.log("Phantom Wallet not found. Redirecting to App Store...");
+                                            window.location.href = appStoreLink;
+                                        }
+                                    }
+                                }, timeoutDuration);
+
+                        // Attempt to open Phantom Wallet deep link
+                            console.log("Trying to open Phantom Wallet...");
+                            window.location.href = phantomDeepLink;
+        
                         //alert("Redirecting to Phantom app...");
+                        console.log("1");
+                            createModal({
+                                        message: "Redirecting to Phantom Wallet.",
+                                        buttonText: "Ok",
+                                        modalHeader: "Phantom Wallet",
+                                        //onClick: () => window.location.href = deepLink,
+                                        onClick: () => 
+                                            // Fallback if the deep link doesn't open Phantom Wallet
+                                            window.open("https://phantom.app/", "_blank"),
+                                        
+                                    });
 
-                        showTabAlert();
-                    ////////////////////////////////
-                        // Display alert modal
-                    function showTabAlert() {
-                        let modal = document.getElementById("tabAlertModal");
-                        if (!modal) {
-                            modal = document.createElement("div");
-                            modal.id = "tabAlertModal";
-                            modal.style.position = "fixed";
-                            modal.style.top = 0;
-                            modal.style.left = 0;
-                            modal.style.width = "100%";
-                            modal.style.height = "100%";
-                            modal.style.background = "rgba(0, 0, 0, 0.6)";
-                            modal.style.display = "flex";
-                            modal.style.justifyContent = "center";
-                            modal.style.alignItems = "center";
-                            modal.style.zIndex = "9999";
-                            modal.style.backdropFilter = "blur(3px)";
-
-                            modal.innerHTML = `
-                                <div style="
-                                    background:#2e1065;
-                                    color:#fff;
-                                    padding:30px 35px;
-                                    border-radius:14px;
-                                    text-align:center;
-                                    max-width:400px;
-                                    width:90%;
-                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
-                                    animation: fadeIn 0.3s ease;
-                                    font-family: 'Segoe UI', Arial, sans-serif;
-                                ">
-                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Phantom Wallet</h3>
-                                    <p style="line-height:1.6;color:#ffcc00">
-                                        Redirecting to Phantom Wallet.
-                                    </p>
-                                    <button id="redirectToWalletBtn" style="
-                                        margin-top:18px;
-                                        background-color:#ffcc00;
-                                        color:#2e1065;
-                                        border:none;
-                                        border-radius:6px;
-                                        padding:10px 24px;
-                                        font-weight:bold;
-                                        cursor:pointer;
-                                        transition: background-color 0.2s ease, transform 0.1s ease;
-                                    ">
-                                        Ok
-                                    </button>
-                                </div>
-                            `;
-
-                                    document.body.appendChild(modal);
-
-                                    // Add fade-in animation dynamically
-                                    const style = document.createElement("style");
-                                    style.textContent = `
-                                    @keyframes fadeIn {
-                                        from { opacity: 0; transform: scale(0.95); }
-                                        to { opacity: 1; transform: scale(1); }
-                                    }
-                                    #redirectToWalletBtn:hover {
-                                        background-color: #ffd633 !important;
-                                        transform: scale(1.05);
-                                    }
-                                `;
-                                document.head.appendChild(style);
-                                } else {
-                                modal.style.display = "flex";
-                                }
-
-                            document.getElementById("redirectToWalletBtn")?.addEventListener("click", () => {
-                                modal.style.display = "none";
-                                window.location.href = deepLink;
-                                //reloads the page after 1.5 secs
-                                //setTimeout(() => location.reload(), 200);
-                            });
-
-                            }
-                        
-                        return;
+                            return;
                     }
 
                     // 💻 No Phantom detected on desktop
                     //alert("Phantom Wallet not detected. Please install it to continue.");
-                            showTabAlert();
-                    ////////////////////////////////
-                        // Display alert modal
-                    function showTabAlert() {
-                        let modal = document.getElementById("tabAlertModal");
-                        if (!modal) {
-                            modal = document.createElement("div");
-                            modal.id = "tabAlertModal";
-                            modal.style.position = "fixed";
-                            modal.style.top = 0;
-                            modal.style.left = 0;
-                            modal.style.width = "100%";
-                            modal.style.height = "100%";
-                            modal.style.background = "rgba(0, 0, 0, 0.6)";
-                            modal.style.display = "flex";
-                            modal.style.justifyContent = "center";
-                            modal.style.alignItems = "center";
-                            modal.style.zIndex = "9999";
-                            modal.style.backdropFilter = "blur(3px)";
+                   
 
-                            modal.innerHTML = `
-                                <div style="
-                                    background:#2e1065;
-                                    color:#fff;
-                                    padding:30px 35px;
-                                    border-radius:14px;
-                                    text-align:center;
-                                    max-width:400px;
-                                    width:90%;
-                                    box-shadow:0 0 20px rgba(0,0,0,0.5);
-                                    animation: fadeIn 0.3s ease;
-                                    font-family: 'Segoe UI', Arial, sans-serif;
-                                ">
-                                    <h3 style="color:#ffcc00; margin-bottom:12px;">⚠️ Phantom Wallet</h3>
-                                    <p style="line-height:1.6;color:#ffcc00">
-                                        Phantom Wallet not detected. Please install it to continue..
-                                    </p>
-                                    <button id="noWalletBtn" style="
-                                        margin-top:18px;
-                                        background-color:#ffcc00;
-                                        color:#2e1065;
-                                        border:none;
-                                        border-radius:6px;
-                                        padding:10px 24px;
-                                        font-weight:bold;
-                                        cursor:pointer;
-                                        transition: background-color 0.2s ease, transform 0.1s ease;
-                                    ">
-                                        Ok
-                                    </button>
-                                </div>
-                            `;
-
-                            document.body.appendChild(modal);
-
-                            // Add fade-in animation dynamically
-                            const style = document.createElement("style");
-                            style.textContent = `
-                            @keyframes fadeIn {
-                                from { opacity: 0; transform: scale(0.95); }
-                                to { opacity: 1; transform: scale(1); }
-                            }
-                            #noWalletBtn:hover {
-                                background-color: #ffd633 !important;
-                                transform: scale(1.05);
-                            }
-                        `;
-                        document.head.appendChild(style);
-                        } else {
-                        modal.style.display = "flex";
-                        }
-
-                    document.getElementById("noWalletBtn")?.addEventListener("click", () => {
-                        modal.style.display = "none";
-                        window.open("https://phantom.app/", "_blank");
-                        //reloads the page after 1.5 secs
-                        setTimeout(() => location.reload(), 200);
-                    });
-
-                    }
                     //window.open("https://phantom.app/", "_blank");
+
+                        createModal({
+                            message: "Phantom Wallet not detected. Please install it to continue.",
+                            buttonText: "Ok",
+                            modalHeader: "Phantom Wallet",
+                            onClick: () => window.open("https://phantom.app/", "_blank"),
+                        });
+
                     throw new Error("Phantom wallet not found.");
                 }
 
@@ -628,7 +463,22 @@ function initUpgradeAccessControl() {
             // -----------------------------
             let connectResponse;
             try {
-                    connectResponse = await provider.connect({ onlyIfTrusted: false });
+                   // connectResponse = await provider.connect({ onlyIfTrusted: false });
+                    // Check if the device is mobile
+                    if (isMobile()) {
+                        console.log("2");
+                        // Open Phantom wallet and prompt for payment on mobile
+                        //connectResponse = await provider.connect({ onlyIfTrusted: true });
+                        connectResponse = await provider.connect();
+                        // You can add additional code here to trigger the payment directly if needed
+                        // If not trusted, attempt a non-trusted connection
+                            if (!connectResponse) {
+                                console.log("2-1");
+                                connectResponse = await provider.connect({ onlyIfTrusted: false });
+                            }
+                    } else {
+                        connectResponse = await provider.connect({ onlyIfTrusted: false });
+                    }
                 } catch (e) {
                     if (e.message?.includes("User rejected")) {
                         statusEl.innerText = "❌ Wallet connection cancelled by user.";
@@ -680,12 +530,12 @@ function initUpgradeAccessControl() {
             //const lamports = Math.round(Number(solAmount) * solanaWeb3.LAMPORTS_PER_SOL);
             const lamports = BigInt(Math.round(solAmount * solanaWeb3.LAMPORTS_PER_SOL));
             //solanaWeb3.LAMPORTS_PER_SOL === 1000000000
-            /*
+            
             console.log("solAmount =", solAmount, "typeof", typeof solAmount);
             console.log("lamports =", lamports, "typeof", typeof lamports);
             console.log("fromPubkey base 58=", fromPubkey.toBase58());
             console.log("toPubkey  base 58=", toPubkey.toBase58());
-            */
+            
             
            // Create transaction
             const transaction = new solanaWeb3.Transaction({
@@ -713,24 +563,58 @@ function initUpgradeAccessControl() {
                     );
             }
 
-            // ✅ Sign and send via Phantom
+            let signature = null;
+            // for mobile
+            // Serialize the transaction
+             if (isMobile()){
+        console.log("3");        
+                    const serializedTx = transaction.serializeMessage();
+                    const base64Transaction = Buffer.from(serializedTx).toString('base64');
+  console.log("Serialized Transaction: ", serializedTx);
+    console.log("Base64 Transaction: ", base64Transaction);
+                    // Create Phantom deep link (only for mobile)
+                    const phantomDeepLink = `phantom://pay?transaction=${base64Transaction}`;
+console.log("4");
+                    // Open Phantom's in-app browser for transaction signing (only on mobile)
+                  
+                    window.location.href = phantomDeepLink;
+                    
+                    // Polling logic to get transaction signature after Phantom signs the transaction
+                   setTimeout(async () => { 
+                    console.log("5");
+                    // Polling the transaction status on Solana after Phantom signs it
+                    const txSignature = await getTransactionSignatureFromSolana(); // Retrieve transaction signature via polling
+                    if (!txSignature) {
+                        throw new Error("Failed to retrieve transaction signature.");
+                    }
+                    signature = txSignature; // Set the signature to the one we received after Phantom signs it
+                    console.log("mb Transaction Signature:", signature);
+                 }, 10000);
+
+            console.log("6");
+            }
+            else{
+            // ✅ Sign and send via Phantom for desktop
             const signedTx = await provider.signTransaction(transaction);
-            const signature = await connection.sendRawTransaction(signedTx.serialize());
-
-             console.log("Signature:", signature);
-
+            const txsignaturedesktop = await connection.sendRawTransaction(signedTx.serialize());
+            signature = txsignaturedesktop ;
+            console.log("dt TransactionSignature:", signature);
+             
+             }
+console.log("7");
+             
              // ✅ Modern confirmation style
             const confirmation = await connection.confirmTransaction({
                 blockhash,
                 lastValidBlockHeight,
                 signature
             });
-
+console.log("8");
            if (confirmation.value.err) 
             {
                 throw new Error("Transaction failed");
             }
-            
+           
             //alert(`✅ Payment successful!! , Please save this Signature: ${signature}`);
             console.log("🎉 web3 api Transaction confirmed!");
 

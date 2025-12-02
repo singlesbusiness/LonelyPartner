@@ -90,8 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
        CLICK OUTSIDE TO HIDE CHAT POPUP
     --------------------------------------------- */
     document.addEventListener("click", (e) => {
-        if (chatBtn.contains(e.target)) return;
-        if (chatWrap.contains(e.target)) return;
+        if (btn.contains(e.target)) return;
+        if (chatInputWrap.contains(e.target)) return;
         if (overlay.contains(e.target)) return;
         hideOverlay();
     });
