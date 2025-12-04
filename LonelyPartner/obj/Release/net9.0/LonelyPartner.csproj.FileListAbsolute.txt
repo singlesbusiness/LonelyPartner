@@ -326,4 +326,6 @@
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Release/net9.0/compressed/e6g7rnmnsg-ici6ddrh77.gz
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Release/net9.0/compressed/a1qz9k8zlx-kt6y5go3wo.gz
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Release/net9.0/compressed/wt2bk9hzrr-7gqf8ed3pc.gz
-/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Release/net9.0/compressed/qsfisfwqpv-2g9phgmo89.gz
+/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Release/net9.0/compressed/otmb1q2prt-wdr8hv794r.gz
+/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Release/net9.0/compressed/qsfisfwqpv-6k2h698fl7.gz
+/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Release/net9.0/compressed/59rprfweuk-4tft56pezv.gz

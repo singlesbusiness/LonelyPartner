@@ -147,7 +147,7 @@ public class SolanaPaymentsController : ControllerBase
         {
             return BadRequest("Missing orderId or txSig");
         }
-        Console.WriteLine($"dto.OrderId = {dto.OrderId}<--->dto.TxSig = {dto.TxSig}");
+        _logger.LogInformation($"dto.OrderId = {dto.OrderId}<--->dto.TxSig = {dto.TxSig}");
         //check if orderId created in Orderentity exists
         var order = await _db.OrderEntity.FirstOrDefaultAsync(o => o.OrderId == dto.OrderId);
         if (order == null) return NotFound("Order not found");
@@ -170,7 +170,7 @@ public class SolanaPaymentsController : ControllerBase
                 txValue = tx.Value;
                 break;
             }
-            Console.WriteLine($"⏳ Waiting for transaction confirmation... attempt {i + 1}");
+            _logger.LogInformation($"⏳ Waiting for transaction confirmation... attempt {i + 1}");
             await Task.Delay(1000);
 
         }       
@@ -178,13 +178,13 @@ public class SolanaPaymentsController : ControllerBase
                 // ✅ Defensive checks — tx.Value can be null or missing "meta"
                 if (txValue.ValueKind == JsonValueKind.Null)
                     {
-                        Console.WriteLine("⚠️ tx.Value is null, transaction not yet confirmed");
+                        _logger.LogInformation("⚠️ tx.Value is null, transaction not yet confirmed");
                         return BadRequest("Transaction not confirmed or still pending.");
                     }
         // Only proceed if meta exists and is not null
         if (!txValue.TryGetProperty("meta", out var metaElem) || metaElem.ValueKind == JsonValueKind.Null)
             {
-                Console.WriteLine("⚠️ meta missing or null for tx");
+                _logger.LogInformation("⚠️ meta missing or null for tx");
                 return BadRequest("Transaction metadata not available yet.");
             }
         // parse transaction object for memo and amount
@@ -356,7 +356,7 @@ public class SolanaPaymentsController : ControllerBase
 
             await _db.SaveChangesAsync();
 
-            Console.WriteLine("payment successful, user saved as paid user.");
+            _logger.LogInformation("✅  Payment successful, user saved as paid user.");
 
             // Send invoice email=====================
             //Using _ = Task.Run(...) makes the email send asynchronously in the background, 
@@ -412,6 +412,183 @@ public class SolanaPaymentsController : ControllerBase
             
             return StatusCode(500, "Error parsing transaction");
         }
+    }
+
+
+///mobile verify: //for mobile version payment check, mobile users////
+
+[HttpPost("verify-mobile")]
+[Authorize]
+    public async Task<IActionResult> VerifyMobile([FromBody] VerifySolDto dto)
+    {
+        try
+        {
+                if (string.IsNullOrWhiteSpace(dto.OrderId) || string.IsNullOrWhiteSpace(dto.TxSig))
+                    return BadRequest("Missing orderId or txSig");
+
+                _logger.LogInformation($"MOBILE VERIFY order={dto.OrderId}, sig={dto.TxSig}");
+
+                var order = await _db.OrderEntity.FirstOrDefaultAsync(o => o.OrderId == dto.OrderId);
+                if (order == null) return NotFound("Order not found");
+
+                if (order.Status == "paid")
+                    return Ok(new { ok = true, alreadyPaid = true });
+
+                JsonElement txValue = default;
+
+                //try 5 times
+                for (int i = 0; i < 5; i++)
+                {
+                    var tx = await _rpc.GetTransactionMobileAsync(dto.TxSig);
+                    if (tx.HasValue && tx.Value.ValueKind != JsonValueKind.Null)
+
+                    {
+                        txValue = tx.Value;
+                        break;
+                    }
+                    _logger.LogInformation($"⏳ Waiting for transaction confirmation... attempt {i + 1}");
+                    await Task.Delay(1000);
+                }
+
+                if (txValue.ValueKind == JsonValueKind.Null)
+                    return BadRequest("Transaction not confirmed yet.");
+
+                if (!txValue.TryGetProperty("meta", out var metaElem) ||
+                    metaElem.ValueKind == JsonValueKind.Null)
+                    return BadRequest("Transaction metadata unavailable.");
+
+                if (metaElem.TryGetProperty("err", out var errProp) &&
+                    errProp.ValueKind != JsonValueKind.Null)
+                    return BadRequest("Transaction failed.");
+
+                var msg = txValue.GetProperty("transaction").GetProperty("message");
+                var instructions = msg.GetProperty("instructions");
+
+                string foundMemo = null;
+                decimal totalSolReceived = 0m;
+
+                // =====================
+                // 100% Reliable Memo Extraction
+                // =====================
+                foreach (var instr in instructions.EnumerateArray())
+                {
+                    if (instr.TryGetProperty("program", out var program) &&
+                        program.GetString() == "spl-memo")
+                    {
+                        if (instr.TryGetProperty("parsed", out var parsed))
+                        {
+                            if (parsed.ValueKind == JsonValueKind.String)
+                            {
+                                foundMemo = parsed.GetString();
+                            }
+                            else if (parsed.ValueKind == JsonValueKind.Object &&
+                                    parsed.TryGetProperty("memo", out var memoEl))
+                            {
+                                foundMemo = memoEl.GetString();
+                            }
+                        }
+                    }
+
+                    // Transfer
+                    if (instr.TryGetProperty("parsed", out var p) &&
+                        p.ValueKind == JsonValueKind.Object)
+                    {
+                        if (p.TryGetProperty("type", out var typeEl) &&
+                            typeEl.GetString() == "transfer")
+                        {
+                            if (p.TryGetProperty("info", out var info) &&
+                                info.TryGetProperty("lamports", out var lamEl))
+                            {
+                                long lam = lamEl.GetInt64();
+                                totalSolReceived += lam / 1_000_000_000m;
+                            }
+                        }
+                    }
+                }
+
+                // =====================
+                // MEMO MATCH FIXED (Contains)
+                // =====================
+                if (string.IsNullOrEmpty(foundMemo) ||
+                    !foundMemo.Contains(order.Memo))
+                {
+                    return BadRequest("Memo mismatch.");
+                }
+
+                // Amount tolerance
+                if (totalSolReceived < order.AmountSol * 0.995m)
+                    return BadRequest($"SOL amount incorrect: {totalSolReceived} < {order.AmountSol}");
+
+                // =====================
+                // APPLY PAYMENT
+                // =====================
+                order.Status = "paid";
+                order.TxId = dto.TxSig;
+                order.PaidAt = DateTime.UtcNow;
+
+                var user = await _db.UserEntity.FindAsync(order.UserId);
+                if (user != null)
+                {
+                    user.ProductId = order.ProductId;
+                    user.ProductName = order.ProductName;
+                    user.TotalAmount = order.AmountUSD;
+                    user.IsActivePlan = true;
+                    user.OrderId = order.OrderId;
+                    user.TransactionId = order.TxId;
+                    user.StartDate = DateTime.UtcNow;
+                    user.EndDate = order.ProductId switch
+                    {
+                        1001 => DateTime.UtcNow.AddHours(1),
+                        1002 => DateTime.UtcNow.AddDays(1),
+                        1003 => DateTime.UtcNow.AddDays(7),
+                        1004 => DateTime.UtcNow.AddMonths(1),
+                        1005 => DateTime.UtcNow.AddYears(1),
+                        _ => DateTime.UtcNow.AddHours(0)
+                    };
+                }
+
+                await _db.SaveChangesAsync();
+
+                _logger.LogInformation("✅  Mobile user - Payment successful, user saved as paid user.");
+                // Send invoice email=====================
+                    //Using _ = Task.Run(...) makes the email send asynchronously in the background, 
+                    // so your API response is fast and the user doesn’t wait for email transmission
+                    // Load user info BEFORE background task
+                        var paidUser = await _db.UserEntity
+                            .Where(u => u.Id == order.UserId)
+                            .Select(u => new { u.CustomerEmail, u.CustomerName })
+                            .FirstOrDefaultAsync();
+
+                        if (!string.IsNullOrEmpty(paidUser.CustomerEmail))
+                        {
+                            var simpleOrderInfo = new
+                            {
+                                Email = paidUser.CustomerEmail,
+                                Name = paidUser.CustomerName,
+                                ProductName = order.ProductName,
+                                AmountUSD = order.AmountUSD,
+                                AmountSol = order.AmountSol,
+                                TxId = order.TxId,
+                                OrderId = order.OrderId,
+                                PaidAt = order.PaidAt
+                            };
+                            // Background fire-and-forget email
+                            _ = Task.Run(async () =>
+                                await _emailService.SendInvoiceEmailAsync(simpleOrderInfo)
+                            );
+                        }
+                        //Console.WriteLine("✅ Payment successful — email queued for sending.");
+                        _logger.LogInformation("✅ Mobile user - Payment successful — email queued for sending.");
+
+                    return Ok(new { ok = true, type = "mobile" });
+
+            }
+            catch (Exception ex)
+            {   
+                _logger.LogError(ex, "Unexpected error in SolanaPaymentsController.VerifyMobile");
+                
+                return StatusCode(500, "Error parsing transaction");
+            }
     }
 
 

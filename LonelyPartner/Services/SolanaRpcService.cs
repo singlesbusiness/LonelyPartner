@@ -81,5 +81,47 @@ namespace LonelyPartner.Services
                 return null;
             }
         }
+
+        //for mobile version payment check, mobile users
+        public async Task<JsonElement?> GetTransactionMobileAsync(string signature)
+            {
+                    try
+                    {
+                        var payload = new
+                        {
+                            jsonrpc = "2.0",
+                            id = 1,
+                            method = "getTransaction",
+                            @params = new object[] {
+                                signature,
+                                new {
+                                    encoding = "jsonParsed",
+                                    commitment = "confirmed"
+                                }
+                            }
+                        };
+
+                        var response = await _http.PostAsync(_rpcUrl,
+                            new StringContent(JsonSerializer.Serialize(payload),
+                            Encoding.UTF8,
+                            "application/json"));
+
+                            response.EnsureSuccessStatusCode();
+
+                            var json = await response.Content.ReadAsStringAsync();
+
+                            using var doc = JsonDocument.Parse(json);
+                            if (!doc.RootElement.TryGetProperty("result", out var result))
+                                return null;
+
+                            return JsonDocument.Parse(result.GetRawText()).RootElement.Clone();
+                    }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Mobile RPC error");
+                            return null;
+                        }
+                }
+
     }
 }

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Send SOL via Phantom</title>
+    <style>
+        /* Dark-mode-proof styles */
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            text-align: center; 
+            background-color: #fff !important; 
+            color: #000 !important; 
+        }
+        h2, p, pre { color: #000 !important; font-size: 26px;}
+        button { 
+            padding: 10px 20px; 
+            font-size: 28px; 
+            cursor: pointer; 
+            background-color: #008CFF; 
+            color: #fff; 
+            border: none; 
+            border-radius: 5px; 
+        }
+        #status { margin-top: 20px; word-break: break-word; color: #000 !important; }
+        #copyArea { 
+            margin-top: 15px; 
+            padding: 10px; 
+            font-size: 24px; 
+            border: 1px solid #ccc; 
+            display: none; 
+            color: #000 !important; 
+            background-color: #f9f9f9 !important; 
+        }
+        pre { white-space: pre-wrap; word-break: break-word; color: #000 !important; }
+    </style>
+</head>
+<body>
+
+<h2>Send SOL via Phantom</h2>
+<p id="info">Preparing your transaction...</p>
+<button id="sendBtn">Send SOL with Phantom</button>
+
+<div id="copyArea">
+    <p>Copy the following to Phantom app:</p>
+    <pre id="copyText"></pre>
+    <button id="copyBtn">Copy to Clipboard</button>
+</div>
+
+<p id="status"></p>
+
+<script type="module">
+import { Connection, PublicKey, SystemProgram, Transaction, TransactionInstruction } from "https://esm.sh/@solana/web3.js@1.95.0";
+
+// Helper to detect mobile
+function isMobile() {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+// Parse query params
+const params = new URLSearchParams(window.location.search);
+const recipientParam = params.get("recipient");
+const amountParam = params.get("amount");
+const memo = params.get("memo") || "";
+const label = params.get("label") || "Payment";
+const heliusurl = params.get("heliusurl");
+// Generate or reuse reference
+const reference = params.get("reference") || ((crypto && crypto.randomUUID) ? crypto.randomUUID() : "ref-" + Math.random().toString(36).slice(2, 12));
+
+// Convert SOL → lamports safely without float issues
+const amountLamports = BigInt(Math.round(Number(amountParam) * 1e9));
+
+const infoEl = document.getElementById("info");
+const statusEl = document.getElementById("status");
+const sendBtn = document.getElementById("sendBtn");
+const copyArea = document.getElementById("copyArea");
+const copyText = document.getElementById("copyText");
+const copyBtn = document.getElementById("copyBtn");
+
+
+ console.log("amountParam=>", amountParam);
+    console.log("memo=>", memo);
+    console.log("heliusurl=>", heliusurl);
+    console.log("recipientParam=>", recipientParam);
+
+if (!recipientParam || !amountParam || !heliusurl) {
+    statusEl.innerText = "Invalid parameters.";
+    sendBtn.disabled = true;
+}
+
+
+infoEl.textContent = `Send ${amountParam} SOL to LONELYPARTNER.COM`;
+
+sendBtn.onclick = async () => {
+
+   
+
+    try {
+        const provider = window?.phantom?.solana;
+
+        if (provider && provider.isPhantom) {
+            // Phantom detected
+            await provider.connect();
+            //Helium url with key comes from create-order in upgradeButton.js
+            const connection = new Connection(heliusurl , "confirmed"); 
+            const fromPubkey = provider.publicKey;
+            const toPubkey = new PublicKey(recipientParam);
+
+            const tx = new Transaction().add(
+                SystemProgram.transfer({
+                    fromPubkey,
+                    toPubkey,
+                    lamports: amountLamports
+                })
+            );
+
+            // Add memo instruction manually (no dynamic import)
+            if (memo || reference) {
+                const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
+                const memoData = new TextEncoder().encode(memo + (reference ? " | reference:" + reference : ""));
+                const memoIx = new TransactionInstruction({
+                    keys: [],
+                    programId: MEMO_PROGRAM_ID,
+                    data: memoData
+                });
+                tx.add(memoIx);
+            }
+
+            tx.feePayer = fromPubkey;
+            tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+
+            const { signature } = await provider.signAndSendTransaction(tx);
+            statusEl.innerText = `Transaction submitted: ${signature}`;
+            console.log("Transaction signature:", signature);
+
+            //alert user to copy and paste in lonelypartner
+            //alert(`Transaction submitted! \nSignature: ${signature}\nPlease copy this signature and paste in lonleypartner transaction screen.`);
+            createModal({
+                            message: `Transaction submitted! \nPlease copy this signature and paste in lonleypartner transaction screen.`,
+                            signature: signature,
+                            buttonText: "Ok",
+                            modalHeader: "Phantom Wallet",
+                            //onClick: () => modal.style.display = "none",
+                        });
+        } 
+        else {
+            // Desktop without Phantom
+            //alert("Phantom Wallet not detected. Please install it.");
+            createModal({
+                            message: "Phantom Wallet not detected. Please install it.",
+                            buttonText: "Ok",
+                            modalHeader: "Phantom Wallet",
+                            //onClick: () => modal.style.display = "none",
+                        });
+        }
+
+    } catch (err) {
+        console.error(err);
+        //statusEl.textContent = "Error: " + err.message;
+        statusEl.innerText = "❌ Processing Failed. Please try again.";
+    }
+};
+
+// Copy button for mobile fallback
+copyBtn.onclick = () => {
+    navigator.clipboard.writeText(copyText.textContent)
+        .then(() => //alert("Copied to clipboard!"))
+                    createModal({
+                                    message: "Copied to clipboard!",
+                                    buttonText: "Ok",
+                                    modalHeader: "Phantom Wallet",
+                                    //onClick: () => modal.style.display = "none",
+                                })
+                )
+        .catch(err => //alert("Failed to copy: " + err)); 
+                createModal({
+                                    message: "Failed to copy.",
+                                    buttonText: "Ok",
+                                    modalHeader: "Phantom Wallet",
+                                    //onClick: () => modal.style.display = "none",
+                                })
+            ); 
+};
+
+
+ //reusing the alert modal
+    function createModal({ message, signature, buttonText, modalHeader, onClick }) {
+    let modal = document.getElementById("tabAlertModal");
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "tabAlertModal";
+        modal.style.position = "fixed";
+        modal.style.top = 0;
+        modal.style.left = 0;
+        modal.style.width = "100%";
+        modal.style.height = "100%";
+        modal.style.background = "rgba(0, 0, 0, 0.6)";
+        modal.style.display = "flex";
+        modal.style.justifyContent = "center";
+        modal.style.alignItems = "center";
+        modal.style.zIndex = "9999";
+        modal.style.backdropFilter = "blur(3px)";
+        modal.innerHTML = `
+            <div style="
+                background:#2e1065;
+                color:#fff;
+                padding:30px 35px;
+                border-radius:14px;
+                text-align:center;
+                max-width:400px;
+                width:90%;
+                box-shadow:0 0 20px rgba(0,0,0,0.5);
+                animation: fadeIn 0.3s ease;
+                font-family: 'Segoe UI', Arial, sans-serif;
+            ">
+                <h3 style="color:#ffcc00; margin-bottom:24px;">⚠️ ${modalHeader}</h3>
+                
+                <p style="line-height:1.6; color:#ffcc00 !important; font-weight: 600; font-size: 24px; white-space: pre-wrap; margin-bottom: 1rem;">
+                    ${message}
+                </p>
+                ${signature ? `
+                    <pre style="
+                        background-color: rgba(255,255,255,0.1);
+                        padding: 12px 15px;
+                        border-radius: 8px;
+                        font-family: monospace, monospace;
+                        font-size: 26px;
+                        user-select: all;  /* easier to copy */
+                        color: #ffcc00 !important;
+                        overflow-wrap: break-word;
+                        white-space: pre-wrap;
+                        margin-bottom: 1rem;
+                            ">${signature}</pre>
+                        ` : ''}
+
+                <button id="modalButton" style="
+                    margin-top:18px;
+                    background-color:#ffcc00;
+                    color:#2e1065;
+                    border:none;
+                    border-radius:6px;
+                    padding:10px 24px;
+                    font-weight:bold;
+                    cursor:pointer;
+                    transition: background-color 0.2s ease, transform 0.1s ease;
+                ">
+                    ${buttonText}
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const style = document.createElement("style");
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: scale(0.95); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            #modalButton:hover {
+                background-color: #ffd633 !important;
+                transform: scale(1.05);
+            }
+        `;
+        document.head.appendChild(style);
+    } else {
+        modal.style.display = "flex";
+    }
+
+    document.getElementById("modalButton")?.addEventListener("click", () => {
+        modal.style.display = "none";
+        if (onClick) onClick();
+
+         // Attempt to close window/tab after user clicks Ok
+            setTimeout(() => {
+                // Try closing the window/tab inside in-app browser on phantom after user copies the signature
+                window.open('', '_self');  // Open self blank
+                window.close();            // Close window
+            }, 100); // slight delay to avoid abrupt close
+            });
+}
+</script>
+</body>
+</html>
