@@ -6,7 +6,7 @@
 
  
 
-console.log("🧭 upgradeButton.js loaded.");
+//console.log("🧭 upgradeButton.js loaded.");
 
 function initUpgradeAccessControl() {
 
@@ -31,8 +31,8 @@ function initUpgradeAccessControl() {
 
                 const endDateLocal = new Date(window.appUser.endDate);
                 const nowLocal = new Date();
-                console.log("upgrade end date=>" , endDateLocal);
-                console.log("upgrade nowLocal=>" , nowLocal);
+                //console.log("upgrade end date=>" , endDateLocal);
+                //console.log("upgrade nowLocal=>" , nowLocal);
                 return (window.appUser.productId != 0) && (endDateLocal > nowLocal);
             }
  
@@ -164,7 +164,7 @@ function formatSol(sol) {
 
     //const hasActivePlan = window.appUser?.hasPlan === false;
 
-    console.log("Upgrade button===> isLoggedIn=>", isLoggedIn, "==hasActivePlan=>", hasActivePlan);
+    //console.log("Upgrade button===> isLoggedIn=>", isLoggedIn, "==hasActivePlan=>", hasActivePlan);
 
 
     // 🔸 Condition 2: Logged in but no active plan
@@ -253,7 +253,7 @@ function formatSol(sol) {
         if (!res.ok) {
 
             const txt = await res.text();
-            console.log("Create order failed: " + txt);
+            //console.log("Create order failed: " + txt);
             //alert("Create order failed: Please try again."); 
 
              createModal({
@@ -268,11 +268,11 @@ function formatSol(sol) {
         }
 
         const data = await res.json();
-        console.log("create-order response==>", data);
+        //console.log("create-order response==>", data);
 
         //console.log(data.checkout.success);
         if (data.checkout.success != true) {
-            console.log("Create order failed: " ,data.checkout.success );
+            //console.log("Create order failed: " ,data.checkout.success );
             //alert("Create order failed: Please try again");
             createModal({
                             message: "Create Order failed: Please try again.",
@@ -391,7 +391,7 @@ function formatSol(sol) {
                 // 🧩 Detect Phantom Wallet
                 // -----------------------------
                 const provider = window?.phantom?.solana || window?.solana;
-                console.log("provider==>",   provider);
+                //console.log("provider==>",   provider);
                 if (!provider) {
                    
 
@@ -428,7 +428,7 @@ function formatSol(sol) {
                                 sendPageUrl.searchParams.set("reference", reference);
                                 sendPageUrl.searchParams.set("heliusurl", heliusurl);
 
-                                console.log("Send page URL:", sendPageUrl.toString());
+                                //console.log("Send page URL:", sendPageUrl.toString());
                         
                             // ------------------------------------------------------
                             // Must be triggered by a user gesture (button click)
@@ -453,7 +453,7 @@ function formatSol(sol) {
                             return;  
 
                             } catch (e) {
-                                console.error("❌ Phantom deeplink error:", e);
+                                //console.error("❌ Phantom deeplink error:", e);
                                 statusEl.innerText =  "❌ Payment failed, please try again.";
                             }
                         
@@ -497,7 +497,7 @@ function formatSol(sol) {
                 const publicKey = connectResponse?.publicKey?.toString() || provider.publicKey?.toString();
                 if (!publicKey) throw new Error("Failed to get Phantom public key.");
 
-                console.log("✅ Connected Phantom wallet:", publicKey);
+                //console.log("✅ Connected Phantom wallet:", publicKey);
             /*
             *************************Working for desktop START***********
             //check if phantom wallet is installed
@@ -578,7 +578,7 @@ function formatSol(sol) {
             //using Helius
             const txsignaturedesktop = await connection.sendRawTransaction(signedTx.serialize());
             signature = txsignaturedesktop ;
-            console.log("dt TransactionSignature:", signature);
+            //console.log("dt TransactionSignature:", signature);
              
             
              
@@ -595,7 +595,7 @@ function formatSol(sol) {
             }
            
             //alert(`✅ Payment successful!! , Please save this Signature: ${signature}`);
-            console.log("🎉 web3 api Transaction confirmed!");
+            //console.log("🎉 web3 api Transaction confirmed!");
 
             statusEl.innerText = `✅ Transaction confirmed: ${signature}. Verifying server-side...`;
             statusEl.className = "text-green-600 text-sm";
@@ -626,7 +626,7 @@ function formatSol(sol) {
 
             const result = await verifyRes.json();
 
-            console.log("result=>", result);
+            //console.log("result=>", result);
 
             if (verifyRes.ok && result.ok ) {
 
@@ -676,7 +676,7 @@ function formatSol(sol) {
                
             }
             else{
-                console.error("Payment failed:", err);
+                //console.error("Payment failed:", err);
                 statusEl.innerText = `❌ Payment failed. Please try again.`;
                 statusEl.className = "text-red-500 text-sm";
             }
@@ -693,7 +693,7 @@ function showSignatureVerificationUI(orderId) {
 
     // If not found, create minimal modal structure
     if (!modalBody) {
-        console.warn("⚠ .modal-body not found — creating fallback modal.");
+        //console.warn("⚠ .modal-body not found — creating fallback modal.");
 
         let wrapper = document.createElement("div");
         wrapper.id = "phantomVerifyModal";
@@ -826,7 +826,7 @@ async function verifyMobilePayment(orderId) {
         }
     }
     catch (err) {
-                 console.error("Payment failed:", err);
+                 //console.error("Payment failed:", err);
                 statusElMb.innerText = `❌ Payment failed. Please try again.`;
                 statusElMb.className = "text-red-500 text-sm";
                 //solmodal iner text
@@ -869,7 +869,7 @@ async function loadPlans() {
                     case "hourplan":
                         tagline = "⭐ Cheapest premium access";
                         badge = `<span class="badge cheap">Cheapest</span>`;
-                        console.log("inside tag");
+                        
                         break;
 
                     case "dayplan":

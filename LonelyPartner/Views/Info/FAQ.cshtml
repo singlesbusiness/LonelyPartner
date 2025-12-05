@@ -344,15 +344,61 @@
 
                         <div class="faq-item">
                             <div class="faq-header" onclick="toggleFaq(this)">
-                                <span class="faq-title">I clicked "Pay x.xxxxSOL" button for payment?</span>
+                                <span class="faq-title">When in Phantom Wallet connecting to LonelyPartner for first time?</span>
                                 <span class="faq-arrow">▼</span>
                             </div>
                             <div class="faq-content">
                                 <p>
-                                    You will be asked to install Phantom wallet if not not installed already.
-                                    Then will be asked to give access to LonelyPartner website, once you give permisson,
+                                    If you do not have enough Solana balance in your phantom wallet and you try to pay,
+                                    you will see a screen in phantom wallet, saying "unsafe" , this is default behaviour
+                                    of phantom wallet, if not enough solana balance exists in your wallet, the message 
+                                    in phantom wallet is misleading.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">From desktop/laptop I clicked "Pay x.xxxxSOL" button for payment?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    From desktop is straight forward and easy. You will be asked to install Phantom wallet if not not installed already.
+                                    Then you will be asked to give connect to LonelyPartner website, once you give permisson to connect,
                                     you will be asked to sign the transaction, meaning you are making the payment. LonelyPartner
                                     will verify the payment and enable premium services immediately.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">From Mobile I clicked "Pay x.xxxxSOL" button for payment?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    From mobile, payment needs few actions from you. You will be asked to install Phantom wallet if not not installed already.
+                                    You will be shown a pop-up, and a button to copy the url, Click the copy the url. Open Phantom Wallet,
+                                    at bottom right corner you will see phantom's in-app browser( magnifing glass icon), click it, it open a new screen, which is
+                                    Phantom's in-app broswer, past the url you copied from LonelyPartner's platform, it will open lonelypartner's page with pay button "Send SOL with Phantom",
+                                    click the button.Then you will be asked to give connect to LonelyPartner website, once you give permisson to connect,
+                                    you will be asked to sign the transaction, meaning you are making the payment. A pop-up is shown with transaction signature, 
+                                    copy the signature, come back to LonelyPartner, where the platform is waiting for you to paste the signature. Paste the signature and click verify button. LonelyPartner
+                                    will verify the payment and enable premium services immediately.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-header" onclick="toggleFaq(this)">
+                                <span class="faq-title">Why is Mobile payment, not straight forward?</span>
+                                <span class="faq-arrow">▼</span>
+                            </div>
+                            <div class="faq-content">
+                                <p>
+                                    From mobile, payment needs few user action, because Phatom Wallet deprecated mobile access programactically.
                                 </p>
                             </div>
                         </div>

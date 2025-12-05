@@ -185,7 +185,7 @@
 
         if (!modal || !yesBtn || !noBtn) {
 
-            console.error("Consent verification modal not found in DOM.");
+            //console.error("Consent verification modal not found in DOM.");
 
             return false;
 
@@ -336,7 +336,7 @@ function enableCameraSwitch() {
 
             }
 
-            console.log("Local camera started", s.getTracks().map(t => t.kind));
+            //console.log("Local camera started", s.getTracks().map(t => t.kind));
 
             return s;
 
@@ -373,14 +373,14 @@ function enableCameraSwitch() {
 
         }
 
-        console.log("Local camera stopped");
+        //console.log("Local camera stopped");
         //stops pc connection and stops remote camera
         //if called from multitab, neeed not call endCallLocal, as the flow goes 
         // to hub->Stop->Partnerleft->endCallLocal
         
         // 3️⃣ Handle disconnect logic
         if (calledfrom === "multitab") {
-            console.log("call came from multiTab");
+            //console.log("call came from multiTab");
             
             // In multitab case, just tell the hub user left
             try {
@@ -411,7 +411,7 @@ function enableCameraSwitch() {
             const tracks = remoteVideo.srcObject.getTracks();
             tracks.forEach(track => track.stop());
             remoteVideo.srcObject = null;
-            console.log("🎥 Remote video stopped.");
+            //console.log("🎥 Remote video stopped.");
         }
     }
 
@@ -422,7 +422,7 @@ function enableCameraSwitch() {
         //if (sendChatBtn) sendBtn.disabled = true;
 
         //setStatus("Chat ended.");
-        console.log("💬 Chat disabled.");
+        //console.log("💬 Chat disabled.");
     }
 
     // 🔹 Enable local chat input 
@@ -432,7 +432,7 @@ function enableCameraSwitch() {
         //if (sendChatBtn) sendBtn.enabled = true;
 
         //setStatus("Chat ended.");
-        console.log("💬 Chat enabled.");
+        //console.log("💬 Chat enabled.");
     }
 
 
@@ -440,7 +440,7 @@ function enableCameraSwitch() {
     // 🔹 Optional: show a subtle 'You left the chat' message
     function showStoppedMessage() {
         setStatus("✅ You left the chat.", "info");
-        console.log("🛑 User stopped chat manually.");
+        //console.log("🛑 User stopped chat manually.");
     }
 
     // For status message
@@ -466,7 +466,7 @@ function enableCameraSwitch() {
 
     function createPeerConnection(partnerId) {
 
-        console.log("createPeerConnection for", partnerId);
+        //console.log("createPeerConnection for", partnerId);
 
         const peer = new RTCPeerConnection(RTC_CONFIG);
 
@@ -474,7 +474,7 @@ function enableCameraSwitch() {
 
         peer.ontrack = (ev) => {
 
-            console.log("ontrack", ev.streams);
+            //console.log("ontrack", ev.streams);
 
             try {
 
@@ -522,7 +522,7 @@ function enableCameraSwitch() {
 
                 // don't auto-close here; Next/Stop will manage
 
-                console.log("pc failed/disconnected");
+                //console.log("pc failed/disconnected");
 
             }
 
@@ -603,7 +603,7 @@ function enableCameraSwitch() {
 
     async function handleOffer(fromId, offerStr) {
 
-        console.log("handleOffer from", fromId);
+        //console.log("handleOffer from", fromId);
 
         const offer = safeParse(offerStr);
 
@@ -632,7 +632,7 @@ function enableCameraSwitch() {
 
         await sendSignal(fromId, "answer", JSON.stringify(answer));
 
-        console.log("Answer created & sent to", fromId);
+        //console.log("Answer created & sent to", fromId);
 
     }
 
@@ -642,7 +642,7 @@ function enableCameraSwitch() {
 
     async function handleAnswer(answerStr) {
 
-        console.log("handleAnswer");
+        //console.log("handleAnswer");
 
         if (!pc) { warn("No pc when answer arrived"); return; }
 
@@ -652,7 +652,7 @@ function enableCameraSwitch() {
 
             await pc.setRemoteDescription(new RTCSessionDescription(answer));
 
-            console.log("Remote description set (answer)");
+            //console.log("Remote description set (answer)");
 
         } catch (e) {
 
@@ -674,7 +674,7 @@ function enableCameraSwitch() {
 
         if (!pc) {
 
-            console.log("pc not ready, queue candidate for", fromId);
+            //console.log("pc not ready, queue candidate for", fromId);
 
             ensurePendingArray(fromId).push(cand);
 
@@ -686,7 +686,7 @@ function enableCameraSwitch() {
 
             await pc.addIceCandidate(new RTCIceCandidate(cand));
 
-            console.log("Added ICE candidate");
+            //console.log("Added ICE candidate");
 
         } catch (e) {
 
@@ -723,7 +723,7 @@ function enableCameraSwitch() {
             pc.close();
             //added new
             pc.stop();
-            console.log("🔴 Disconnected from hub");
+            //console.log("🔴 Disconnected from hub");
             ///
             pc = null;
 
@@ -755,7 +755,7 @@ function enableCameraSwitch() {
 
        
 
-        console.log("Call ended locally");
+        //console.log("Call ended locally");
 
     }
 
@@ -832,7 +832,7 @@ function enableCameraSwitch() {
  
         //connection.on("Error", (message) => { from = start stop next
         connection.on("Waiting", async (from) => {
-                console.log("⏳ No match found. Waiting...");
+                //console.log("⏳ No match found. Waiting...");
 
                 mygenderSelectEl = document.getElementById("myGenderSelect");
 
@@ -858,13 +858,13 @@ function enableCameraSwitch() {
 
                 const hasActivePlan = (isLoggedIn && productId > 0 && endDate > new Date());
 
-                console.log(" Waiting js=>hasActivePlan" , hasActivePlan);
+                //console.log(" Waiting js=>hasActivePlan" , hasActivePlan);
                 // 6️⃣ Give WebRTC time to fully close before restarting
                 await new Promise(r => setTimeout(r, 1000)); // waits 1 second
 
             if(!isMatched) 
                 {
-                    console.log("⏳ No match found, going for Waiting...");
+                    //console.log("⏳ No match found, going for Waiting...");
                         // Only trigger fallback for paid/admin users
                 if (hasActivePlan) 
                 {
@@ -872,7 +872,7 @@ function enableCameraSwitch() {
                       //if waiting comes from hub-start we should do RelaxedSearch
                      if(from == "start")
                         {   
-                            console.log("⏳ No Strict match found. going for relaxed search...");
+                            //console.log("⏳ No Strict match found. going for relaxed search...");
                             // After 10 seconds, call relaxed version
                             fallbackTimer = setTimeout(async () => {
                             try {   
@@ -882,7 +882,7 @@ function enableCameraSwitch() {
                                     await connection.invoke("StartSearchingRelaxed", myGender, desiredGender);
                                         }
                                 } catch (err) {
-                                    console.error("Relaxed search failed:", err);
+                                    //console.error("Relaxed search failed:", err);
                                     setStatus("Relaxed search failed. Please try again.", "error");
                                     myGenderSelect.style.display = "inline-block";  // dont hide mygender
                                 }
@@ -892,7 +892,7 @@ function enableCameraSwitch() {
                         //StrictSearch, then relaxedsearch
                      if(from == "next")
                         {   
-                            console.log("⏳ Next button match with Strict search...");
+                            //console.log("⏳ Next button match with Strict search...");
                             //just to make await work adding dealy of 3millisecs
                             fallbackTimer = setTimeout(async () => {
                             try {
@@ -901,7 +901,7 @@ function enableCameraSwitch() {
                         
                                 
                             } catch (err) {
-                                console.error("RSearch failed:", err);
+                                //console.error("RSearch failed:", err);
                                 setStatus("Search failed. Please try again.", "error");
                                 myGenderSelect.style.display = "inline-block";  // dont hide mygender
                             }
@@ -920,7 +920,7 @@ function enableCameraSwitch() {
                                 await connection.invoke("StartSearchingFree", myGender, desiredContinent);
                             }
                             catch (err) {
-                                        console.error("Search failed:", err);
+                                        //console.error("Search failed:", err);
                                         setStatus("Search failed. Please try again.", "error");
                                         myGenderSelect.style.display = "inline-block";  // dont hide mygender
                                     }
@@ -953,11 +953,11 @@ function enableCameraSwitch() {
                 }
             
             
-            console.log("Matched with partner:",  partnerCity, partnerCountry);
+            //console.log("Matched with partner:",  partnerCity, partnerCountry);
 
             try {
 
-                console.log("Matched payload:", payload);
+                //console.log("Matched payload:", payload);
 
                 isCaller = role === "Caller";
 
@@ -967,7 +967,7 @@ function enableCameraSwitch() {
 
                 if (!partner) {
 
-                    console.warn("Matched received but partner id missing:", payload);
+                    //console.warn("Matched received but partner id missing:", payload);
 
                     return;
 
@@ -977,7 +977,7 @@ function enableCameraSwitch() {
 
                 isInitiator = !!initiator;
 
-                console.log("Matched -> partner:", currentPartnerId, "initiator:", isInitiator);
+                //console.log("Matched -> partner:", currentPartnerId, "initiator:", isInitiator);
 
  
                 // Start WebRTC flow
@@ -990,7 +990,7 @@ function enableCameraSwitch() {
 
                     // wait for offer; nothing to do here explicitly
 
-                    console.log("Awaiting offer from partner");
+                    //console.log("Awaiting offer from partner");
 
                 }
 
@@ -1010,17 +1010,17 @@ function enableCameraSwitch() {
 
             // ✅ Safety check: only accept signals from current partner
             if (!currentPartnerId) {
-                console.warn("⚠️ Ignored signal (no active partner):", senderId, type);
+                //console.warn("⚠️ Ignored signal (no active partner):", senderId, type);
                 return;
             }
 
             if (senderId !== currentPartnerId) {
-                console.warn("🚫 Ignored signal from non-partner:", senderId, "Expected:", currentPartnerId);
+                //console.warn("🚫 Ignored signal from non-partner:", senderId, "Expected:", currentPartnerId);
                 return;
             }
 
             // ✅ Proceed only if signal comes from current partner
-            console.log("📡 ReceiveSignal:", senderId, type);
+            //console.log("📡 ReceiveSignal:", senderId, type);
 
             try {
                     switch (type) {
@@ -1051,7 +1051,7 @@ function enableCameraSwitch() {
                 console.log("⚠️ Ignoring PartnerLeft — currently matched in progress");
                 return;
             } */
-            console.log("⚠️ Partner left the chat.");
+            //console.log("⚠️ Partner left the chat.");
 
             //Reset partner status
             isMatched = false;
@@ -1105,7 +1105,7 @@ function enableCameraSwitch() {
         connection.on("Error", (message) => {
 
             setStatus("Error...", "info");
-            console.error("Hub Error:", message);
+            //console.error("Hub Error:", message);
 
             //End the call safely
             if (typeof endCallLocal === "function") {
@@ -1121,7 +1121,7 @@ function enableCameraSwitch() {
 
         connection.on("ReceiveChatMessage", (senderId, message) => {
 
-            console.log("ReceiveChatMessage from", senderId, message);
+            //console.log("ReceiveChatMessage from", senderId, message);
 
             appendMessage("Partner", message);
 
@@ -1130,7 +1130,7 @@ function enableCameraSwitch() {
  
         //when server connection is lost or server is down
         connection.onclose(async () => {
-                console.warn("⚠️ Connection to server lost.");
+                //console.warn("⚠️ Connection to server lost.");
 
                 setStatus("⚠️ Disconnected from server. Please refresh the page.", "danger");
 
@@ -1180,7 +1180,7 @@ function enableCameraSwitch() {
         //not using it for now
         connection.on("PlanActivated", (payload) => {
 
-            console.log("PlanActivated payload:", payload);
+            //console.log("PlanActivated payload:", payload);
 
             // Example payload: { productId, productName, endDate, txId }
 
@@ -1392,7 +1392,7 @@ function enableCameraSwitch() {
             }
 
              catch (e) {
-                    console.error("Start error:", e);
+                    //console.error("Start error:", e);
                     //alert("Server Error, please referesh the page");
                      showTabAlert();
                 ////////////////////////////////
@@ -1504,7 +1504,7 @@ function enableCameraSwitch() {
 
             mygenderSelectEl.addEventListener("change", (e) => {
                 myGender = e.target.value;
-                console.log("Updated gender:", myGender);
+                //console.log("Updated gender:", myGender);
             });
 
             //Read User Info
@@ -1521,11 +1521,11 @@ function enableCameraSwitch() {
 
             
 
-            console.log("isLoggedIn=>", isLoggedIn);
+            //console.log("isLoggedIn=>", isLoggedIn);
 
-            console.log("hasActivePlan=>", hasActivePlan);
+            //console.log("hasActivePlan=>", hasActivePlan);
 
-            console.log("productId=>", productId);
+            //console.log("productId=>", productId);
 
  
 
@@ -1550,18 +1550,18 @@ function enableCameraSwitch() {
             if (hasActivePlan) {
                 // Paid or admin user - start strict search
                 setStatus(`Searching for ${desiredGender} in ${desiredContinent}...`, "info");
-                console.log("StartSearchingStrict my gender=>",myGender, "-",  desiredGender , "-", desiredContinent);
+                //console.log("StartSearchingStrict my gender=>",myGender, "-",  desiredGender , "-", desiredContinent);
                 await connection.invoke("StartSearchingStrict", myGender, desiredGender, desiredContinent);
                 myGenderSelect.style.display = "none";  // hide gender select while chatting
                 } else {
                 // Free or anonymous user
                 setStatus("Searching for a partner...", "info");
-                console.log("StartSearchingFree my gender=>",myGender, "-", desiredGender , "-", desiredContinent);
+                //console.log("StartSearchingFree my gender=>",myGender, "-", desiredGender , "-", desiredContinent);
                 await connection.invoke("StartSearchingFree", myGender, desiredContinent);
                 myGenderSelect.style.display = "none";  // hide gender select while chatting
                 }
             } catch (e) {
-                console.error("Start search failed:", e);
+                //console.error("Start search failed:", e);
                 setStatus("Search failed. Please retry.", "error");
                 myGenderSelect.style.display = "inline-block";  // hide gender select while chatting
             }
@@ -1593,16 +1593,16 @@ function enableCameraSwitch() {
                         try {
                             await connection.invoke("Next");
                             setStatus("Searching for the next partner...", "info");
-                            console.info("Next() hub is called");
+                            //console.info("Next() hub is called");
                         } catch (err) {
-                            console.error("Next() failed:", err);
+                            //console.error("Next() failed:", err);
                             setStatus("Next failed. Please retry...", "info");
                         }
                     }
                 }
             }
             catch (err) {
-                           console.error("Next() failed:", err);
+                           //console.error("Next() failed:", err);
                             setStatus("Next failed. Please retry...", "info");
                         }
     }    
@@ -1631,7 +1631,7 @@ function enableCameraSwitch() {
             if (connection && connection.state === signalR.HubConnectionState.Connected) {
                 await connection.invoke("Stop");
             } else {
-                console.warn("SignalR not connected when Stop clicked");
+                //console.warn("SignalR not connected when Stop clicked");
             }
         } catch (e) {
             console.error("Stop failed:", e);
@@ -1994,7 +1994,7 @@ function enableCameraSwitch() {
 
         initSignalR();
 
-        console.log("UI initialized");
+        //console.log("UI initialized");
 
     });
 
@@ -2017,7 +2017,7 @@ function enableCameraSwitch() {
     //window.LP.endCallLocal = endCallLocal;
     // Optional: attach more methods
     window.LP.disconnectSignalR = function () {
-        console.log("🔌 LP.disconnectSignalR() called");
+        //console.log("🔌 LP.disconnectSignalR() called");
         if (window.connection?.stop) {
             window.connection.stop();
         }

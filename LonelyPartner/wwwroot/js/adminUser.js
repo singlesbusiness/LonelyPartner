@@ -8,7 +8,7 @@
 
 
                 async function updateSolKey(newKey) {
-                    console.log("update address");
+                    //console.log("update address");
                     try{
                             if (!confirm("⚠️ Changing the Solana address will redirect all new payments. Proceed?"))
                                 return;
@@ -24,7 +24,7 @@
                             
                             await loadSolKey(); // refresh displayed key
                         } catch (err) {
-                            console.error("❌ updateSolKey() failed:", err);
+                            //console.error("❌ updateSolKey() failed:", err);
                             alert("Error updating Solana public key. Check console.");
                             }
                         }
@@ -32,7 +32,7 @@
                     
                     async function loadSolKey() {
                         
-                            console.log("get address");
+                            //console.log("get address");
                             try {
                                 const res = await fetch("/api/wallet/solkey");
                                 if (!res.ok) {
@@ -45,7 +45,7 @@
                                     return;
                                 }
                                 const data = JSON.parse(text);
-                                console.log("get address==", data);
+                                //console.log("get address==", data);
                                 document.getElementById("solKey").textContent = data.solanaPublicKey || "(none)";
                             } catch (err) {
                                 console.error("Error fetching SolKey:", err);
@@ -54,7 +54,7 @@
     //======================================
     //==============for helius url==========
          async function updateHeliusURL(newKey) {
-                    console.log("update HeliusURL");
+                    //console.log("update HeliusURL");
                     try{
                             if (!confirm("⚠️ Changing Helius URL will impact Solana payments. Proceed?"))
                                 return;
@@ -78,7 +78,7 @@
                     
                     async function loadHeliusURL() {
                         
-                            console.log("get helius url");
+                            //console.log("get helius url");
                             try {
                                 const res = await fetch("/api/wallet/heliusurl");
                                 if (!res.ok) {
@@ -91,7 +91,7 @@
                                     return;
                                 }
                                 const data = JSON.parse(text);
-                                console.log("get helius url==", data);
+                                //console.log("get helius url==", data);
                                 document.getElementById("heliusurl").textContent = data.heliusURL || "(none)";
                             } catch (err) {
                                 console.error("Error fetching Helius URL:", err);
@@ -102,7 +102,7 @@
     
  
 document.addEventListener("DOMContentLoaded", async () => {
-    console.log("adminUser.js script loaded ✅");
+    //console.log("adminUser.js script loaded ✅");
 
     // Wait until DOM has the wallet buttons
     const refreshKeyBtn = document.getElementById("refreshKey");
@@ -158,7 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                         const data = await response.json();
 
-                        console.log("admin data=>", data);
+                        //console.log("admin data=>", data);
 
                         if (data.role && data.role.toLowerCase() === "admin") {
 

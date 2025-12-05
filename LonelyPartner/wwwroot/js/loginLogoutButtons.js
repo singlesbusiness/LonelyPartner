@@ -6,7 +6,7 @@
 
  
 
-console.log("loginLogoutButtons.js loaded.");
+//console.log("loginLogoutButtons.js loaded.");
 
 
 document.addEventListener("DOMContentLoaded", async () => {

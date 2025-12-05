@@ -25,7 +25,7 @@
                 if (event.key === PAGE_KEY) {
                     // If newValue exists -> another tab opened
                     if (event.newValue) {
-                        console.log("⚠️ Another tab opened, closing local resources.");
+                        //console.log("⚠️ Another tab opened, closing local resources.");
                         showTabAlert();
 
                         waitForLP((LP) => {
@@ -34,7 +34,7 @@
                         });
                     } else {
                         // event.newValue === null → a tab closed
-                        console.log("ℹ️ Tab closed, no action needed.");
+                        //console.log("ℹ️ Tab closed, no action needed.");
                     }
                 }
             });

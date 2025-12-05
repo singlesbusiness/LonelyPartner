@@ -9,16 +9,20 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>LonelyPartner - Video Chat</title>
+        <title>LonelyPartner - Free Video Sex Chat</title>
+        <meta name="description" content="Video sex and adult chat for free. LonelyPartner is an anonymous adult nude cam site for random cam sex chat with many naked lonely people." /><meta
             <!-- Favicon for solana wallet-->
-        <link rel="icon" type="image/png" href="/images/lpcamera.png">
+        <link rel="icon" type="image/png" href="/images/LPLogo.png">
 
         <!-- Social / Wallet Preview -->
         <meta name="application-name" content="LonelyPartner">
-        <meta property="og:title" content="LonelyPartner">
-        <meta property="og:description" content="Match Connect LonleyPartners.">
+        <meta property="og:title" content="LonelyPartner: Free Video Sex Chat">
+        <meta property="og:description" content="Video sex chat and adult chat for free. LonelyPartner is an anonymous adult nude cam site for random sex chat with many naked lonely people.">
        <meta property="og:image" content="https://lonelypartner.com/images/LPLogo.png">
+       <meta property="og:type" content="website" />
         <meta property="og:url" content="https://lonelypartner.com">
+        <link rel="canonical" href="https://lonelypartner.com" />
+        <link rel="image_src" href="https://lonelypartner.com/images/LPLogo.png" />
         <meta name="theme-color" content="#4637A2">
         <!-- css -->
         <link rel="stylesheet" href="~/css/videochat.css" />
@@ -488,14 +492,14 @@
                 
             };
 
-            console.log("🔹 window.appUser initialized:");
-            console.table(window.appUser);
+            //console.log("🔹 window.appUser initialized:");
+            //console.table(window.appUser);
 
             // Check if Razor values came through
             if (!window.appUser.isAuthenticated || window.appUser.isAuthenticated === "false") {
-                console.warn("⚠️ User not authenticated according to Razor context.");
+                //console.warn("⚠️ User not authenticated according to Razor context.");
             } else {
-                console.log("✅ User is authenticated according to Razor context.");
+                //console.log("✅ User is authenticated according to Razor context.");
             }
         </script>
 
@@ -528,20 +532,20 @@
                                 }
                             }
                             window.Buffer = SimpleBuffer;
-                            console.log("✅ Custom Buffer polyfill active");
+                            //console.log("✅ Custom Buffer polyfill active");
                         }
 
                         // Needed by Solana’s internal utils
                         window.global = window;
                         window.process = { env: {} };
 
-                        console.log("✅ Solana + Buffer environment ready");
+                        //console.log("✅ Solana + Buffer environment ready");
                     </script>
         <!-- ✅ 2.1. (Optional) Verify environment -->
             <script>
             window.addEventListener("load", () => {
-                console.log("🔍 Post-load check: Buffer.from =", typeof Buffer.from);
-                console.log("🔍 SolanaWeb3 =", typeof solanaWeb3);
+                //console.log("🔍 Post-load check: Buffer.from =", typeof Buffer.from);
+                //console.log("🔍 SolanaWeb3 =", typeof solanaWeb3);
             });
             </script>
         <!-- ✅ 3. QR and app scripts -->

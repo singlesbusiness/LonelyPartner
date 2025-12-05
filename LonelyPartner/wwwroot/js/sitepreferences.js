@@ -29,10 +29,10 @@ function loadMarketing() {
 document.addEventListener("DOMContentLoaded", function () {
     const banner = document.getElementById("cookie-banner");
     const modal = document.getElementById("cookie-settings");
-console.log("cookie js loaded");
+//console.log("cookie js loaded");
 
 if (!banner) {
-        console.warn("Cookie banner HTML not found");
+        //console.warn("Cookie banner HTML not found");
         return;
     }
     const c = getConsent();

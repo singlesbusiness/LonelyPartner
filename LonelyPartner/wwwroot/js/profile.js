@@ -6,12 +6,12 @@
 
  
 
-console.log("🧭 profileHandler.js loaded.");
+//console.log("🧭 profileHandler.js loaded.");
 
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-    console.log("🚀 DOM Ready in profileHandler.js");
+    //console.log("🚀 DOM Ready in profileHandler.js");
 
  
         function isActivePlan() {
@@ -20,14 +20,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 const endDateLocal = new Date(window.appUser.endDate);
                 const nowLocal = new Date();
-                console.log("profile end date=>" , endDateLocal);
-                console.log("profile nowLocal=>" , nowLocal);
+                //console.log("profile end date=>" , endDateLocal);
+                //console.log("profile nowLocal=>" , nowLocal);
                 return (window.appUser.productId != 0) && (endDateLocal > nowLocal);
             }
 
         if (!window.appUser) {
 
-            console.error("❌ window.appUser not loggedin.");
+            //console.error("❌ window.appUser not loggedin.");
 
             return;
 
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 profileBtn.addEventListener("click", async () => {
 
-    console.log("📡 Fetching profile data for:", window.appUser.email);
+    //console.log("📡 Fetching profile data for:", window.appUser.email);
 
         const email = window.appUser.email;
 
@@ -173,7 +173,7 @@ profileBtn.addEventListener("click", async () => {
 
             const data = await response.json();
 
-            console.log("✅ Profile data received:", data);
+            //console.log("✅ Profile data received:", data);
             
             document.getElementById("profName").innerText = data.customerName || "N/A" ;
 
@@ -205,7 +205,7 @@ profileBtn.addEventListener("click", async () => {
             }
 
             else {  
-                    console.log("✅ Profile data received:", data);
+                    //console.log("✅ Profile data received:", data);
 
                 
 
@@ -234,11 +234,11 @@ profileBtn.addEventListener("click", async () => {
                 }
 
             profileModal.style.display = "flex";
-            console.log("✅ profileHandler.js fully loaded and parsed.");
+            //console.log("✅ profileHandler.js fully loaded and parsed.");
 
         } catch (err) {
 
-            console.error("❌ Failed to load profile:", err);
+            //console.error("❌ Failed to load profile:", err);
 
             //alert("Could not load profile.");
                 showTabAlert();
@@ -323,7 +323,7 @@ profileBtn.addEventListener("click", async () => {
             ////////////////////////////////
 
         }
-        console.log("✅ profileHandler.js fully loaded and parsed====.");
+        //console.log("✅ profileHandler.js fully loaded and parsed====.");
     });
 
     

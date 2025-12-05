@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const result = await verifyRes.json();
 
-            console.log("result=>", result);
+            //console.log("result=>", result);
 
             if (verifyRes.ok && result.ok && result.alreadyPaid != true) {
 
@@ -128,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } 
         catch (err) {
 
-            console.error(err);
+            //console.error(err);
 
             statusMsg.textContent = "❌ Error verifying transaction. Try again later.";
 

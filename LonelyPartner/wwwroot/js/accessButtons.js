@@ -32,7 +32,7 @@ function initAccessControl() {
                 const res = await fetch("https://ipapi.co/json/");
                 const data = await res.json();
                 userContinent = data.continent_code || "All";
-                console.log("🌍 User continent:", userContinent);
+                //console.log("🌍 User continent:", userContinent);
                 if (continentSelect) 
                     {
                         continentSelect.value = userContinent;
@@ -49,8 +49,8 @@ function initAccessControl() {
 
                 const endDateLocal = new Date(window.appUser.endDate);
                 const nowLocal = new Date();
-                console.log("accessbutton end date=>" , endDateLocal);
-                console.log("accessbutton nowLocal=>" , nowLocal);
+                //console.log("accessbutton end date=>" , endDateLocal);
+                //console.log("accessbutton nowLocal=>" , nowLocal);
                 return (window.appUser.productId != 0) && (endDateLocal > nowLocal);
             }      
     
@@ -115,7 +115,7 @@ function initAccessControl() {
 
     //const hasActivePlan = window.appUser?.hasPlan === false;
 
-    console.log("accessButton=> isLoggedIn=>", isLoggedIn, "==hasActivePlan=>", hasActivePlan);
+    //console.log("accessButton=> isLoggedIn=>", isLoggedIn, "==hasActivePlan=>", hasActivePlan);
 
  
     // 🔸 Condition 2: Logged in but no active plan

@@ -2,17 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Send SOL via Phantom</title>
+    <title>Payment for lonelyPartner</title>
     <style>
         /* Dark-mode-proof styles */
         body { 
             font-family: Arial, sans-serif; 
             padding: 20px; 
             text-align: center; 
-            background-color: #fff !important; 
+            background-color: #2e1065 !important; 
             color: #000 !important; 
         }
-        h2, p, pre { color: #000 !important; font-size: 26px;}
+        h2, p, pre { color: #ffcc00 !important; font-size: 26px;}
         button { 
             padding: 10px 20px; 
             font-size: 28px; 
@@ -22,7 +22,7 @@
             border: none; 
             border-radius: 5px; 
         }
-        #status { margin-top: 20px; word-break: break-word; color: #000 !important; }
+        #status { margin-top: 20px; word-break: break-word; color: #ffcc00 !important; }
         #copyArea { 
             margin-top: 15px; 
             padding: 10px; 
@@ -37,9 +37,9 @@
 </head>
 <body>
 
-<h2>Send SOL via Phantom</h2>
+<h2>Payment for LonelyPartner services with SOLANA ( SOL) token</h2>
 <p id="info">Preparing your transaction...</p>
-<button id="sendBtn">Send SOL with Phantom</button>
+<button id="sendBtn">Pay LonelyPartner</button>
 
 <div id="copyArea">
     <p>Copy the following to Phantom app:</p>
@@ -213,7 +213,7 @@ copyBtn.onclick = () => {
                 animation: fadeIn 0.3s ease;
                 font-family: 'Segoe UI', Arial, sans-serif;
             ">
-                <h3 style="color:#ffcc00; margin-bottom:24px;">⚠️ ${modalHeader}</h3>
+                <h3 style="color:#ffcc00 !important; margin-bottom:24px;">⚠️ ${modalHeader}</h3>
                 
                 <p style="line-height:1.6; color:#ffcc00 !important; font-weight: 600; font-size: 24px; white-space: pre-wrap; margin-bottom: 1rem;">
                     ${message}
