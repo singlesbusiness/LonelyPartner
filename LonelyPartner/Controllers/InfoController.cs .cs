@@ -71,13 +71,15 @@ namespace LonelyPartner.Controllers
                 string from = emailSettings["FromEmailAddress"];//
                 string host = emailSettings["Host"];
                 int port = Convert.ToInt32(emailSettings["Port"]);
-                string username = emailSettings["Username"];
-                string password = emailSettings["Password"];
+                //string username = emailSettings["Username"];
+                //string password = emailSettings["Password"];
 
                 using var client = new SmtpClient(host, port)
                 {
                     EnableSsl = true,
-                    Credentials = new NetworkCredential(username, password)
+                    UseDefaultCredentials = false, // IMPORTANT: smtp-relay requires NO auth, so use this line
+                    Credentials = null     // IMPORTANT: smtp-relay requires NO auth
+                    //Credentials = new NetworkCredential(username, password)
                 };
                 
    

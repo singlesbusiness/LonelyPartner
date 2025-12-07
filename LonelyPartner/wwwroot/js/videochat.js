@@ -504,7 +504,7 @@ function enableCameraSwitch() {
 
                 sendSignal(partnerId, "candidate", candStr);
 
-                log("onicecandidate sent", partnerId);
+                //log("onicecandidate sent", partnerId);
 
             }
 
@@ -514,7 +514,7 @@ function enableCameraSwitch() {
 
         peer.onconnectionstatechange = () => {
 
-            log("pc state:", peer.connectionState);
+            //log("pc state:", peer.connectionState);
 
             if (peer.connectionState === "failed" || peer.connectionState === "disconnected") {
 
@@ -540,7 +540,10 @@ function enableCameraSwitch() {
 
                 for (const c of pending) {
 
-                    try { await peer.addIceCandidate(new RTCIceCandidate(c)); log("applied queued candidate"); }
+                    try { 
+                        await peer.addIceCandidate(new RTCIceCandidate(c)); 
+                        //log("applied queued candidate"); 
+                        }
 
                     catch (e) { error("queued addIceCandidate failed:", e); }
 
@@ -590,7 +593,7 @@ function enableCameraSwitch() {
 
         await sendSignal(partnerId, "offer", JSON.stringify(offer));
 
-        log("Offer created & sent to", partnerId);
+        //log("Offer created & sent to", partnerId);
 
         // Now it's safe: enable the camera switch button
             enableCameraSwitch();
@@ -799,7 +802,7 @@ function enableCameraSwitch() {
 
         } catch (e1) {
 
-            log("SendChatMessage failed, trying alternative 'SendChat'...", e1);
+            //log("SendChatMessage failed, trying alternative 'SendChat'...", e1);
 
             try {
 
@@ -826,6 +829,8 @@ function enableCameraSwitch() {
             .withUrl("/chathub")
 
             .withAutomaticReconnect()
+
+            .configureLogging(signalR.LogLevel.Error) // Only show errors
 
             .build();
 
@@ -1373,9 +1378,9 @@ function enableCameraSwitch() {
                 if (!connection) await initSignalR(); // build connection if missing
                 if (connection.state !== signalR.HubConnectionState.Connected) {
                     await connection.start();
-                    log("✅ SignalR connection started on Start click");
+                    //log("✅ SignalR connection started on Start click");
                 } else {
-                    log("SignalR already connected, skipping start()");
+                    //log("SignalR already connected, skipping start()");
                 }
 
                 //call hub very important

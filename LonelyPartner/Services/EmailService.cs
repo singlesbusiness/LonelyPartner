@@ -34,8 +34,8 @@ namespace LonelyPartner.Services
                     var emailCfg = _config.GetSection("EmailConfig");
                     var host = emailCfg["Host"];
                     var port = Convert.ToInt32(emailCfg["Port"]);
-                    var username = emailCfg["Username"];
-                    var password = emailCfg["Password"];
+                    //var username = emailCfg["Username"];
+                    //var password = emailCfg["Password"];
                     //var from = emailCfg["FromEmailAddress"];
                     var from = string.Concat(emailCfg["FromEmailAddress"] , "LonelyPartner" ) ;
 
@@ -103,7 +103,10 @@ namespace LonelyPartner.Services
                 using var client = new SmtpClient(host, port)
                 {
                     EnableSsl = true,
-                    Credentials = new NetworkCredential(username, password)
+                    //Credentials = new NetworkCredential(username, password)
+                    UseDefaultCredentials = false, // IMPORTANT: smtp-relay requires NO auth, so use this line
+                    Credentials = null     // IMPORTANT: smtp-relay requires NO auth
+                    //Credentials = new NetworkCredential(username, password)
                 };
                     //////////////
                     var mail = new MailMessage
