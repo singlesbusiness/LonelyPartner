@@ -34,8 +34,8 @@ namespace LonelyPartner.Services
                     var emailCfg = _config.GetSection("EmailConfig");
                     var host = emailCfg["Host"];
                     var port = Convert.ToInt32(emailCfg["Port"]);
-                    //var username = emailCfg["Username"];
-                    //var password = emailCfg["Password"];
+                    var username = emailCfg["Username"];
+                    var password = emailCfg["Password"];
                     //var from = emailCfg["FromEmailAddress"];
                     var from = string.Concat(emailCfg["FromEmailAddress"] , "LonelyPartner" ) ;
 
@@ -104,9 +104,9 @@ namespace LonelyPartner.Services
                 {
                     EnableSsl = true,
                     //Credentials = new NetworkCredential(username, password)
-                    UseDefaultCredentials = false, // IMPORTANT: smtp-relay requires NO auth, so use this line
-                    Credentials = null     // IMPORTANT: smtp-relay requires NO auth
-                    //Credentials = new NetworkCredential(username, password)
+                    //UseDefaultCredentials = false, // IMPORTANT: smtp-relay requires NO auth, so use this line
+                    //Credentials = null     // IMPORTANT: smtp-relay requires NO auth
+                    Credentials = new NetworkCredential(username, password)
                 };
                     //////////////
                     var mail = new MailMessage
@@ -132,6 +132,11 @@ namespace LonelyPartner.Services
                     */
                     _logger.LogInformation($"✅ Invoice email sent to {orderInfo.Email}");
                     return true;
+                }
+                catch (SmtpException ex)
+                {
+                    _logger.LogError($"SMTP Error: {ex.StatusCode} - {ex.Message}");
+                    return false;
                 }
                 catch (Exception ex)
                 {

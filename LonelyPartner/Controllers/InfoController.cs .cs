@@ -67,19 +67,19 @@ namespace LonelyPartner.Controllers
             try
             {   
                 var emailSettings = _config.GetSection("EmailConfig");
-                string to = emailSettings["ToEmailAddress"];
+                string toEmail = emailSettings["ToEmailAddress"];
                 string from = emailSettings["FromEmailAddress"];//
                 string host = emailSettings["Host"];
                 int port = Convert.ToInt32(emailSettings["Port"]);
-                //string username = emailSettings["Username"];
-                //string password = emailSettings["Password"];
+                string username = emailSettings["Username"];
+                string password = emailSettings["Password"];
 
                 using var client = new SmtpClient(host, port)
                 {
                     EnableSsl = true,
-                    UseDefaultCredentials = false, // IMPORTANT: smtp-relay requires NO auth, so use this line
-                    Credentials = null     // IMPORTANT: smtp-relay requires NO auth
-                    //Credentials = new NetworkCredential(username, password)
+                    //UseDefaultCredentials = false, // IMPORTANT: smtp-relay requires NO auth, so use this line
+                    //Credentials = null     // IMPORTANT: smtp-relay requires NO auth
+                    Credentials = new NetworkCredential(username, password)
                 };
                 
    
@@ -91,13 +91,18 @@ namespace LonelyPartner.Controllers
                     IsBodyHtml = false
                 };
 
-                mail.To.Add(to);
+                mail.To.Add(toEmail);
 
                 await client.SendMailAsync(mail);
 
                 ViewBag.Status = "✅ Your message has been sent successfully.";
                 //Console.WriteLine("sent contact email.");
                 _logger.LogInformation("Sent contact email.");
+            }
+            catch (SmtpException ex)
+            {
+                _logger.LogError($"SMTP Error: {ex.StatusCode} - {ex.Message}");
+                ViewBag.Status = $"❌ Failed to send email: {ex.Message}";
             }
             catch (Exception ex)
             {   

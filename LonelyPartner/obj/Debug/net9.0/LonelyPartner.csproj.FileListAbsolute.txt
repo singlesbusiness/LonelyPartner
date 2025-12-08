@@ -1,11 +1,5 @@
-/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/publish/web.config
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/appsettings.Development.json
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/appsettings.json
-/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/publish/appsettings.Development.json
-/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/publish/appsettings.json
-/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/publish/LonelyPartner.deps.json
-/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/publish/LonelyPartner.runtimeconfig.json
-/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/publish/LonelyPartner.staticwebassets.endpoints.json
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/LonelyPartner.staticwebassets.runtime.json
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/LonelyPartner.staticwebassets.endpoints.json
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/bin/Debug/net9.0/LonelyPartner

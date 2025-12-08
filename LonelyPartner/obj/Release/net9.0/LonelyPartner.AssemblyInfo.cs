@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LonelyPartner")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7564545fea79ecf546ed51e6fb7657748f0d8c4a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8b71ee51acf42e258a2ebaf1a71c8a03853ce6a0")]
 [assembly: System.Reflection.AssemblyProductAttribute("LonelyPartner")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LonelyPartner")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
