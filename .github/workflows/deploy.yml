@@ -1,4 +1,4 @@
-name: Deploy .NET to Zomro VPS
+name: Deploy LonelyPartner to Zomro VPS
 
 on:
   push:
