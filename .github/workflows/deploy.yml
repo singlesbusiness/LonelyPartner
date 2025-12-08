@@ -1,0 +1,50 @@
+name: Deploy .NET to Zomro VPS
+
+on:
+  push:
+    branches:
+      - main  # trigger on main branch commits
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build project
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Publish project
+      run: dotnet publish -c Release -o publish
+
+    - name: Copy files to VPS
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        source: "publish/*"
+        target: "/var/www/lonelypartner"  # your VPS folder
+
+    - name: Restart app on VPS
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        script: |
+          cd /var/www/lonelypartner
+          # If using systemd
+          sudo systemctl restart lonelypartner.service
