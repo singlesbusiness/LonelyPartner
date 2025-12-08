@@ -35,7 +35,7 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: ${{ secrets.VPS_PORT }}
         source: "publish/*"
-        target: "/var/www/lonelypartner"  # your VPS folder
+        target: "/var/www/LonelyPartner"  # your VPS folder
 
     - name: Restart app on VPS
       uses: appleboy/ssh-action@v0.1.5
@@ -45,6 +45,6 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: ${{ secrets.VPS_PORT }}
         script: |
-          cd /var/www/lonelypartner
+          cd /var/www/LonelyPartner
           # If using systemd
           sudo systemctl restart lonelypartner.service
