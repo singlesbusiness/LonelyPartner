@@ -88,6 +88,7 @@ builder.Services.AddAuthentication()
         var googleAuth = builder.Configuration.GetSection("Authentication:Google");
         option.ClientId = googleAuth["ClientId"];
         option.ClientSecret = googleAuth["ClientSecret"];
+        option.CallbackPath = "/signin-google"; // MUST MATCH GOOGLE
     });
 
 // Add services to the container.

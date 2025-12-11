@@ -51,84 +51,84 @@ namespace LonelyPartner.Controllers
         }
 
         [HttpGet]
-public async Task<IActionResult> GoogleResponse()
-{   
-    try
-            {
-                var info = await _signInManager.GetExternalLoginInfoAsync();
-                if (info == null)
-                    return RedirectToAction("Index", "Home");
-
-                var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
-                ApplicationUser user;
-
-                if (!signInResult.Succeeded)
-                {
-                    var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                    var name = info.Principal.FindFirstValue(ClaimTypes.Name);
-
-                    // Check if user exists
-                    user = await _userManager.FindByEmailAsync(email);
-                    if (user == null)
+        public async Task<IActionResult> GoogleResponse()
+        {   
+            try
                     {
-                        user = new ApplicationUser { UserName = email, Email = email };
-                        var result = await _userManager.CreateAsync(user);
-                        if (result.Succeeded)
-                        {
-                            await _userManager.AddLoginAsync(user, info);
+                        var info = await _signInManager.GetExternalLoginInfoAsync();
+                        if (info == null)
+                            return RedirectToAction("Index", "Home");
 
-                            // Also sync to your UserEntity table
-                            var existing = await _context.UserEntity.FirstOrDefaultAsync(u => u.CustomerEmail == email);
-                            if (existing == null)
+                        var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
+                        ApplicationUser user;
+
+                        if (!signInResult.Succeeded)
+                        {
+                            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+
+                            // Check if user exists
+                            user = await _userManager.FindByEmailAsync(email);
+                            if (user == null)
                             {
-                                _context.UserEntity.Add(new UserEntity
+                                user = new ApplicationUser { UserName = email, Email = email };
+                                var result = await _userManager.CreateAsync(user);
+                                if (result.Succeeded)
                                 {
-                                    CustomerName = name ?? email,
-                                    CustomerEmail = email,
-                                    Role = email == "singlesbusiness@gmail.com" ? "Admin" : "User",
-                                    ProductId = email == "singlesbusiness@gmail.com" ? 1000 : 0,
-                                    ProductName = email == "singlesbusiness@gmail.com" ? "LongPlan" : "",
-                                    TotalAmount = 0.0M,
-                                    StartDate = DateTime.UtcNow,
-                                    EndDate = email == "singlesbusiness@gmail.com" ? DateTime.UtcNow.AddYears(50) : DateTime.UtcNow
-                                });
-                                await _context.SaveChangesAsync();
-                                _logger.LogInformation($"🟢  New user= {email} ,.");
+                                    await _userManager.AddLoginAsync(user, info);
+
+                                    // Also sync to your UserEntity table
+                                    var existing = await _context.UserEntity.FirstOrDefaultAsync(u => u.CustomerEmail == email);
+                                    if (existing == null)
+                                    {
+                                        _context.UserEntity.Add(new UserEntity
+                                        {
+                                            CustomerName = name ?? email,
+                                            CustomerEmail = email,
+                                            Role = email == "singlesbusiness@gmail.com" ? "Admin" : "User",
+                                            ProductId = email == "singlesbusiness@gmail.com" ? 1000 : 0,
+                                            ProductName = email == "singlesbusiness@gmail.com" ? "LongPlan" : "",
+                                            TotalAmount = 0.0M,
+                                            StartDate = DateTime.UtcNow,
+                                            EndDate = email == "singlesbusiness@gmail.com" ? DateTime.UtcNow.AddYears(50) : DateTime.UtcNow
+                                        });
+                                        await _context.SaveChangesAsync();
+                                        _logger.LogInformation($"🟢  New user= {email} ,.");
+                                    }
+                                }
                             }
                         }
-                    }
-                }
-                else
-                {
-                    user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
-                }
-
-                // ✅ Generate a new unique session ID for this login
-                var newSessionId = Guid.NewGuid().ToString("N");
-                HttpContext.Session.SetString("SessionId", newSessionId);
-
-                        // ✅ Check if the user was already logged in elsewhere
-                        if (!string.IsNullOrEmpty(user.CurrentSessionId) && user.CurrentSessionId != newSessionId)
+                        else
                         {
-                            // Invalidate old session
-                            TempData["ExpiredAlert"] = "You’ve been signed out in another browser, You can continue here.";
+                            user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
                         }
-            
-                        // ✅ Update it in database
-                        user.CurrentSessionId = newSessionId;
-                        await _userManager.UpdateAsync(user);
 
-                        // ✅ Sign in again to refresh claims
-                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        // ✅ Generate a new unique session ID for this login
+                        var newSessionId = Guid.NewGuid().ToString("N");
+                        HttpContext.Session.SetString("SessionId", newSessionId);
 
-                        return RedirectToAction("Index", "Home");
-            }
-            catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error during Google OAuth response handling.");
-                    return RedirectToAction("Error", "Home");
-                }
-}
+                                // ✅ Check if the user was already logged in elsewhere
+                                if (!string.IsNullOrEmpty(user.CurrentSessionId) && user.CurrentSessionId != newSessionId)
+                                {
+                                    // Invalidate old session
+                                    TempData["ExpiredAlert"] = "You’ve been signed out in another browser, You can continue here.";
+                                }
+                    
+                                // ✅ Update it in database
+                                user.CurrentSessionId = newSessionId;
+                                await _userManager.UpdateAsync(user);
+
+                                // ✅ Sign in again to refresh claims
+                                await _signInManager.SignInAsync(user, isPersistent: false);
+
+                                return RedirectToAction("Index", "Home");
+                    }
+                    catch (Exception ex)
+                        {
+                            _logger.LogError(ex, "Error during Google OAuth response handling.");
+                            return RedirectToAction("Error", "Home");
+                        }
+        }
 
 
         [HttpGet]
