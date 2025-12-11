@@ -958,7 +958,7 @@ function enableCameraSwitch() {
                 }
             
             
-            //console.log("Matched with partner:",  partnerCity, partnerCountry, partnerGenderIcon);
+            console.log("Matched with partner:",  partnerCity, partnerCountry, partnerGenderIcon);
 
             try {
 
