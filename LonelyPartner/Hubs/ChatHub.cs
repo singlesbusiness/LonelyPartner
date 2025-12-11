@@ -262,7 +262,7 @@ namespace LonelyPartner.Hubs
                 var partnerGenderIcon = GetGenderIcon(partnerInfo.Gender);
                 var userGenderIcon = GetGenderIcon(gender); // assumes "gender" belongs to connectionId
 
-                //_logger.LogInformation($"PartnerInfo Gender = {partnerGenderIcon}");
+               // _logger.LogInformation($"PartnerInfo Gender = {partnerGenderIcon}");
                 //_logger.LogInformation($"My Gender = {userGenderIcon}");
 
                 // Notify both users
