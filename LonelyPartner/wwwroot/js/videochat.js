@@ -439,7 +439,7 @@ function enableCameraSwitch() {
 
     // 🔹 Optional: show a subtle 'You left the chat' message
     function showStoppedMessage() {
-        setStatus("✅ You left the chat.", "info");
+        setStatus("You left the chat.", "info");
         //console.log("🛑 User stopped chat manually.");
     }
 
@@ -943,7 +943,7 @@ function enableCameraSwitch() {
 
         // Matched payload may be object with .partner / .Partner and isInitiator / IsInitiator
 
-        connection.on("Matched", async (payload, role, partnerCountry, partnerCity) => {
+        connection.on("Matched", async (payload, role, partnerCountry, partnerCity, partnerGenderIcon) => {
             // ✅ mark matched state so “Searching...” won't override later
             isMatched = true;
             setStatus("🎉 Partner found!", "success");
@@ -954,11 +954,11 @@ function enableCameraSwitch() {
             // show partner’s location
             infoDiv.style.display = "inline-block";
             if (infoDiv) {
-                    infoDiv.textContent = `🌍 ${partnerCity}, ${partnerCountry}`;
+                    infoDiv.textContent = `🌍 ${partnerCity}, ${partnerCountry} , ${partnerGenderIcon}`;
                 }
             
             
-            //console.log("Matched with partner:",  partnerCity, partnerCountry);
+            //console.log("Matched with partner:",  partnerCity, partnerCountry, partnerGenderIcon);
 
             try {
 
