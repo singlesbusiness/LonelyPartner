@@ -165,6 +165,22 @@ namespace LonelyPartner.Hubs
                     }
                 }
 
+        //For Gender icons after users Match
+        private static string GetGenderIcon(string gender)
+                {
+                    if (string.IsNullOrWhiteSpace(gender)) 
+                        return ""; // fallback if missing
+
+                    gender = gender.ToLower();
+
+                    return gender switch
+                    {
+                        "male"   => "♂️", // blue
+                        "female" => "♀️", // pink
+                        _        => ""
+                    };
+                }
+
 
         // ===============================
         // 🔹 Core: Start Searching Shared
@@ -185,20 +201,33 @@ namespace LonelyPartner.Hubs
             if (!isAdmin)
             {
                 var httpContext = Context.GetHttpContext();
-                string ip = httpContext?.Connection?.RemoteIpAddress?.ToString();
-                //_logger.LogInformation($"ip=> {ip}");
+                string ip = null;
 
-                if (string.IsNullOrEmpty(ip) || ip == "::1" || ip == "127.0.0.1" || ip.StartsWith("127.")|| ip.StartsWith("::ffff:127."))
-                {   
-                    ip = httpContext?.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-                } 
-
-                // Normalize IPv6-mapped IPv4 (e.g., ::ffff:192.168.1.5 → 192.168.1.5)
-                if (!string.IsNullOrWhiteSpace(ip) && ip.Contains("::ffff:"))
-                {       
-                    ip = ip.Replace("::ffff:", "");
+                // 1) Cloudflare real IP header
+                if (httpContext.Request.Headers.TryGetValue("CF-Connecting-IP", out var cfIp))
+                {
+                    ip = cfIp.FirstOrDefault();
                 }
 
+                // 2) X-Forwarded-For (Nginx)
+                if (string.IsNullOrEmpty(ip) &&
+                    httpContext.Request.Headers.TryGetValue("X-Forwarded-For", out var xff))
+                {
+                    ip = xff.FirstOrDefault()?.Split(',')[0].Trim();
+                }
+
+                // 3) Fallback to RemoteIpAddress
+                if (string.IsNullOrEmpty(ip))
+                {
+                    ip = httpContext.Connection.RemoteIpAddress?.ToString();
+                }
+
+                // Normalize IPv6-mapped IPv4
+                if (!string.IsNullOrWhiteSpace(ip) && ip.Contains("::ffff:"))
+                {
+                    ip = ip.Replace("::ffff:", "");
+                }
+        
                 
                 (country, city) = await GetLocationFromIp(ip);
             }
@@ -224,12 +253,17 @@ namespace LonelyPartner.Hubs
                 ActivePairs[connectionId] = matchId;
                 ActivePairs[matchId] = connectionId;
 
+                // get icons
+                var partnerGenderIcon = GetGenderIcon(partnerInfo.Gender);
+                var userGenderIcon = GetGenderIcon(gender); // assumes "gender" belongs to connectionId
+
+
                 // Notify both users
                 await Clients.Client(connectionId).SendAsync("Matched", matchId, "Caller", partnerInfo.Country, partnerInfo.City);
                 await Clients.Client(matchId).SendAsync("Matched", connectionId, "Callee", country, city);
 
-                await Clients.Client(connectionId).SendAsync("StatusUpdate", "🎉 Partner found!", "success");
-                await Clients.Client(matchId).SendAsync("StatusUpdate", "🎉 Partner found!", "success");
+                await Clients.Client(connectionId).SendAsync("StatusUpdate", $"🎉 Partner found! {partnerGenderIcon}", "success");
+                await Clients.Client(matchId).SendAsync("StatusUpdate", $"🎉 Partner found! {userGenderIcon}", "success");
             }
             else
             {
