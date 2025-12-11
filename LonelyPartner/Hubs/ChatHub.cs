@@ -256,14 +256,14 @@ namespace LonelyPartner.Hubs
 
                 // get icons
 
-                _logger.LogInformation($"PartnerInfo Gender = {partnerInfo.Gender}");
-                _logger.LogInformation($"My Gender = {gender}");
+                //_logger.LogInformation($"PartnerInfo Gender = {partnerInfo.Gender}");
+                //_logger.LogInformation($"My Gender = {gender}");
 
                 var partnerGenderIcon = GetGenderIcon(partnerInfo.Gender);
                 var userGenderIcon = GetGenderIcon(gender); // assumes "gender" belongs to connectionId
 
-                _logger.LogInformation($"PartnerInfo Gender = {partnerGenderIcon}");
-                _logger.LogInformation($"My Gender = {userGenderIcon}");
+                //_logger.LogInformation($"PartnerInfo Gender = {partnerGenderIcon}");
+                //_logger.LogInformation($"My Gender = {userGenderIcon}");
 
                 // Notify both users
                 await Clients.Client(connectionId).SendAsync("Matched", matchId, "Caller", partnerInfo.Country, partnerInfo.City, partnerGenderIcon);

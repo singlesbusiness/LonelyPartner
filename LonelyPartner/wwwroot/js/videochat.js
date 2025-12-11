@@ -953,12 +953,34 @@ function enableCameraSwitch() {
             //toggleMic.style.display = "inline-block";
             // show partner’s location
             infoDiv.style.display = "inline-block";
+            /*
             if (infoDiv) {
                     infoDiv.textContent = `🌍 ${partnerCity}, ${partnerCountry} , ${partnerGenderIcon}`;
                 }
+            */
             
-            
-            console.log("Matched with partner:",  partnerCity, partnerCountry, partnerGenderIcon);
+            //console.log("Matched with partner:",  partnerCity, partnerCountry, partnerGenderIcon);
+
+            if (infoDiv) {
+                    // Set location text + icon
+                    infoDiv.innerHTML = `🌍 ${partnerCity}, ${partnerCountry} , <span id="genderIcon">${partnerGenderIcon}</span>`;
+
+                    const genderSpan = document.getElementById("genderIcon");
+
+                    // Make bigger + bold for ALL icons
+                    genderSpan.style.fontSize = "1.8rem";
+                    genderSpan.style.fontWeight = "bold";
+
+                    // Apply color based on icon
+                    if (partnerGenderIcon === "♂️") {
+                        genderSpan.style.color = "dodgerblue";   // blue male
+                    } else if (partnerGenderIcon === "♀️") {
+                        genderSpan.style.color = "hotpink";      // pink female
+                    }
+                    else if (partnerGenderIcon === "💑") {
+                        genderSpan.style.color = "hotpink";      // pink couple
+                    }
+                }
 
             try {
 
