@@ -171,12 +171,13 @@ namespace LonelyPartner.Hubs
                     if (string.IsNullOrWhiteSpace(gender)) 
                         return ""; // fallback if missing
 
-                    gender = gender.ToLower();
+                    gender = gender.Trim().ToLower();
 
                     return gender switch
                     {
                         "male"   => "♂️", // blue
                         "female" => "♀️", // pink
+                        "couple" => "💑", //couple
                         _        => ""
                     };
                 }
@@ -254,16 +255,22 @@ namespace LonelyPartner.Hubs
                 ActivePairs[matchId] = connectionId;
 
                 // get icons
+
+                _logger.LogInformation($"PartnerInfo Gender = {partnerInfo.Gender}");
+                _logger.LogInformation($"My Gender = {gender}");
+
                 var partnerGenderIcon = GetGenderIcon(partnerInfo.Gender);
                 var userGenderIcon = GetGenderIcon(gender); // assumes "gender" belongs to connectionId
 
+                _logger.LogInformation($"PartnerInfo Gender = {partnerGenderIcon}");
+                _logger.LogInformation($"My Gender = {userGenderIcon}");
 
                 // Notify both users
                 await Clients.Client(connectionId).SendAsync("Matched", matchId, "Caller", partnerInfo.Country, partnerInfo.City, partnerGenderIcon);
-                await Clients.Client(matchId).SendAsync("Matched", connectionId, "Callee", country, city,userGenderIcon);
+                await Clients.Client(matchId).SendAsync("Matched", connectionId, "Callee", country, city, userGenderIcon);
 
-                await Clients.Client(connectionId).SendAsync("StatusUpdate", $"🎉 Partner found! {partnerGenderIcon}", "success");
-                await Clients.Client(matchId).SendAsync("StatusUpdate", $"🎉 Partner found! {userGenderIcon}", "success");
+                await Clients.Client(connectionId).SendAsync("StatusUpdate", $"🎉 Partner found! ", "success");
+                await Clients.Client(matchId).SendAsync("StatusUpdate", $"🎉 Partner found! ", "success");
             }
             else
             {
