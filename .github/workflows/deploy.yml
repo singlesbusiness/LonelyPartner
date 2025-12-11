@@ -27,6 +27,17 @@ jobs:
     - name: Publish project
       run: dotnet publish -c Release -o publish
 
+    - name: CLEAN VPS TARGET FOLDER (VERY IMPORTANT)
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        port: ${{ secrets.VPS_PORT }}
+        script: |
+          sudo rm -rf /var/www/LonelyPartner/*
+          sudo mkdir -p /var/www/LonelyPartner
+
     - name: Copy files to VPS
       uses: appleboy/scp-action@v0.1.4
       with:
@@ -45,6 +56,4 @@ jobs:
         key: ${{ secrets.VPS_SSH_KEY }}
         port: ${{ secrets.VPS_PORT }}
         script: |
-          cd /var/www/LonelyPartner
-          # If using systemd
           sudo systemctl restart lonelypartner.service
