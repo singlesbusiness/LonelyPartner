@@ -1797,19 +1797,32 @@ function enableCameraSwitch() {
     //personal data sharing detection
     function containsPersonalInfo(text) {
             const patterns = [
-                /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i,          // Email
-                /\b(?:\+?\d{1,3}[\s-]?)?\d{10,}\b/,                   // Phone / WhatsApp
-                /\b(insta|instagram)\b/i,
-                /\b(telegram|tg)\b/i,
+                // Email
+                /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i,
+
+                // Phone / WhatsApp numbers
+                /\b(?:\+?\d{1,3}[\s-]?)?\d{10,}\b/,
+
+                // Social & messaging platforms (full + short forms)
+                /\b(insta|instagram|ig)\b/i,
+                /\b(telegram|tele|tg)\b/i,
+                /\b(whatsapp|wa)\b/i,
+                /\b(signal)\b/i,
+                /\b(gmail|gchat|google\s?chat)\b/i,
+                /\b(hangout|hangouts)\b/i,
                 /\b(facebook|fb)\b/i,
                 /\b(snapchat|snap)\b/i,
-                /\b(linkedin)\b/i,
-                /\bdiscord\b/i,
-                /\b(@[a-zA-Z0-9_.]{3,})\b/                             // @username
+                /\b(linkedin|ln)\b/i,
+                /\b(discord|dc)\b/i,
+                /\b(twitter|x)\b/i,
+
+                // @username (generic handle)
+                /\B@[a-zA-Z0-9_.]{3,}\b/
             ];
 
             return patterns.some(rx => rx.test(text));
         }
+
 
  
     //for styling

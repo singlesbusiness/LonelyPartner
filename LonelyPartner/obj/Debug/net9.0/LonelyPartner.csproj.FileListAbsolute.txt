@@ -256,7 +256,6 @@
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/compressed/vyecvb8p1v-jytmyo7kel.gz
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/compressed/qsfisfwqpv-wk50li4gil.gz
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/compressed/vdfs59eqva-zvd55rzt77.gz
-/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/compressed/e6g7rnmnsg-gtzs1sbbmk.gz
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/compressed/prxy6b2ykj-bqjiyaj88i.gz
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/compressed/eap4cb5ply-c2jlpeoesf.gz
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/compressed/xzh11wl5vu-erw9l3u2r3.gz
@@ -329,3 +328,4 @@
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/LonelyPartner.pdb
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/LonelyPartner.genruntimeconfig.cache
 /Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/ref/LonelyPartner.dll
+/Users/sri/Desktop/dotnetws/LonelyPartner/LonelyPartner/obj/Debug/net9.0/compressed/e6g7rnmnsg-z1886t5ub3.gz
