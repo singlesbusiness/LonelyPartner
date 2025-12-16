@@ -152,7 +152,10 @@
         if (!messagesDiv) return;
 
         const el = document.createElement("div");
-        el.className = `message ${sender === "You" ? "me" : "other"}`;
+        el.className = 
+            sender === "System"
+            ? "message system"
+            : `message ${sender === "You" ? "me" : "other"}`;
         el.innerHTML = `<strong>${escapeHtml(sender)}:</strong> ${escapeHtml(text)}`;
 
         messagesDiv.appendChild(el);
@@ -1791,6 +1794,29 @@ function enableCameraSwitch() {
 
     // --- Chat send wiring ---
 
+    //personal data sharing detection
+    function containsPersonalInfo(text) {
+            const patterns = [
+                /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i,          // Email
+                /\b(?:\+?\d{1,3}[\s-]?)?\d{10,}\b/,                   // Phone / WhatsApp
+                /\b(insta|instagram)\b/i,
+                /\b(telegram|tg)\b/i,
+                /\b(facebook|fb)\b/i,
+                /\b(snapchat|snap)\b/i,
+                /\b(linkedin)\b/i,
+                /\bdiscord\b/i,
+                /\b(@[a-zA-Z0-9_.]{3,})\b/                             // @username
+            ];
+
+            return patterns.some(rx => rx.test(text));
+        }
+
+ 
+    //for styling
+    function appendSystemMessage(text) {
+             window.appendMessage("System", text);
+        }
+
     function initChat() {
 
 
@@ -1807,6 +1833,15 @@ function enableCameraSwitch() {
                 //alert("You are not connected to a partner."); 
                 setStatus("Click Start, connect to a partner.", "info");
                 return; 
+            }
+
+            
+            // ⚠️ Detect personal info BEFORE sending
+            if (containsPersonalInfo(msg)) {
+                 appendSystemMessage(
+                    "⚠️ Be careful! You may be sharing personal contact details. " +
+                    "Avoid sharing emails, phone numbers, or social media IDs with strangers."
+                );
             }
 
             appendMessage("You", msg);
