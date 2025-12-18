@@ -702,7 +702,7 @@ function enableCameraSwitch() {
 
     }
 
- 
+    
 
     // end current call
 
@@ -713,8 +713,8 @@ function enableCameraSwitch() {
         statusText.style.display = "none";
         //local and remote cam and  mic icon display off
         remoteToggleMic.style.display = "none"
-        //toggleCamera.style.display = "none";
-        //toggleMic.style.display = "none";
+        //reset local controls
+        resetMediaButtonsUI();
         //clear chat
         if (infoDiv) {
             infoDiv.textContent = "";
@@ -1304,7 +1304,9 @@ function enableCameraSwitch() {
 
         if (!validateMyGender()) return;
 
- 
+        
+        // 🔄 RESET UI STATE FIRST
+            resetMediaButtonsUI();
 
         // start camera (user gesture)
 
@@ -2023,8 +2025,8 @@ function enableCameraSwitch() {
         //remote mic control
         remoteToggleMic = document.getElementById("remoteToggleMic");
         //local cam and  mic control
-        //toggleCamera = document.getElementById("toggleCamera");
-        //toggleMic = document.getElementById("toggleMic");
+        toggleCamera = document.getElementById("toggleCamera");
+        toggleMic = document.getElementById("toggleMic");
 
         // sanity check
 
@@ -2153,7 +2155,18 @@ function enableCameraSwitch() {
 
     });
 
- 
+    //reset UI when start button is clicked
+    function resetMediaButtonsUI() {
+            //const camBtn = document.getElementById("toggleCamera");
+            //const micBtn = document.getElementById("toggleMic");
+
+            toggleCamera.classList.remove("off");
+            toggleMic.classList.remove("off");
+
+            //camBtn.title = "Toggle Camera";
+            //micBtn.title = "Toggle Mic";
+        }
+
 
     
 
