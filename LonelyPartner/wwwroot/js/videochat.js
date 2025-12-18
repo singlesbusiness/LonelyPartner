@@ -946,7 +946,7 @@ function enableCameraSwitch() {
 
         // Matched payload may be object with .partner / .Partner and isInitiator / IsInitiator
 
-        connection.on("Matched", async (payload, role, partnerCountry, partnerCity, partnerGenderIcon) => {
+        connection.on("Matched", async (payload, role, partnerCountry, partnerCity, partnerGenderIcon, isPaidPartner) => {
             // ✅ mark matched state so “Searching...” won't override later
             isMatched = true;
             setStatus("🎉 Partner found!", "success");
@@ -965,8 +965,18 @@ function enableCameraSwitch() {
             //console.log("Matched with partner:",  partnerCity, partnerCountry, partnerGenderIcon);
 
             if (infoDiv) {
+                    //for paid users
+                    let badgeHtml = "";
+
+                    if (isPaidPartner) {
+                        badgeHtml = `
+                            <span class="paid-badge" title="Premium Member">
+                                💎 Premium
+                            </span>
+                        `;
+                    }
                     // Set location text + icon
-                    infoDiv.innerHTML = `🌍 ${partnerCity}, ${partnerCountry} , <span id="genderIcon">${partnerGenderIcon}</span>`;
+                    infoDiv.innerHTML = `🌍 ${partnerCity}, ${partnerCountry} , <span id="genderIcon">${partnerGenderIcon}</span> , ${badgeHtml}`;
 
                     const genderSpan = document.getElementById("genderIcon");
 

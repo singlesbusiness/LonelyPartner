@@ -1237,3 +1237,17 @@ nav {
     border-radius: 6px;
     font-size: 18px;
 }
+
+/*paid member badge*/
+.paid-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #8ec5f2;
+    background: linear-gradient(135deg, #ff9800, #ff5722);
+    border-radius: 12px;
+    vertical-align: middle;
+    box-shadow: 0 0 6px rgba(255, 152, 0, 0.6);
+}

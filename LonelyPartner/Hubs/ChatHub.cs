@@ -266,8 +266,8 @@ namespace LonelyPartner.Hubs
                 //_logger.LogInformation($"My Gender = {userGenderIcon}");
 
                 // Notify both users
-                await Clients.Client(connectionId).SendAsync("Matched", matchId, "Caller", partnerInfo.Country, partnerInfo.City, partnerGenderIcon);
-                await Clients.Client(matchId).SendAsync("Matched", connectionId, "Callee", country, city, userGenderIcon);
+                await Clients.Client(connectionId).SendAsync("Matched", matchId, "Caller", partnerInfo.Country, partnerInfo.City, partnerGenderIcon, partnerInfo.IsPaidUser);
+                await Clients.Client(matchId).SendAsync("Matched", connectionId, "Callee", country, city, userGenderIcon, isPaidUser);
 
                 await Clients.Client(connectionId).SendAsync("StatusUpdate", $"🎉 Partner found! ", "success");
                 await Clients.Client(matchId).SendAsync("StatusUpdate", $"🎉 Partner found! ", "success");
