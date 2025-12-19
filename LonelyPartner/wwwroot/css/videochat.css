@@ -1251,3 +1251,76 @@ nav {
     vertical-align: middle;
     box-shadow: 0 0 6px rgba(255, 152, 0, 0.6);
 }
+
+/* for interest tag*/
+.hidden {
+    display: none !important;
+}
+#interestsWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.interest-label {
+    display: inline-flex;
+    white-space: nowrap;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f3db41; /* matches yellow theme */
+}
+
+.interests {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    width: 300px;              /* fits placeholder text */
+    max-width: 100%;
+    padding: 4px;
+
+    overflow-x: auto;          /* 🔥 scroll instead of grow */
+    overflow-y: hidden;
+    white-space: nowrap;
+
+    border-radius: 6px;
+    background-color: #f9f9f5 !important;
+    border: 1px solid #edc842 !important;
+}
+
+.interest-tags {
+    display: flex;
+    flex-shrink: 0;
+    gap: 4px;
+}
+
+.interest-tag {
+    background: #383eae !important;
+    border: 1px solid #142883 !important;
+    border-radius: 16px;
+    padding: 4px 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.interest-tag .remove {
+    cursor: pointer;
+    display: none;
+    font-weight: bold;
+}
+
+.interest-tag:hover .remove {
+    display: inline;
+}
+
+.interest-input {
+    color: #222; 
+    width: 180px;              /* fits placeholder */
+    min-width: 220px;
+    background: transparent !important;
+    border: none;
+    outline: none;
+    padding: 4px 4px;
+}

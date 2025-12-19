@@ -24,6 +24,13 @@ namespace LonelyPartner.Hubs
         
         //user preference
         public static ConcurrentDictionary<string, (string Gender, string DesiredGender, string Continent, string Country, string City, bool IsPaidUser, bool IsAdmin)> UserPreferences = new();
+
+        // Interests per user
+        private static readonly ConcurrentDictionary<string, List<string>> UserInterests = new();
+        // 🔒 Only users here are allowed to be matched
+        private static readonly ConcurrentDictionary<string, bool> ActivelySearching = new();
+
+
         public ChatHub(UserDBContext db , ILogger<ChatHub> logger)
         {
             _db = db;
@@ -54,10 +61,17 @@ namespace LonelyPartner.Hubs
             string currentId,
             string desiredGender,
             string desiredContinent,
-            bool strict)
+            bool strict
+            )
         {
+            //commonInterests = new();
+
             if (!UserPreferences.TryGetValue(currentId, out var currentUser))
                 return null;
+
+            //tags
+            UserInterests.TryGetValue(currentId, out var myInterests);
+            myInterests ??= new();
 
             var selfGender = currentUser.Gender;
             string selfDesiredGender = currentUser.DesiredGender;
@@ -74,9 +88,23 @@ namespace LonelyPartner.Hubs
                
                 if (!WaitingUsers.ContainsKey(candidateId)) 
                      continue; // removed by someone else
+                
+                // 🔒 HARD GUARD , if user click stop button
+                if (!ActivelySearching.ContainsKey(candidateId))
+                    continue;
+                if (!ActivelySearching.ContainsKey(currentId))
+                    return null; // caller stopped mid-search
 
                 if (!UserPreferences.TryGetValue(candidateId, out var candidate))
                     continue;
+                
+                //tags
+                UserInterests.TryGetValue(candidateId, out var candidateInterests);
+                candidateInterests ??= new();
+
+                var sharedInterests = myInterests
+                                         .Intersect(candidateInterests, StringComparer.OrdinalIgnoreCase)
+                                         .ToList();
 
                     // Get candidate details
                     string candidateGender = candidate.Gender;        // candidate’s self gender
@@ -98,16 +126,31 @@ namespace LonelyPartner.Hubs
                     bool genderMatch = candidateGender.Equals(desiredGender, StringComparison.OrdinalIgnoreCase);
                     bool continentMatch = candidateContinent.Equals(desiredContinent, StringComparison.OrdinalIgnoreCase);
 
-                    if (genderMatch && continentMatch)
+                    //match with gender , continent and tags
+                    if (genderMatch && continentMatch  && sharedInterests.Any())
                     {
-                        _logger.LogInformation($"✅ Strict match: {currentId} ↔ {candidateId} ({desiredGender}/{desiredContinent})");
+                        _logger.LogInformation($"✅ Strict match with gender , continent and tags: {currentId} ↔ {candidateId} ({desiredGender}/{desiredContinent})");
+                        //commonInterests = sharedInterests;
+                        return candidateId;
+                    }
+                    //match with gender and continent
+                    if (genderMatch && continentMatch )
+                    {
+                        _logger.LogInformation($"✅ Strict match with gender and continent: {currentId} ↔ {candidateId} ({desiredGender}/{desiredContinent})");
                         return candidateId;
                     }
 
-                    // 2️⃣ RELAXED: Match desired gender (any continent)
-                    if (genderMatch)
+                    // 2️⃣ RELAXED: Match desired gender (any continent) and tags
+                    if (genderMatch && sharedInterests.Any())
                     {
-                        _logger.LogInformation($"🌍 Relaxed match: {currentId} ↔ {candidateId} ({desiredGender}/All continents)");
+                        _logger.LogInformation($"✅ Strict match with gender and tags: {currentId} ↔ {candidateId} ({desiredGender}/All continents)");
+                        //commonInterests = sharedInterests;
+                        return candidateId;
+                    }
+                    // 2️⃣ RELAXED: Match desired gender (any continent)
+                    if (genderMatch )
+                    {
+                        _logger.LogInformation($"🌍 Relaxed match with gender only: {currentId} ↔ {candidateId} ({desiredGender}/All continents)");
                         return candidateId;
                     }
 
@@ -129,10 +172,19 @@ namespace LonelyPartner.Hubs
                         candidateWantsAll ||
                         candidateWantsThisGender ||
                         (candidateIsPaid && desiredGender.Equals(candidate.DesiredGender, StringComparison.OrdinalIgnoreCase));
-
-                    if (matchAllowed)
+                    
+                    // 1️⃣ Prefer interest match
+                    if (matchAllowed && sharedInterests.Any())
                     {
                         _logger.LogInformation($"🎲 Free/random match: {currentId} ↔ {candidateId}");
+                        //commonInterests = sharedInterests;
+                        return candidateId;
+                    }
+
+                    // 2️⃣ Fallback random match
+                    if (matchAllowed)
+                    {
+                        _logger.LogInformation($"🎲 Free random match: {currentId} ↔ {candidateId}");
                         return candidateId;
                     }
                 }
@@ -190,12 +242,28 @@ namespace LonelyPartner.Hubs
             string gender,
             string desiredGender,
             string continent,
-            bool strict)
+            bool strict,
+            List<string> interests)
         {
             var connectionId = Context.ConnectionId;
             var currentUser = await GetCurrentUserAsync();
             bool isPaidUser = HasActivePlan(currentUser);
             bool isAdmin = currentUser?.Role == "Admin";
+
+            //user is actively searching
+            ActivelySearching[connectionId] = true;
+
+            
+            //tag
+            // Normalize interests (important!)
+            var cleanInterests = interests?
+                .Select(i => i.Trim().ToLowerInvariant())
+                .Distinct()
+                .ToList()
+                ?? new List<string>();
+
+            // 🔹 STORE INTERESTS HERE
+            UserInterests[connectionId] = cleanInterests;
 
             // Location detection
             string country = "Unknown", city = "Unknown";
@@ -240,7 +308,7 @@ namespace LonelyPartner.Hubs
             //await Clients.Caller.SendAsync("StatusUpdate", $"Searching for {desiredGender} in {continent}...", "info");
 
             // Try to find partner
-            var matchId = FindCompatiblePartner(connectionId, desiredGender, continent, strict);
+            var matchId = FindCompatiblePartner(connectionId, desiredGender, continent, strict );
             
 
             if (matchId != null && WaitingUsers.TryRemove(matchId, out var partnerInfo))
@@ -254,6 +322,14 @@ namespace LonelyPartner.Hubs
                 ActivePairs[connectionId] = matchId;
                 ActivePairs[matchId] = connectionId;
 
+                //tags
+                UserInterests.TryGetValue(connectionId, out var myInterests);
+                UserInterests.TryGetValue(matchId, out var partnerInterests);
+
+                var commonInterests = myInterests?
+                    .Intersect(partnerInterests ?? Enumerable.Empty<string>())
+                    .ToList()
+                    ?? new List<string>();
                 // get icons
 
                 //_logger.LogInformation($"PartnerInfo Gender = {partnerInfo.Gender}");
@@ -266,8 +342,8 @@ namespace LonelyPartner.Hubs
                 //_logger.LogInformation($"My Gender = {userGenderIcon}");
 
                 // Notify both users
-                await Clients.Client(connectionId).SendAsync("Matched", matchId, "Caller", partnerInfo.Country, partnerInfo.City, partnerGenderIcon, partnerInfo.IsPaidUser);
-                await Clients.Client(matchId).SendAsync("Matched", connectionId, "Callee", country, city, userGenderIcon, isPaidUser);
+                await Clients.Client(connectionId).SendAsync("Matched", matchId, "Caller", partnerInfo.Country, partnerInfo.City, partnerGenderIcon, partnerInfo.IsPaidUser , commonInterests);
+                await Clients.Client(matchId).SendAsync("Matched", connectionId, "Callee", country, city, userGenderIcon, isPaidUser , commonInterests);
 
                 await Clients.Client(connectionId).SendAsync("StatusUpdate", $"🎉 Partner found! ", "success");
                 await Clients.Client(matchId).SendAsync("StatusUpdate", $"🎉 Partner found! ", "success");
@@ -282,25 +358,25 @@ namespace LonelyPartner.Hubs
         // ===============================
         // 🔹 StartSearching for Paid Users (Strict)
         // ===============================
-        public async Task StartSearchingStrict(string gender, string desiredGender, string continent)
+        public async Task StartSearchingStrict(string gender, string desiredGender, string continent, List<string> interests)
         {
-            await StartSearchInternal(gender, desiredGender, continent, strict: true);
+            await StartSearchInternal(gender, desiredGender, continent, strict: true, interests);
         }
 
         // ===============================
         // 🔹 StartSearching for Paid Users (Relaxed)
         // ===============================
-        public async Task StartSearchingRelaxed(string gender, string desiredGender)
+        public async Task StartSearchingRelaxed(string gender, string desiredGender, List<string> interests)
         {
-            await StartSearchInternal(gender, desiredGender, "All", strict: true);
+            await StartSearchInternal(gender, desiredGender, "All", strict: true , interests);
         }
 
         // ===============================
         // 🔹 StartSearching for Free Users
         // ===============================
-        public async Task StartSearchingFree(string gender, string continent)
+        public async Task StartSearchingFree(string gender, string continent, List<string> interests)
         {
-            await StartSearchInternal(gender, "All", continent, strict: false);
+            await StartSearchInternal(gender, "All", continent, strict: false, interests);
         }
 
 
@@ -315,6 +391,10 @@ namespace LonelyPartner.Hubs
 
                 // Remove from waiting list (if user wasn't matched yet)
                 WaitingUsers.TryRemove(connectionId, out _);
+                //remove tags
+                UserInterests.TryRemove(connectionId, out _);
+                // 🔒 HARD STOP — prevents future matches
+                ActivelySearching.TryRemove(connectionId, out _);
 
                 // 2️⃣ Remove from FIFO queue
                 RemoveFromQueue(connectionId);
@@ -448,6 +528,10 @@ namespace LonelyPartner.Hubs
 
                 WaitingUsers.TryRemove(connectionId, out _);
                 RemoveFromQueue(connectionId);
+                // 🔒 HARD STOP — prevents future matches
+                ActivelySearching.TryRemove(connectionId, out _);
+                //remove tags
+                UserInterests.TryRemove(connectionId, out _);
 
                 if (ActivePairs.TryRemove(connectionId, out var partnerId))
                     {

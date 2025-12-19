@@ -227,7 +227,24 @@
                     }
                     
                 </div>
-            
+
+                @* Interests Wrapper *@
+                <div id="interestsWrapper">
+                    @* Interests Label *@
+                    <label for="interestInput" class="interest-label">
+                        🏷️ Add Interests
+                    </label>
+                    @*For interest-tags*@
+                    <div class="interests" id="interests">
+                        <div id="interestTags" class="interest-tags"></div>
+                        <input id="interestInput"
+                            type="text"
+                            class="interest-input"
+                            placeholder="Type an interest and press Enter" />
+                    </div>
+                </div>
+
+                @*Chat Section*@
                 <div class="chat-section" id="chatsection">
                     
                     <!-- 🔹 Status Message -->
@@ -579,6 +596,8 @@
                 <script src ="~/js/verifyPayment.js"></script>
                 <script src="~/js/profile.js"></script>
                 <script src="~/js/multiTabAccessBlock.js"></script>
+                @*tag*@
+                <script src="~/js/chattag.js"></script>
                 @*EU Cookie*@
                 <script src="~/js/sitepreferences.js"></script>
                 

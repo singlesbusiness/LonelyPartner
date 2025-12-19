@@ -96,8 +96,60 @@
                 text-align: center;
                 height: 26px;
             }
+         /*tags*/
+         #interestsWrapper {
+                order: 3 !important;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px !important;
+            }
+
+            #interestsWrapper .interest-label {
+                flex: 0 0 auto;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+            #interests {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+          }
+            #interestTags {
+                display: flex;
+                gap: 4px;
+                flex-wrap: nowrap;
+                white-space: nowrap;
+            }
+
+            .interest-input {
+                flex: 0 0 auto;
+                min-width: 120px;
+                height: 26px;
+                font-size: 12px;
+                padding: 0 10px;
+                border-radius: 10px;
+            }
+         /* Optional scrollbar styling */
+            #interests::-webkit-scrollbar {
+                height: 4px;
+            }
+
+            #interests::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
             
-            .chat-section {
+        .chat-section {
                 display: flex; 
                 order: 2 !important;
                 width: 100%;

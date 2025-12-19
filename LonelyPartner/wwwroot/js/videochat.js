@@ -34,7 +34,10 @@
 
     let fallbackTimer = null; //for fallback match,set to 5sec in on.waiting
 
- 
+    const userInterests = []; //for tag
+
+    const interestInput = document.getElementById("interestInput");
+    const interestTags = document.getElementById("interestTags");
  
 
  
@@ -866,6 +869,9 @@ function enableCameraSwitch() {
 
                 const hasActivePlan = (isLoggedIn && productId > 0 && endDate > new Date());
 
+                //tags
+                //const interests = ChatTags.getTags();
+
                 //console.log(" Waiting js=>hasActivePlan" , hasActivePlan);
                 // 6️⃣ Give WebRTC time to fully close before restarting
                 await new Promise(r => setTimeout(r, 1000)); // waits 1 second
@@ -887,7 +893,7 @@ function enableCameraSwitch() {
                                     //if is for, in case match happens in the delay period, then dont call relaxed search.
                                     if(!isMatched) {
                                     setStatus(`Expanding search for ${desiredGender} in all continents...`, "info");
-                                    await connection.invoke("StartSearchingRelaxed", myGender, desiredGender);
+                                    await connection.invoke("StartSearchingRelaxed", myGender, desiredGender, interests);
                                         }
                                 } catch (err) {
                                     //console.error("Relaxed search failed:", err);
@@ -905,7 +911,7 @@ function enableCameraSwitch() {
                             fallbackTimer = setTimeout(async () => {
                             try {
                                 setStatus(`Searching for ${desiredGender} in ${desiredContinent}...`, "info");
-                                await connection.invoke("StartSearchingStrict", myGender, desiredGender, desiredContinent);
+                                await connection.invoke("StartSearchingStrict", myGender, desiredGender, desiredContinent, interests);
                         
                                 
                             } catch (err) {
@@ -946,7 +952,7 @@ function enableCameraSwitch() {
 
         // Matched payload may be object with .partner / .Partner and isInitiator / IsInitiator
 
-        connection.on("Matched", async (payload, role, partnerCountry, partnerCity, partnerGenderIcon, isPaidPartner) => {
+        connection.on("Matched", async (payload, role, partnerCountry, partnerCity, partnerGenderIcon, isPaidPartner, commonInterests) => {
             // ✅ mark matched state so “Searching...” won't override later
             isMatched = true;
             setStatus("🎉 Partner found!", "success");
@@ -964,7 +970,9 @@ function enableCameraSwitch() {
             
             //console.log("Matched with partner:",  partnerCity, partnerCountry, partnerGenderIcon);
 
-            if (infoDiv) {
+             if (infoDiv) {
+
+                const parts = [];
                     //for paid users
                     let badgeHtml = "";
 
@@ -975,8 +983,40 @@ function enableCameraSwitch() {
                             </span>
                         `;
                     }
-                    // Set location text + icon
-                    infoDiv.innerHTML = `🌍 ${partnerCity}, ${partnerCountry} , <span id="genderIcon">${partnerGenderIcon}</span> , ${badgeHtml}`;
+                    //tags
+                    /*
+                    let interestHtml = commonInterests?.length
+                                    ? `<div class="common-interests">
+                                        ❤️ Common interests: ${commonInterests.join(", ")}
+                                    </div>`
+                                    : "";
+                    */
+                    // Set location text + gender icon + tags
+                    //infoDiv.innerHTML = `🌍 ${partnerCity}, ${partnerCountry} , <span id="genderIcon">${partnerGenderIcon}</span> , ${badgeHtml} , ${interestHtml}`;
+                    
+                    // Location
+                    if (partnerCity || partnerCountry) {
+                        parts.push(`🌍 ${[partnerCity, partnerCountry].filter(Boolean).join(", ")}`);
+                    }
+
+                    // Gender
+                    if (partnerGenderIcon) {
+                        parts.push(`<span id="genderIcon">${partnerGenderIcon}</span>`);
+                    }
+                    // Paid badge
+                    if (isPaidPartner) {
+                        parts.push(`
+                            <span class="paid-badge" title="Premium Member">
+                                💎 Premium
+                            </span>
+                        `);
+                    }
+                    // Common interests (INLINE, not div)
+                    if (commonInterests?.length) {
+                        parts.push(`<br>❤️ common interest: ${commonInterests.join(", ")}`);
+                    }
+
+                    infoDiv.innerHTML = parts.join(" ");
 
                     const genderSpan = document.getElementById("genderIcon");
 
@@ -995,7 +1035,7 @@ function enableCameraSwitch() {
                     }
                 }
 
-            try {
+             try {
 
                 //console.log("Matched payload:", payload);
 
@@ -1034,7 +1074,7 @@ function enableCameraSwitch() {
 
                 }
 
-            } catch (e) {
+             } catch (e) {
 
                 console.error("Matched handler error:", e);
 
@@ -1317,6 +1357,8 @@ function enableCameraSwitch() {
         
         // 🔄 RESET UI STATE FIRST
             resetMediaButtonsUI();
+        // hide interests / tags
+        interestsWrapper.classList.add("hidden");
 
         // start camera (user gesture)
 
@@ -1588,18 +1630,20 @@ function enableCameraSwitch() {
 
             }
 
+            //
+            const interests = ChatTags.getInterests();
           
             if (hasActivePlan) {
                 // Paid or admin user - start strict search
                 setStatus(`Searching for ${desiredGender} in ${desiredContinent}...`, "info");
                 //console.log("StartSearchingStrict my gender=>",myGender, "-",  desiredGender , "-", desiredContinent);
-                await connection.invoke("StartSearchingStrict", myGender, desiredGender, desiredContinent);
+                await connection.invoke("StartSearchingStrict", myGender, desiredGender, desiredContinent, interests);
                 myGenderSelect.style.display = "none";  // hide gender select while chatting
                 } else {
                 // Free or anonymous user
                 setStatus("Searching for a partner...", "info");
                 //console.log("StartSearchingFree my gender=>",myGender, "-", desiredGender , "-", desiredContinent);
-                await connection.invoke("StartSearchingFree", myGender, desiredContinent);
+                await connection.invoke("StartSearchingFree", myGender, desiredContinent, interests);
                 myGenderSelect.style.display = "none";  // hide gender select while chatting
                 }
             } catch (e) {
@@ -1669,6 +1713,8 @@ function enableCameraSwitch() {
         stopBtn.disabled = true;
         //myGenderSelect dispaly
         myGenderSelect.style.display = "inline-block"; 
+        // show interests / tags
+        interestsWrapper.classList.remove("hidden");
         try {
             if (connection && connection.state === signalR.HubConnectionState.Connected) {
                 await connection.invoke("Stop");
@@ -2038,6 +2084,11 @@ function enableCameraSwitch() {
         toggleCamera = document.getElementById("toggleCamera");
         toggleMic = document.getElementById("toggleMic");
 
+        //tag / interests
+            if (!interestsWrapper) return;
+        // ✅ Page refresh → visible
+            interestsWrapper.classList.remove("hidden");
+
         // sanity check
 
         if (!startBtn || !nextBtn || !stopBtn || !localVideo || !remoteVideo) {
@@ -2082,6 +2133,9 @@ function enableCameraSwitch() {
         initSignalR();
 
         //console.log("UI initialized");
+
+        // 🔹 INIT TAG SYSTEM
+        ChatTags.init("interestInput", "interestTags");
 
     });
 

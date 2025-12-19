@@ -118,6 +118,8 @@
     document.getElementById("restartSearchBtn")?.addEventListener("click", () => {
         modal.style.display = "none";
         localStorage.setItem(PAGE_KEY, Date.now().toString());
+        // Reload page
+         window.location.reload();
     });
 
     }
