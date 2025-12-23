@@ -869,8 +869,8 @@ function enableCameraSwitch() {
 
                 const hasActivePlan = (isLoggedIn && productId > 0 && endDate > new Date());
 
-                //tags
-                //const interests = ChatTags.getTags();
+                //tags / interests
+                const interests = ChatTags.getTags();
 
                 //console.log(" Waiting js=>hasActivePlan" , hasActivePlan);
                 // 6️⃣ Give WebRTC time to fully close before restarting
@@ -1630,7 +1630,7 @@ function enableCameraSwitch() {
 
             }
 
-            //
+            //interests
             const interests = ChatTags.getInterests();
           
             if (hasActivePlan) {
