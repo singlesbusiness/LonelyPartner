@@ -931,7 +931,7 @@ function enableCameraSwitch() {
                             try
                             {
                                 setStatus("Searching for a partner...", "info");
-                                await connection.invoke("StartSearchingFree", myGender, desiredContinent);
+                                await connection.invoke("StartSearchingFree", myGender, desiredContinent , interests);
                             }
                             catch (err) {
                                         //console.error("Search failed:", err);
