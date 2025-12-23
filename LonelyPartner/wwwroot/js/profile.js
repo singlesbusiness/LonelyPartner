@@ -195,7 +195,7 @@ profileBtn.addEventListener("click", async () => {
                     profProductEl.style.color = "red";
                 } else if (isActivePlan()) {
                     // Active plan
-                    profProductEl.innerText = `${data.productName} (Active)`;
+                    profProductEl.innerText = `💎 Premium - ${data.productName} (Active)`;
                     profProductEl.style.color = "green";
                 } else {
                     // Inactive plan
