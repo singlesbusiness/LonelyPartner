@@ -1238,7 +1238,7 @@ nav {
     font-size: 18px;
 }
 
-/*paid member badge*/
+/*paid member badge in chat*/
 .paid-badge {
     display: inline-block;
     margin-left: 8px;
@@ -1251,6 +1251,21 @@ nav {
     vertical-align: middle;
     box-shadow: 0 0 6px rgba(255, 152, 0, 0.6);
 }
+
+/*paid member badge in local video*/
+.premium-badge {
+    margin-left: 6px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #6b4f00;
+    background: linear-gradient(135deg, #ffe680, #f5c542);
+    border-radius: 12px;
+    border: 1px solid #e0b200;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
 
 /* for interest tag*/
 .hidden {

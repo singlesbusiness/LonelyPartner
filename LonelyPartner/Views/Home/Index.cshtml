@@ -155,7 +155,13 @@
                 <div class="vertical-divider" id="verticalDivider"></div>
 
                 <div id="localVideoBlock" class="video-block small">
-                    <div class="label">You</div>
+                   @* <div class="label">You</div>  *@
+                    <div class="label">
+                        <span>You</span>
+                        <span id="localPremiumBadge" class="premium-badge" style="display:none;">
+                            💎
+                        </span>
+                    </div>
                     <video id="localVideo" autoplay muted playsinline></video>
                     <div class="placeholder" id="localPlaceholder">
                         <div class="avatar" id="localavatar">🎥</div>
@@ -534,6 +540,8 @@
             } else {
                 //console.log("✅ User is authenticated according to Razor context.");
             }
+
+        
         </script>
 
         <!--===================================================-->

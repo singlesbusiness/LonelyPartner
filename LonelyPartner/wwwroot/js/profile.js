@@ -33,8 +33,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         }
 
- 
+            //For paid member badge in local video
+            if (isActivePlan()) {
 
+                const badge = document.getElementById("localPremiumBadge");
+                if (!badge || !window.appUser) return;
+     
+                badge.style.display = "inline-flex";
+
+           }   
         //console.table(window.appUser);
 
  
