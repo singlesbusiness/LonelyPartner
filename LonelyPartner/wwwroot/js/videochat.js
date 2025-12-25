@@ -327,7 +327,7 @@ function enableCameraSwitch() {
                     }
                 */
                 video: {
-                    facingMode: { exact: currentFacingMode }, // "user" | "environment"
+                    facingMode: { exact: usingBackCamera }, // "user" | "environment"
 
                     width: { min: 640, ideal: 7680, max: 7680 },
 
