@@ -1,231 +1,575 @@
-/* ---------------------------------------------------------
-   📱 MOBILE UI — Applies only on screens <= 768px
-----------------------------------------------------------*/
-@media (max-width: 768px) {
+        /* ---------------------------------------------------------
+        📱 FINAL MOBILE LAYOUT (≤ 768px)
+        ----------------------------------------------------------*/
+        @media (max-width: 768px) {
 
-    /* Overall container becomes vertical */
-    .container {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100%;
-        height: auto !important;
-        overflow: visible;
-    }
+            /* make main container vertical */
+            .container {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                height: auto !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
 
-    /* LEFT & RIGHT PANELS stack vertically */
-    .left-panel,
-    .right-panel {
-        width: 100% !important;
-        height: auto !important;
-        display: block !important;
-        padding: 0;
-    }
+        /* Remove all gaps */
+            .container,
+            .left-panel,
+            .right-panel {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        
+            .center {
+                margin: auto;
+                height: 28px !important;
+                width: 85%;
+                padding: 0 !important;
+            }
+            .header-link{
+                width: 80%;
+                font-size: 16px;
+                text-decoration: none;
+                color: inherit; 
+            }
+            .menu-toggle {
+                display: flex;
+                flex-direction: column;
+                position: fixed !important;
+                top: 10px;
+                right: 12px;
+                z-index: 9999;
+                transform: scale(0.75); /* smaller */
+                opacity: 0.85;
+                cursor: pointer;
+            }
+            .menu-toggle span {
+                width: 14px;
+                height: 2px;
+                background: white;
+                margin: 2px 0;
+                display: block;
+            }
+            /* Left panel contains ONLY videos */
+            .left-panel {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                order: 1; /* BELOW controls */
+            }
 
-    /* --------------------------------------
-       🔹 1. Start/Stop Buttons at the Top
-    ---------------------------------------*/
-    .right-panel .controls {
-        order: 1;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-        padding: 10px 0;
-        background: rgba(0,0,0,0.25);
-    }
+        /* Right panel contains controls + chat  */
+            .right-panel {
+                width: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+                order: 0 !important; /* buttons on top */
+                padding: 10px 10px 0 10px;
+            } 
+            /* ---------------------------------------------------------
+            🔹 1. CONTROLS MUST COME FIRST — ON TOP
+            ----------------------------------------------------------*/
+            
+            .controls {
+                order: 1 !important;
+                width: 100%;
+                padding: 5px 5px !important;
+                margin: 0 !important;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                justify-content: center;
+                background: rgba(0, 0, 0, 0.35);
+                z-index: 10;
+            }
+        
 
-    /* Make buttons larger on mobile */
-    .right-panel .controls .btn {
-        flex: 1 1 45%;
-        font-size: 16px;
-        padding: 12px;
-    }
+        
+            /* Buttons + selects layout */ 
+            .controls .btn,
+            .controls select {
+                flex: 1 1 30%;
+                padding: 1px;
+                font-size: 12px !important;
+                border-radius: 12px;
+                text-align: center;
+                height: 26px;
+            }
+         /*tags*/
+         #interestsWrapper {
+                order: 3 !important;
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px !important;
+            }
 
-    /* --------------------------------------
-       🔹 2. Remote Video (Full Width)
-    ---------------------------------------*/
-    #remoteVideoBlock {
-        order: 2;
-        width: 100%;
-        margin-top: 10px;
-    }
+            #interestsWrapper .interest-label {
+                flex: 0 0 auto;
+                font-size: 11px;
+                white-space: nowrap;
+            }
+            #interests {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
 
-    #remoteVideo {
-        width: 100% !important;
-        height: auto !important;
-        max-height: 55vh;
-        border-radius: 8px;
-        background: black;
-    }
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
 
-    /* Remote placeholder also full-width */
-    #remotePlaceholder {
-        width: 100%;
-    }
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+          }
+            #interestTags {
+                display: flex;
+                gap: 4px;
+                flex-wrap: nowrap;
+                white-space: nowrap;
+            }
 
-    /* Remote video controls pinned at bottom-left */
-    #remoteControls {
-        position: absolute;
-        bottom: 8px;
-        left: 8px;
-        display: flex;
-        gap: 8px;
-    }
+            .interest-input {
+                flex: 0 0 auto;
+                min-width: 120px;
+                height: 26px;
+                font-size: 12px;
+                padding: 0 10px;
+                border-radius: 10px;
+            }
+         /* Optional scrollbar styling */
+            #interests::-webkit-scrollbar {
+                height: 4px;
+            }
 
-    /* --------------------------------------
-       🔹 3. Local Video (Below Remote)
-    ---------------------------------------*/
-    #localVideoBlock {
-        order: 3;
-        width: 100%;
-        margin-top: 12px;
-    }
+            #interests::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.3);
+                border-radius: 4px;
+            }
+            
+        .chat-section {
+                display: flex; 
+                order: 2 !important;
+                width: 100%;
+        } 
+        #statusText{
+            display: flex; 
+            order: 1;
+            font-size: 8px !important;
+        }
+        #partnerInfo{
+            display: flex; 
+            order: 2;
+            font-size: 8px !important;
+        }
+        #chatinput {
+            display: none; /* hide separate chat section on mobile */
+        }
+            #messages{
+            display: none; /* hide separate chat section on mobile */
+        }
+        #emojiPicker{
+            display: none; /* hide separate chat section on mobile */
+        }
+        
+            /* ---------------------------------------------------------
+            🔹 2. REMOTE VIDEO — LARGE & PRIORITY
+            ----------------------------------------------------------*/
+            #remoteVideoBlock {
+                order: 1 !important;
+                width: 100% !important;
+                height: 75vh !important;   /* bigger placeholder */
+                min-height: 260px !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                position: relative !important;
+                
+                
+                
+                background: black;
+                overflow: hidden;  /* keeps button inside */
+                display: block !important;
+            }
 
-    #localVideo {
-        width: 100% !important;
-        height: auto !important;
-        max-height: 35vh;
-        border-radius: 8px;
-        background: black;
-    }
+            #remoteVideo {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                object-fit: cover !important;  /* BEST for full fill without distortion */
+                background: black;
+            }
 
-    #localControls {
-        bottom: 8px;
-        right: 8px;
-        position: absolute;
-        display: flex;
-        gap: 8px;
-    }
+            /* Remote controls */
+            #remoteControls {
+                position: absolute;
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                bottom: 2px !important;   /* was 1px — pushes block height visually */
+                right: 1px !important;
+                z-index: 999;
+                display: flex;
+                gap: 10px;
+                pointer-events: auto;
+            }
+            #remotelable{
+                z-index: 30;
+                display: none;
+            }
+            #remoteavatar{
+                align-items: center;
+                justify-content: center;
+                width: 38px;
+                height: 38px;
+                top: 50px;
+                left: 50px;
+                z-index: 20;
+            }
+            /* Extra protection to remove invisible spacing below video */
+            #remoteVideoBlock > * {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            /* ---------------------------------------------------------
+            🔹 3. LOCAL VIDEO — BELOW REMOTE
+            ----------------------------------------------------------*/
+            #localVideoBlock {
+                order: 2 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                position: relative !important;
+                height: 20vh !important;   /* larger placeholder */
+                min-height: 130px !important;
+                max-height: 260px !important;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: black;
+                overflow: hidden;  /* keeps button inside */
+            }
+            
+            #sub{
+                color:#fff;
+            }
+            #localVideo {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                background: black;
+            } 
+            
 
-    /* --------------------------------------
-       🔹 Chat Section (Below Local Video)
-    ---------------------------------------*/
-    .chat-section {
-        order: 4;
-        width: 100%;
-        margin-top: 16px;
-        padding: 0 10px;
-    }
+            #localControls {
+                position: absolute;
+                top: 2px;
+                right: 50px;
+                display: flex;
+                gap: 8px;
+                
+            }
+            .avatar{
+                align-items: center;
+                justify-content: center;
+                width: 38px;
+                height: 38px;
+                top: 50px;
+                left: 50px;
 
-    .messages {
-        max-height: 35vh;
-        overflow-y: auto;
-        padding: 10px;
-    }
+            }
+            .switch-camera-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            /* Position at top-right of video */
+            position: absolute;
+            top: 2px;    /* slightly spaced from edge */
+            right: 2px;  /* aligns to top-right corner */
+            z-index: 20;
+            pointer-events: auto !important;
+        }
+            /* ===============================
+            📌 TEXT CHAT OVERLAY ON LOCAL VIDEO
+            Displays when user types
+            ==================================*/
+            #mobileChatOverlay {
+                display: none;
+                position: absolute;
+                bottom: 50px; /* above bottom bar */
+                left: 0;
+                right: 0;
+                max-height: 45%;
+                overflow-y: auto;
+                background: rgba(0, 0, 0, 0.55);
+                color: white;
+                padding: 10px;
+                font-size: 14px;
+                z-index: 9999;
+            }
+            #mobileChatInput {
+                display: none;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                padding: 1px;
+                background: rgba(79, 75, 75, 0.85);
+                z-index: 99999;
+                
+                align-items: center;
+                gap: 6px;
+            }
+        /* Chat input box */
+            #mobileChatText {
+                flex: 1;                     /* Makes input full-width */
+                height: 30px;                /* taller input */
+                padding: 0 12px;
+                border-radius: 8px;
+                border: none;
+                font-size: 16px;
+            }
+            /* Send button smaller + right aligned */
+            #sendChatmobile {
+                height: 40px;
+                padding: 0 14px;
+                font-size: 15px;
+                border-radius: 8px;
+                white-space: nowrap;        /* prevents wrapping */
+            }
+            /*
+            #mobileChatInput, #input #sendChatmobile{
+                width: 100%;
+                height: 30px;
+                padding: 0 !important;
+                border-radius: 2px;
+                border: none;
+                font-size: 16px;
+            }
+        */
+            /* ******************************************************************
+        📱 MOBILE CHAT — MESSAGE HISTORY OVER LOCAL VIDEO
+        ******************************************************************* */
+        #mobileChatMessages {
+            display: none;
+            position: absolute;
+            bottom: 1px;       /* above input area */
+            left: 0;
+            right: 0;
+            max-height: 22%;
+            overflow-y: auto;
+            padding: 5px;
+            font-size: 14px;
+            background: transparent !important; /* transparent bubble */
+            color: white;
+            z-index: 9998;      /* below input, above video */
+            pointer-events: none !important;    /* allows video taps to pass through */
+        }
 
-    .chat-input {
-        display: flex;
-        gap: 10px;
-        padding: 10px 0;
-    }
+        /* Chat bubbles */
+        .message {
+            margin-bottom: 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            max-width: 80%;
+            display: block !important;
+            pointer-events: auto;
+            background: transparent !important; /* transparent bubble */
+            color: white !important;
+            backdrop-filter: none !important;
+        }
 
-    /* --------------------------------------
-       Layout cleanup for mobile
-    ---------------------------------------*/
-    .vertical-divider,
-    .splitter {
-        display: none !important;
-    }
+        .message.me {
+            background: transparent !important;
+            margin-right: auto;
+        }
 
-    .label {
-        font-size: 16px !important;
-        text-align: left;
-        margin-bottom: 6px;
-        padding-left: 4px;
-    }
+        .message.other {
+            background: transparent !important;
+            margin-right: auto;
+        }
 
-    video {
-        object-fit: cover !important;
-    }
+            /* ===============================
+            📌 FIXED BOTTOM ICON BAR
+            ==================================*/
+            #mobileBottomBar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 20px;
+                padding: 0 !important;
+                background: rgba(81, 79, 79, 0.75);
+                display: flex;
+                justify-content: center;
+                z-index: 99999;
+            }
+            #mobileBottomBar .chat-icon {
+                font-size: 20px;
+                color: white;
+                cursor: pointer;
+            }
 
-    /* Fix menu button overlapping */
-    .menu-toggle {
-        position: fixed;
-        top: 10px;
-        right: 12px;
-        z-index: 9999;
-    }
+            /* Clean up */
+            .vertical-divider
+            {
+                display: none !important;
+            }
 
-    /* Prevent giant spacing from global styles */
-    body {
-        padding: 0 !important;
-        margin: 0 !important;
-        overflow-x: hidden !important;
-    }
-}
-  /* ============================================================
-       MOBILE-SPECIFIC MODAL BEHAVIOR (SEPARATE CONFIGS)
-       — Every modal can be edited independently
-============================================================ */
+            /*for consent buttons to work*/
+            #mobileChatOverlay,
+            #mobileChatMessages {
+            
+            pointer-events: none !important;
+            z-index: 10 !important;
+        }
+        /* ============================================================
+            MOBILE-SPECIFIC MODAL BEHAVIOR (SEPARATE CONFIGS)
+            — Every modal can be edited independently
+        ============================================================ */
 
-    /* ---- GENERAL FIX FOR ALL modal overlays ---- */
-    .cs-modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.70);
-        display: none;              /* hidden unless JS shows it */
-        justify-content: center;
-        align-items: center;
-        z-index: 99999;
-        padding: 0 12px;
-    }
+            /* ---- GENERAL FIX FOR ALL modal overlays ---- */
+            .cs-modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 60%;
+                height: 70%;
+                background: rgba(0,0,0,0.70);
+                display: none;              /* hidden unless JS shows it */
+                justify-content: center;
+                align-items: center;
+                z-index: 99999;
+                padding: 0 12px;
+            }
 
-    .cs-modal-content {
-        width: 90%;
-        max-height: 85vh;
-        overflow-y: auto;
-        border-radius: 14px;
-        padding: 16px;
-        background: #1e003b;
-        position: relative;
-    }
+            .cs-modal-content {
+                width: 90%;
+                max-height: 85vh;
+                overflow-y: auto;
+                border-radius: 14px;
+                padding: 14px;
+                background: #1e003b;
+                position: relative;
+            }
+        
 
-    .cs-modal-close {
-        position: absolute;
-        top: 8px;
-        right: 12px;
-        font-size: 26px;
-        cursor: pointer;
-        color: #fff;
-        z-index: 5;
-    }
+            .cs-modal-close {
+                position: absolute;
+                top: 8px;
+                right: 12px;
+                font-size: 26px;
+                cursor: pointer;
+                color: #fff;
+                z-index: 5;
+            }
 
-    /* ---- CONSENT MODAL ---- */
-    #consentModal.cs-modal-overlay {
-        display: flex !important; /* ONLY modal visible on load */
-    }
-    #consentModal .cs-modal-content {
-        background: #24004d;
-    }
+            /* ---- CONSENT MODAL ---- */
+        
+        /* Modal box */
+        #consentModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
 
-    /* ---- LOGIN MODAL ---- */
-    #loginModal .cs-modal-content {
-        background: #26005a;
-    }
+            width: 92vw;
+            max-width: 500px;
+            max-height: 100vh;
 
-    /* ---- PROFILE MODAL ---- */
-    #profileModal .cs-modal-content {
-        background: #1a0038;
-    }
+            background: #24004d;
+            border-radius: 16px;
 
-    /* ---- UPGRADE MODAL ---- */
-    #upgradeModal .cs-modal-content {
-        background: #32006b;
-    }
+            padding: 2px;
+            z-index: 999999999 !important;
 
-    /* ---- SOLANA PAYMENT MODAL ---- */
-    #solModal .cs-modal-content {
-        background: #1f0033;
-    }
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-    /* QR size fix */
-    #solQrCanvas {
-        width: 220px !important;
-        height: 220px !important;
-        display: block;
-        margin: 10px auto;
-    }
+            pointer-events: auto; /* important */
+            
+            /* for testing
+            display: none !important;
+            */
+        }
+
+        /* Scrollable modal content */
+        #consentModalContent {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            z-index: 999999 !important;
+            pointer-events: auto !important;
+        }
+        
+
+        /* Buttons MUST have pointer events */
+        #consentModalContent button {
+            pointer-events: auto !important;
+        }
+
+  
+
+        /* Enable modal itself */
+        #consentModal,
+        #consentModal * {
+            pointer-events: auto !important;
+            z-index: 9999999 !important;
+        }
+
+            /* ---- LOGIN MODAL ---- */
+            #loginModal .cs-modal-content {
+                background: #26005a;
+               
+            }
+
+            /* ---- PROFILE MODAL ---- */
+            #profileModal {
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                width: 92vw;
+                max-width: 500px;
+                max-height: 85vh;
+                
+                background: #1a0038;
+            }
+
+            /* ---- UPGRADE MODAL ---- */
+            #upgradeModal .cs-modal-content {
+                background: #32006b;
+            }
+
+            /* ---- SOLANA PAYMENT MODAL ---- */
+            #solModal .cs-modal-content {
+                background: #1f0033;
+            }
+
+            /* QR size fix */
+            #solQrCanvas {
+                width: 220px !important;
+                height: 220px !important;
+                display: block;
+                margin: 10px auto;
+            }
+
+           .cs-modal-content[style*="display"] #remoteControls {
+                display: none !important;
+            }
+
+
+        }

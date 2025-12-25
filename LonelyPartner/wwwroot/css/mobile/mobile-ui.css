@@ -185,9 +185,6 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 position: relative !important;
-                
-                
-                
                 background: black;
                 overflow: hidden;  /* keeps button inside */
                 display: block !important;
@@ -245,9 +242,13 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 position: relative !important;
-                height: 20vh !important;   /* larger placeholder */
+                height: 65vh !important;   /* bigger placeholder */
+                min-height: 260px !important;
+                /*
+                height: 20vh !important;  
                 min-height: 130px !important;
                 max-height: 260px !important;
+                */
                 display: flex;
                 justify-content: center;
                 align-items: center;

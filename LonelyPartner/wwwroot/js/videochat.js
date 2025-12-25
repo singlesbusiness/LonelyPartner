@@ -35,7 +35,10 @@
     let fallbackTimer = null; //for fallback match,set to 5sec in on.waiting
 
     const userInterests = []; //for tag
-
+    //local camera and mic toggle buttons state
+    let isCameraOn = true;
+    let isMicOn = true;
+    let currentFacingMode = "user"; // "user" | "environment"
     const interestInput = document.getElementById("interestInput");
     const interestTags = document.getElementById("interestTags");
  
@@ -230,15 +233,20 @@ function enableCameraSwitch() {
     const switchBtn = document.getElementById("switchCameraBtn");
 
     switchBtn.onclick = async () => {
-        try {
+        try {   
+                /*
                 if (!pc) {
                     //alert("Peer connection not ready yet!");
                     return;
                 }
+                */
                     usingBackCamera = !usingBackCamera;
                     // Stop old stream
+                    
                     if (localStream) {
                         localStream.getTracks().forEach(t => t.stop());
+                        //Stop ONLY the video track (keep mic alive)
+                        //localStream.getVideoTracks().forEach(t => t.stop());
                     }
                     
                     const constraints = {
@@ -248,7 +256,7 @@ function enableCameraSwitch() {
                                 : { ideal: "user" },
                             width: { ideal: 1920, max: 3840 },
                             height: { ideal: 1080, max: 2160 },
-                            frameRate: { ideal: 60, max: 60 }
+                            frameRate: { ideal: 30, max: 60 }
                         },
                         audio: {
                             echoCancellation: true,
@@ -279,6 +287,11 @@ function enableCameraSwitch() {
                     }
 
                     localStream = newStream;
+                    //for toggle icons
+                    isCameraOn = true;
+                    toggleCamera.classList.remove("off");
+                    isMicOn = true;
+                    toggleMic.classList.remove("off");
             
             } catch (err) {
                     console.error(err);
@@ -299,8 +312,21 @@ function enableCameraSwitch() {
             //const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
             const s = await navigator.mediaDevices.getUserMedia({
-
+                /*
                 video: {
+                        facingMode: currentFacingMode, // "user" | "environment"
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        frameRate: { ideal: 30, max: 60 }
+                    },
+                audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        channelCount: 1
+                    }
+                */
+                video: {
+                    facingMode: currentFacingMode, // "user" | "environment"
 
                     width: { min: 640, ideal: 7680, max: 7680 },
 
@@ -319,6 +345,7 @@ function enableCameraSwitch() {
                     channelCount: 2
 
                 }
+                
 
             });
 
@@ -343,9 +370,14 @@ function enableCameraSwitch() {
             }
 
             //console.log("Local camera started", s.getTracks().map(t => t.kind));
+            //for toggle icons
+            isCameraOn = true;
+            toggleCamera.classList.remove("off");
+            isMicOn = true;
+            toggleMic.classList.remove("off");
 
             return s;
-
+   
         } catch (e) {
 
             error("getUserMedia failed:", e);
@@ -360,12 +392,12 @@ function enableCameraSwitch() {
 
     function stopCamera(calledfrom = "") {
 
-        // 1️⃣ Stop local video stream
+        // 1️⃣ Stop local video stream and releases camera hardware
         if (localStream) {
 
             localStream.getTracks().forEach(t => t.stop());
 
-            localStream = null;
+            //localStream = null;
 
         }
         // 2️⃣ Hide local video preview
@@ -374,10 +406,15 @@ function enableCameraSwitch() {
             localVideo.srcObject = null;
 
             localVideo.style.display = "none";
-
-            if (localPlaceholder) localPlaceholder.style.display = "block";
+        }
+        if (localPlaceholder)  {
+                localPlaceholder.style.display = "block";
 
         }
+
+        // State + button UI
+        isCameraOn = false;
+        //toggleCamera.classList.add("off");
 
         //console.log("Local camera stopped");
         //stops pc connection and stops remote camera
@@ -1668,6 +1705,13 @@ function enableCameraSwitch() {
         // 2️⃣ End local media cleanly
         endCallLocal();
         //PartnerLeft();
+        if( isCameraOn = false){
+           toggleCamera.classList.add("off"); 
+        }
+        if( isCameraOn = true){
+           toggleCamera.classList.remove("off"); 
+        }
+        
 
         try {
 
@@ -2188,14 +2232,31 @@ function enableCameraSwitch() {
         if (!localStream) return;
 
         const videoTrack = localStream.getVideoTracks()[0];
+        if (!videoTrack) return;
 
-        if (videoTrack) {
+        isCameraOn = !isCameraOn;
+        videoTrack.enabled = isCameraOn;
 
-            videoTrack.enabled = !videoTrack.enabled;
+        toggleCamera.classList.toggle("off", !isCameraOn);
 
-            btn.classList.toggle("off", !videoTrack.enabled);
-
+        if (!isCameraOn) {
+            localVideo.style.display = "none";
+            localPlaceholder.style.display = "block";
+        } else {
+            localVideo.style.display = "block";
+            localPlaceholder.style.display = "none";
         }
+            /*
+            const videoTrack = localStream.getVideoTracks()[0];
+
+            if (videoTrack) {
+
+                videoTrack.enabled = !videoTrack.enabled;
+
+                btn.classList.toggle("off", !videoTrack.enabled);
+
+            }
+            */
 
     });
 
@@ -2208,7 +2269,13 @@ function enableCameraSwitch() {
         if (!localStream) return;
 
         const audioTrack = localStream.getAudioTracks()[0];
+        if (!audioTrack) return;
 
+        isMicOn = !isMicOn;
+        audioTrack.enabled = isMicOn;
+
+        btn.classList.toggle("off", !isMicOn);
+        /*
         if (audioTrack) {
 
             audioTrack.enabled = !audioTrack.enabled;
@@ -2216,6 +2283,7 @@ function enableCameraSwitch() {
             btn.classList.toggle("off", !audioTrack.enabled);
 
         }
+        */
 
     });
 
