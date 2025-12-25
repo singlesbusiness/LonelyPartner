@@ -242,13 +242,14 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 position: relative !important;
-                height: 40vh !important;   /* bigger placeholder */
-                min-height: 200px !important;
                 /*
-                height: 20vh !important;  
+                height: 40vh !important;  
+                min-height: 200px !important;
+                */
+                height: 25vh !important;  
                 min-height: 130px !important;
                 max-height: 260px !important;
-                */
+               
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -315,7 +316,8 @@
                 right: 0;
                 max-height: 45%;
                 overflow-y: auto;
-                background: rgba(0, 0, 0, 0.55);
+                /*background: rgba(0, 0, 0, 0.55);*/
+                background: transparent !important; /* transparent bubble */
                 color: white;
                 padding: 10px;
                 font-size: 14px;
