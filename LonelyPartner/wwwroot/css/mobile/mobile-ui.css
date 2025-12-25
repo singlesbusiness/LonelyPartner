@@ -247,8 +247,8 @@
                 min-height: 200px !important;
                 */
                 height: 25vh !important;  
-                min-height: 130px !important;
-                max-height: 260px !important;
+                min-height: 160px !important;
+                max-height: 200px !important;
                
                 display: flex;
                 justify-content: center;
@@ -330,7 +330,8 @@
                 left: 0;
                 width: 100%;
                 padding: 1px;
-                background: rgba(79, 75, 75, 0.85);
+                /*background: rgba(79, 75, 75, 0.85);*/
+                background: transparent !important; /* transparent bubble */
                 z-index: 99999;
                 
                 align-items: center;

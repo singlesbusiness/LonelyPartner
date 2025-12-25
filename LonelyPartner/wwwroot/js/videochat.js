@@ -260,7 +260,7 @@ function enableCameraSwitch() {
                                 : { ideal: "user" },
                             width: { ideal: 1920, max: 3840 },
                             height: { ideal: 1080, max: 2160 },
-                            frameRate: { ideal: 30, max: 60 }
+                            frameRate: { ideal: 60, max: 60 }
                         },
                         audio: false // keep existing mic
                     };
