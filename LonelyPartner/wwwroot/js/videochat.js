@@ -255,7 +255,7 @@ function enableCameraSwitch() {
                     
                     const constraints = {
                         video: {
-                            facingMode: usingBackCamera 
+                            facingMode: currentFacingMode 
                                 ? { ideal: "environment" } 
                                 : { ideal: "user" },
                             width: { ideal: 1920, max: 3840 },
@@ -327,7 +327,7 @@ function enableCameraSwitch() {
                     }
                 */
                 video: {
-                    facingMode: { exact: usingBackCamera }, // "user" | "environment"
+                    facingMode: { exact: currentFacingMode }, // "user" | "environment"
 
                     width: { min: 640, ideal: 7680, max: 7680 },
 
