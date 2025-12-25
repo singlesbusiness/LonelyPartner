@@ -242,8 +242,8 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 position: relative !important;
-                height: 65vh !important;   /* bigger placeholder */
-                min-height: 260px !important;
+                height: 40vh !important;   /* bigger placeholder */
+                min-height: 200px !important;
                 /*
                 height: 20vh !important;  
                 min-height: 130px !important;

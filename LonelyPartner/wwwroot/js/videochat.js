@@ -240,13 +240,17 @@ function enableCameraSwitch() {
                     return;
                 }
                 */
+                    // 🔹 Ensure camera is running (WAITING or MATCHED)
+                    if (!localStream) {
+                        await startCamera();
+                    }
                     usingBackCamera = !usingBackCamera;
                     // Stop old stream
                     
                     if (localStream) {
-                        localStream.getTracks().forEach(t => t.stop());
+                        //localStream.getTracks().forEach(t => t.stop());
                         //Stop ONLY the video track (keep mic alive)
-                        //localStream.getVideoTracks().forEach(t => t.stop());
+                        localStream.getVideoTracks().forEach(t => t.stop());
                     }
                     
                     const constraints = {
@@ -258,10 +262,7 @@ function enableCameraSwitch() {
                             height: { ideal: 1080, max: 2160 },
                             frameRate: { ideal: 30, max: 60 }
                         },
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true
-                        }
+                        audio: false // keep existing mic
                     };
             
                     const newStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -276,13 +277,13 @@ function enableCameraSwitch() {
                         const senders = pc.getSenders();
 
                         const videoTrack = newStream.getVideoTracks()[0];
-                        const audioTrack = newStream.getAudioTracks()[0];
+                        //const audioTrack = newStream.getAudioTracks()[0];
             
                         const videoSender = senders.find(s => s.track?.kind === "video");
                         if (videoSender) await videoSender.replaceTrack(videoTrack);
             
-                        const audioSender = senders.find(s => s.track?.kind === "audio");
-                        if (audioSender) await audioSender.replaceTrack(audioTrack);
+                        //const audioSender = senders.find(s => s.track?.kind === "audio");
+                        //if (audioSender) await audioSender.replaceTrack(audioTrack);
                         
                     }
 
@@ -1705,11 +1706,18 @@ function enableCameraSwitch() {
         // 2️⃣ End local media cleanly
         endCallLocal();
         //PartnerLeft();
-        if( isCameraOn = false){
+        //toggle cam/mic icons
+        if( isCameraOn === false){
            toggleCamera.classList.add("off"); 
         }
-        if( isCameraOn = true){
+        if( isCameraOn === true){
            toggleCamera.classList.remove("off"); 
+        }
+        if( isMicOn === false){
+           toggleMic.classList.add("off"); 
+        }
+        if( isMicOn === true){
+           toggleMic.classList.remove("off"); 
         }
         
 
