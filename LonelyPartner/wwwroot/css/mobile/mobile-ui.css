@@ -174,7 +174,7 @@
             display: none; /* mobile has emoji inbuilt */
         }
         #nextBtn{
-            display: none; /*on mobile version we have an arrow overlay*/
+            display: none !important;; /*on mobile version we have an arrow overlay*/
         }
             /* ---------------------------------------------------------
             🔹 2. REMOTE VIDEO — LARGE & PRIORITY
