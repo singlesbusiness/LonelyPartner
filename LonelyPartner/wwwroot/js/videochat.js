@@ -58,7 +58,7 @@
 
     let localStream = null;
     
-    //for bck camera on mobile
+    //for bck camera on mobile , value => false = front, true = back
     let usingBackCamera = false;
 
     let pc = null;
@@ -244,6 +244,7 @@ function enableCameraSwitch() {
                     if (!localStream) {
                         await startCamera();
                     }
+                    // 🔁 Toggle camera
                     usingBackCamera = !usingBackCamera;
                     // Stop old stream
                     
@@ -253,17 +254,34 @@ function enableCameraSwitch() {
                         localStream.getVideoTracks().forEach(t => t.stop());
                     }
                     
-                    const constraints = {
-                        video: {
-                            facingMode: currentFacingMode 
-                                ? { ideal: "environment" } 
-                                : { ideal: "user" },
-                            width: { ideal: 1920, max: 3840 },
-                            height: { ideal: 1080, max: 2160 },
-                            frameRate: { ideal: 60, max: 60 }
-                        },
-                        audio: false // keep existing mic
-                    };
+                    try {
+                        const constraints = {
+                         video: {
+                                facingMode: usingBackCamera 
+                                    ? { exact: "environment" } 
+                                    : { exact: "user" },
+                                width: { ideal: 1920, max: 3840 },
+                                height: { ideal: 1080, max: 2160 },
+                                frameRate: { ideal: 30, max: 60 }
+                                },
+                                audio: false // keep existing mic
+                            };
+                        }
+                         catch (err) {
+                            //console.warn("Exact facingMode failed, falling back:", err);
+                            const constraints = {
+                                video: {
+                                facingMode: usingBackCamera ? "environment" : "user",
+                                width: { ideal: 1920, max: 3840 },
+                                height: { ideal: 1080, max: 2160 },
+                                frameRate: { ideal: 30, max: 60 }
+                                },
+                                audio: false // keep existing mic
+                            };
+                        }
+                       
+                            
+                    
             
                     const newStream = await navigator.mediaDevices.getUserMedia(constraints);
             
