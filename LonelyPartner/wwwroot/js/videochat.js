@@ -254,8 +254,11 @@ function enableCameraSwitch() {
                         localStream.getVideoTracks().forEach(t => t.stop());
                     }
                     
+                    let newStream;
                     try {
-                        const constraints = {
+                        //const constraints = {
+                        // 1️⃣ Force exact camera (best)
+                         newStream = await navigator.mediaDevices.getUserMedia({
                          video: {
                                 facingMode: usingBackCamera 
                                     ? { exact: "environment" } 
@@ -265,11 +268,12 @@ function enableCameraSwitch() {
                                 frameRate: { ideal: 30, max: 60 }
                                 },
                                 audio: false // keep existing mic
-                            };
+                            });
                         }
                          catch (err) {
                             //console.warn("Exact facingMode failed, falling back:", err);
-                            const constraints = {
+                           // const constraints = {
+                           newStream = await navigator.mediaDevices.getUserMedia({
                                 video: {
                                 facingMode: usingBackCamera ? "environment" : "user",
                                 width: { ideal: 1920, max: 3840 },
@@ -277,13 +281,13 @@ function enableCameraSwitch() {
                                 frameRate: { ideal: 30, max: 60 }
                                 },
                                 audio: false // keep existing mic
-                            };
+                            });
                         }
                        
                             
                     
             
-                    const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    //const newStream = await navigator.mediaDevices.getUserMedia(constraints);
             
                     // Update video preview
                     const localVideo = document.getElementById("localVideo");
