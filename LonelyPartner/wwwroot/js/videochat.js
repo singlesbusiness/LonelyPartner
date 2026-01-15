@@ -246,6 +246,7 @@ function enableCameraSwitch() {
                     }
                     // 🔁 Toggle camera
                     usingBackCamera = !usingBackCamera;
+                    currentFacingMode = usingBackCamera ? "environment" : "user";
                     // Stop old stream
                     
                     if (localStream) {
@@ -260,9 +261,7 @@ function enableCameraSwitch() {
                         // 1️⃣ Force exact camera (best)
                          newStream = await navigator.mediaDevices.getUserMedia({
                          video: {
-                                facingMode: usingBackCamera 
-                                    ? { exact: "environment" } 
-                                    : { exact: "user" },
+                                facingMode: currentFacingMode,
                                 width: { ideal: 1920, max: 3840 },
                                 height: { ideal: 1080, max: 2160 },
                                 frameRate: { ideal: 30, max: 60 }
@@ -275,7 +274,7 @@ function enableCameraSwitch() {
                            // const constraints = {
                            newStream = await navigator.mediaDevices.getUserMedia({
                                 video: {
-                                facingMode: usingBackCamera ? "environment" : "user",
+                                facingMode: currentFacingMode,
                                 width: { ideal: 1920, max: 3840 },
                                 height: { ideal: 1080, max: 2160 },
                                 frameRate: { ideal: 30, max: 60 }
