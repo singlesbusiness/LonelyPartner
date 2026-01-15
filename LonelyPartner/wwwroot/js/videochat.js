@@ -1031,6 +1031,8 @@ function enableCameraSwitch() {
             setStatus("🎉 Partner found!", "success");
             //remote mic and cam icon display on for both local and remote
             remoteToggleMic.style.display = "inline-block";
+            //mobile next button
+            nextChevron.style.display = "inline-block";
             //toggleCamera.style.display = "inline-block";
             //toggleMic.style.display = "inline-block";
             // show partner’s location
@@ -1541,7 +1543,7 @@ function enableCameraSwitch() {
             //enable Next button       
             nextBtn.style.display = "inline-block";
             //mobile next button
-            nextChevron.style.display = "inline-block";
+            nextChevron.style.display = "none";
             //start button hide
             startBtn.style.display = "none";
             //enable stop button
