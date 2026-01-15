@@ -326,6 +326,8 @@ function enableCameraSwitch() {
                         channelCount: 1
                     }
                 */
+               //8K
+               /*
                 video: {
                     //facingMode: { exact: currentFacingMode }, // "user" | "environment"
 
@@ -336,6 +338,16 @@ function enableCameraSwitch() {
                     frameRate: { min: 15, ideal: 60, max: 60 }
 
                 },
+                */
+               //4k
+               
+                video: {
+                        facingMode: { exact: currentFacingMode }, // "user" | "environment"
+                        width: { ideal: 3840, max: 3840 },
+                        height: { ideal: 2160, max: 2160 },
+                        frameRate: { ideal: 30, max: 60 }
+                        
+                    },
 
                 audio: {
 
