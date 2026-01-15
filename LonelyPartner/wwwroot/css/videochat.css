@@ -1339,3 +1339,32 @@ nav {
     outline: none;
     padding: 4px 4px;
 }
+
+/*for arrow on mobile version*/
+.next-chevron {
+    display: none; /* hidden everywhere by default */
+}
+@media (max-width: 768px) {
+    .next-chevron {
+        display: block;
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        z-index: 20;
+        padding: 12px;
+        width: 36px;
+        height: 64px;
+        cursor: pointer;
+        filter: drop-shadow(0 0 6px rgba(242, 235, 28, 0.983));
+    }
+
+    .next-chevron::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-right: 4px solid rgb(231, 240, 52);
+        border-top: 4px solid rgb(244, 244, 8);
+        transform: rotate(45deg) skewY(-15deg);
+    }
+}

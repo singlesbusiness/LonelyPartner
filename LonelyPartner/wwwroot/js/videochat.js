@@ -19,7 +19,7 @@
 
     // DOM refs (populated on DOMContentLoaded)
 
-    let startBtn, nextBtn, stopBtn, girlsBtn;
+    let startBtn, nextBtn, stopBtn, girlsBtn, nextChevron;
 
     let localVideo, remoteVideo, localPlaceholder, remotePlaceholder;
 
@@ -363,10 +363,10 @@ function enableCameraSwitch() {
                //4k
                
                 video: {
-                        facingMode: { exact: currentFacingMode }, // "user" | "environment"
-                        width: { ideal: 3840, max: 3840 },
-                        height: { ideal: 2160, max: 2160 },
-                        frameRate: { ideal: 30, max: 60 }
+                        facingMode: { ideal: currentFacingMode }, // "user" | "environment"
+                        width: { min: 640, ideal: 3840, max: 3840 },
+                        height: { min:480, ideal: 2160, max: 2160 },
+                        frameRate: { min: 30, ideal: 30, max: 60 }
                         
                     },
 
@@ -376,7 +376,7 @@ function enableCameraSwitch() {
 
                     noiseSuppression: true,
 
-                    channelCount: 2
+                    //channelCount: 2
 
                 }
                 
@@ -414,7 +414,7 @@ function enableCameraSwitch() {
    
         } catch (e) {
 
-            error("getUserMedia failed:", e);
+            console.error("getUserMedia failed:", e);
 
             throw e;
 
@@ -563,7 +563,7 @@ function enableCameraSwitch() {
 
             } catch (e) {
 
-                error("ontrack error:", e);
+                console.error("ontrack error:", e);
 
             }
 
@@ -622,7 +622,9 @@ function enableCameraSwitch() {
                         //log("applied queued candidate"); 
                         }
 
-                    catch (e) { error("queued addIceCandidate failed:", e); }
+                    catch (e) { 
+                        console.error("queued addIceCandidate failed:", e);
+                     }
 
                 }
 
@@ -692,7 +694,7 @@ function enableCameraSwitch() {
 
         if (!localStream) {
 
-            try { await startCamera(); } catch (e) { error("cannot start camera on offer", e); return; }
+            try { await startCamera(); } catch (e) { console.error("cannot start camera on offer", e); return; }
 
         }
 
@@ -845,7 +847,7 @@ function enableCameraSwitch() {
 
     async function sendSignal(targetId, type, data) {
 
-        if (!connection) { error("SignalR not connected"); return; }
+        if (!connection) { console.error("SignalR not connected"); return; }
 
         try {
 
@@ -855,7 +857,7 @@ function enableCameraSwitch() {
 
             // fallback retry log
 
-            error("SendSignal invoke failed:", e);
+            console.error("SendSignal invoke failed:", e);
 
         }
 
@@ -869,7 +871,7 @@ function enableCameraSwitch() {
    // MAKE GLOBAL — send chat to partner from mobile & desktop
     window.sendChatToPartner = async function (partnerId, message) {
 
-        if (!connection) { error("SignalR connection missing"); return; }
+        if (!connection) { console.error("SignalR connection missing"); return; }
 
         try {
 
@@ -887,7 +889,7 @@ function enableCameraSwitch() {
 
             } catch (e2) {
 
-                error("Chat send failed (both methods):", e2);
+                console.error("Chat send failed (both methods):", e2);
 
             }
 
@@ -1538,6 +1540,8 @@ function enableCameraSwitch() {
 
             //enable Next button       
             nextBtn.style.display = "inline-block";
+            //mobile next button
+            nextChevron.style.display = "inline-block";
             //start button hide
             startBtn.style.display = "none";
             //enable stop button
@@ -1792,6 +1796,8 @@ function enableCameraSwitch() {
         //endCallLocal();
         //Next button hide
         nextBtn.style.display = "none";
+        //mobile next button
+        nextChevron.style.display = "none";
         //start button hide
         startBtn.style.display = "inline-block";
         //disable stop button
@@ -2115,6 +2121,8 @@ function enableCameraSwitch() {
         startBtn = document.getElementById("startBtn");
 
         nextBtn = document.getElementById("nextBtn");
+        //mobile next button
+        nextChevron = document.getElementById("nextChevron");
 
         stopBtn = document.getElementById("stopBtn");
 
@@ -2176,9 +2184,9 @@ function enableCameraSwitch() {
 
         // sanity check
 
-        if (!startBtn || !nextBtn || !stopBtn || !localVideo || !remoteVideo) {
+        if (!startBtn || !nextBtn || !stopBtn || !localVideo || !remoteVideo || !nextChevron) {
 
-            error("Required DOM elements missing - check IDs in HTML");
+            console.error("Required DOM elements missing - check IDs in HTML");
 
             return;
 
@@ -2204,6 +2212,8 @@ function enableCameraSwitch() {
         startBtn.addEventListener("click", onStartClicked);
 
         nextBtn.addEventListener("click", onNextClicked);
+        //next button for mobile
+        nextChevron.addEventListener("click", onNextClicked);
 
         stopBtn.addEventListener("click", onStopClicked);
         

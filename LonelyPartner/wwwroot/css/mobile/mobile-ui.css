@@ -171,9 +171,11 @@
             display: none; /* hide separate chat section on mobile */
         }
         #emojiPicker{
-            display: none; /* hide separate chat section on mobile */
+            display: none; /* mobile has emoji inbuilt */
         }
-        
+        #nextBtn{
+            display: none; /*on mobile version we have an arrow overlay*/
+        }
             /* ---------------------------------------------------------
             🔹 2. REMOTE VIDEO — LARGE & PRIORITY
             ----------------------------------------------------------*/
