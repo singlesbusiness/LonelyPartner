@@ -1543,7 +1543,7 @@ function enableCameraSwitch() {
             //enable Next button       
             nextBtn.style.display = "inline-block";
             //mobile next button
-            nextChevron.style.display = "none";
+            nextChevron.style.display = "inline-block";
             //start button hide
             startBtn.style.display = "none";
             //enable stop button
